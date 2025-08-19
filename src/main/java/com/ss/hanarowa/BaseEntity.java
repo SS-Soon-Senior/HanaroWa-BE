@@ -22,12 +22,10 @@ import lombok.ToString;
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class BaseEntity {
-	@CreatedDate
-	@Column(updatable = false, columnDefinition = "DATETIME(0)")
+	@Column(nullable = false, columnDefinition = "DATETIME(0)")
 	private LocalDateTime startedAt;
 
-	@LastModifiedDate
-	@Column(columnDefinition = "DATETIME(0)")
+	@Column(nullable=false, columnDefinition = "DATETIME(0)")
 	private LocalDateTime endedAt;
 
 }
