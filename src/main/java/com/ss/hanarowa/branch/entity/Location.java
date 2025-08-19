@@ -25,7 +25,7 @@ public class Location {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
-	@Column(nullable = false)
+	@Column(nullable = false, length = 15)
 	private String name;
 
 	@OneToMany(mappedBy = "location", cascade = CascadeType.ALL)

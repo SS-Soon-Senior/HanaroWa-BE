@@ -8,7 +8,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import com.ss.hanarowa.branch.entity.Branch;
-import com.ss.hanarowa.facility.entity.FacilityImage;
 import com.ss.hanarowa.facility.entity.FacilityTime;
 
 import jakarta.persistence.CascadeType;
@@ -22,8 +21,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -62,7 +61,7 @@ public class Member {
 	@Column(nullable = false)
 	private Role role;
 
-	@OneToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "branch",
 		foreignKey = @ForeignKey(name = "fk_Member_Branch"))
 	@OnDelete(action = OnDeleteAction.CASCADE)

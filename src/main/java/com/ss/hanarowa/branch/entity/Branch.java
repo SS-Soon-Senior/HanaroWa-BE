@@ -7,6 +7,8 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import com.ss.hanarowa.facility.entity.Facility;
+import com.ss.hanarowa.lesson.entity.Lesson;
+import com.ss.hanarowa.member.entity.Member;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -35,13 +37,13 @@ public class Branch {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
-	@Column(nullable = false)
+	@Column(nullable = false, length = 25)
 	private String name;
 
-	@Column(nullable = false)
+	@Column(nullable = false, length = 50)
 	private String address;
 
-	@Column(nullable = false)
+	@Column(nullable = false, length = 15, unique = true)
 	private String telNumber;
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -50,8 +52,14 @@ public class Branch {
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Location location;
 
-	@OneToMany(mappedBy = "Branch", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "branch", cascade = CascadeType.ALL)
 	@Builder.Default
 	private List<Facility> facilities = new ArrayList<>();
 
+	@OneToMany(mappedBy = "branch", cascade = CascadeType.ALL)
+	private List<Member> members = new ArrayList<>();
+
+
+	@OneToMany(mappedBy = "branch", cascade = CascadeType.ALL)
+	private List<Lesson> lessons = new ArrayList<>();
 }
