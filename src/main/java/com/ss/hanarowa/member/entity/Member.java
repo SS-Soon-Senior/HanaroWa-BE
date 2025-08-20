@@ -67,11 +67,11 @@ public class Member {
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Branch branch;
 
-	@OneToMany(mappedBy = "facilityTime", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
 	@Builder.Default
 	private List<FacilityTime> facilityTimes = new ArrayList<>();
 
-	@OneToMany(mappedBy = "myLesson", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
 	@Builder.Default
 	private List<MyLesson> myLessons = new ArrayList<>();
 }
