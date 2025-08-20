@@ -33,13 +33,13 @@ public class FacilityTime extends BaseEntity {
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "facility",
+	@JoinColumn(name = "facilityId",
 		foreignKey = @ForeignKey(name = "fk_FacilityTime_Facility"))
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Facility facility;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "member",
+	@JoinColumn(name = "memberId",
 		foreignKey = @ForeignKey(name = "fk_FacilityTime_Member"))
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Member member;

@@ -35,7 +35,7 @@ public class Facility {
 	private long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "branch",
+	@JoinColumn(name = "branchId",
 		foreignKey = @ForeignKey(name="fk_Facility_Branch"))
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Branch branch;

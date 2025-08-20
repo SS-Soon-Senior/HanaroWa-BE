@@ -60,7 +60,7 @@ public class Member {
 	private Role role;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "branch",
+	@JoinColumn(name = "branchId",
 		foreignKey = @ForeignKey(name = "fk_Member_Branch"))
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Branch branch;
