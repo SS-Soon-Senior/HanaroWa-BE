@@ -50,8 +50,6 @@ public class Member {
 
 	private String password;
 
-	private String account;
-
 	@Column(nullable = false)
 	private String phoneNumber;
 
