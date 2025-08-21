@@ -9,6 +9,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import com.ss.hanarowa.branch.entity.Branch;
 import com.ss.hanarowa.facility.entity.FacilityTime;
+import com.ss.hanarowa.lesson.entity.Lesson;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -72,4 +73,16 @@ public class Member {
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
 	@Builder.Default
 	private List<MyLesson> myLessons = new ArrayList<>();
+
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	@Builder.Default
+	private List<Review> reviews = new ArrayList<>();
+
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	@Builder.Default
+	private List<Advice> advices = new ArrayList<>();
+
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	@Builder.Default
+	private List<Lesson> lessons = new ArrayList<>();
 }
