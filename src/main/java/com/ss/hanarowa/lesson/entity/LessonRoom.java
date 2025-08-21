@@ -37,7 +37,7 @@ public class LessonRoom {
 
 	@OneToMany(mappedBy = "lessonRoom", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
-	private List<LessonGisu> lessonGisu = new ArrayList<>();
+	private List<LessonGisu> lessonGisus = new ArrayList<>();
 
 	@OneToMany(mappedBy = "lessonRoom", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default

@@ -28,7 +28,7 @@ public class Location {
 	@Column(nullable = false, length = 15)
 	private String name;
 
-	@OneToMany(mappedBy = "location", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "location", cascade = CascadeType.ALL,orphanRemoval = true)
 	@Builder.Default
 	private List<Branch> branches = new ArrayList<>();
 }

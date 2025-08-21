@@ -1,15 +1,11 @@
 package com.ss.hanarowa.lesson.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import com.ss.hanarowa.branch.entity.Branch;
 import com.ss.hanarowa.member.entity.Member;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -21,7 +17,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -59,7 +54,6 @@ public class Lesson {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "branchId", nullable = false,
 		foreignKey = @ForeignKey(name = "fk_Lesson_Branch"))
-	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Branch branch;
 
 	@ManyToOne(fetch = FetchType.LAZY)

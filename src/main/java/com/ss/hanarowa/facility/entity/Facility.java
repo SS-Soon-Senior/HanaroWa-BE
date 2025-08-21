@@ -41,10 +41,9 @@ public class Facility {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "branchId", nullable = false,
 		foreignKey = @ForeignKey(name="fk_Facility_Branch"))
-	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Branch branch;
 
-	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
 	private List<FacilityImage> facilityImages = new ArrayList<>();
 }
