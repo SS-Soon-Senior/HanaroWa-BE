@@ -1,11 +1,12 @@
-package com.ss.hanarowa.facility.entity;
+package com.ss.hanarowa.member.entity;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import com.ss.hanarowa.BaseEntity;
-import com.ss.hanarowa.member.entity.Member;
+import com.ss.hanarowa.branch.entity.Branch;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
@@ -20,25 +21,22 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
+@EqualsAndHashCode(callSuper=false)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FacilityTime extends BaseEntity {
+public class Advice extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "facilityId",
-		foreignKey = @ForeignKey(name = "fk_FacilityTime_Facility"), nullable = false)
-	private Facility facility;
+	@Column(nullable = false)
+	private Category category;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "memberId",
-		foreignKey = @ForeignKey(name = "fk_FacilityTime_Member"), nullable = false)
+		foreignKey = @ForeignKey(name = "fk_Advice_Member"), nullable = false)
 	private Member member;
 }

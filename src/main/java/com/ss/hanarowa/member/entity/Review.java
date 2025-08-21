@@ -1,13 +1,12 @@
-package com.ss.hanarowa.facility.entity;
+package com.ss.hanarowa.member.entity;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import com.ss.hanarowa.BaseEntity;
-import com.ss.hanarowa.member.entity.Member;
+import com.ss.hanarowa.lesson.entity.Lesson;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,28 +16,30 @@ import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FacilityTime extends BaseEntity {
+public class Review {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "facilityId",
-		foreignKey = @ForeignKey(name = "fk_FacilityTime_Facility"), nullable = false)
-	private Facility facility;
+	@Column(nullable = false)
+	private int rating;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	private String reviewTxt;
+
+	@ManyToOne
 	@JoinColumn(name = "memberId",
-		foreignKey = @ForeignKey(name = "fk_FacilityTime_Member"), nullable = false)
+		foreignKey = @ForeignKey(name = "fk_Review_Member"), nullable = false)
 	private Member member;
+
+	@ManyToOne
+	@JoinColumn(name = "lessonId",
+		foreignKey = @ForeignKey(name = "fk_Review_Lesson"), nullable = false)
+	private Lesson lesson;
 }
