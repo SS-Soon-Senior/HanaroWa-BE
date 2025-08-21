@@ -7,6 +7,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import com.ss.hanarowa.BaseEntity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
@@ -33,12 +34,11 @@ public class Curriculum extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(nullable = false, length = 100)
 	private String content;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "lessonId",
-		foreignKey = @ForeignKey(name = "fk_Curriculum_Lesson"))
-	@OnDelete(action = OnDeleteAction.CASCADE)
-	private Lesson lesson;
-
+	@JoinColumn(name = "lessonGisuId", nullable = false,
+		foreignKey = @ForeignKey(name = "fk_Curriculum_LessonGisu"))
+	private LessonGisu lessonGisu;
 }

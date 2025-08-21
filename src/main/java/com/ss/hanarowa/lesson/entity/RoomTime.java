@@ -1,11 +1,7 @@
-package com.ss.hanarowa.facility.entity;
+package com.ss.hanarowa.lesson.entity;
 
+import com.ss.hanarowa.BaseEntity;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
-
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
@@ -16,27 +12,22 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FacilityImage {
+@Getter @Setter
+public class RoomTime extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-
-	@Column(nullable = false)
-	private String facilityImage;
+	private long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "facilityId", nullable = false,
-		foreignKey = @ForeignKey(name="fk_FacilityImage_Facility"))
-	private Facility facility;
-
+	@JoinColumn(name = "lessonRoomId", nullable = false,
+		foreignKey = @ForeignKey(name="fk_RoomTime_LessonRoom"))
+	private LessonRoom lessonRoom;
 }

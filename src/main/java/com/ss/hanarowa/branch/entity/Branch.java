@@ -47,19 +47,17 @@ public class Branch {
 	private String telNumber;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "locationId",
+	@JoinColumn(name = "locationId", nullable = false,
 		foreignKey = @ForeignKey(name="fk_Branch_Location"))
-	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Location location;
 
-	@OneToMany(mappedBy = "branch", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
 	private List<Facility> facilities = new ArrayList<>();
 
-	@OneToMany(mappedBy = "branch", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Member> members = new ArrayList<>();
 
-
-	@OneToMany(mappedBy = "branch", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Lesson> lessons = new ArrayList<>();
 }

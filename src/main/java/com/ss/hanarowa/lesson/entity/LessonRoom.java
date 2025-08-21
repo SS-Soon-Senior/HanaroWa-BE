@@ -1,10 +1,7 @@
-package com.ss.hanarowa.facility.entity;
+package com.ss.hanarowa.lesson.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import com.ss.hanarowa.branch.entity.Branch;
 
@@ -21,29 +18,33 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-
+import lombok.Setter;
 
 @Entity
-@Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class Facility {
+@Getter @Setter
+public class LessonRoom {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
-	@Column(nullable = false, length = 15)
+	@Column(nullable = false, length = 20)
 	private String name;
+
+	@OneToMany(mappedBy = "lessonRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+	@Builder.Default
+	private List<LessonGisu> lessonGisus = new ArrayList<>();
+
+	@OneToMany(mappedBy = "lessonRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+	@Builder.Default
+	private List<RoomTime> roomTimes = new ArrayList<>();
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "branchId", nullable = false,
-		foreignKey = @ForeignKey(name="fk_Facility_Branch"))
+		foreignKey = @ForeignKey(name = "fk_LessonRoom_Branch"))
 	private Branch branch;
-
-	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true)
-	@Builder.Default
-	private List<FacilityImage> facilityImages = new ArrayList<>();
 }
