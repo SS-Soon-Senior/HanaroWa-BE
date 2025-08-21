@@ -1,8 +1,5 @@
 package com.ss.hanarowa.lesson.entity;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import com.ss.hanarowa.branch.entity.Branch;
 import com.ss.hanarowa.member.entity.Member;
 

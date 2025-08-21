@@ -1,10 +1,6 @@
 package com.ss.hanarowa.member.entity;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import com.ss.hanarowa.BaseEntity;
-import com.ss.hanarowa.branch.entity.Branch;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

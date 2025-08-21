@@ -4,9 +4,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import com.ss.hanarowa.branch.entity.Branch;
 import com.ss.hanarowa.facility.entity.FacilityTime;
 import com.ss.hanarowa.lesson.entity.Lesson;
