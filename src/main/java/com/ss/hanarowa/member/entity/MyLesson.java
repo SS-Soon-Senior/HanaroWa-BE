@@ -33,12 +33,10 @@ public class MyLesson {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "memberId",
 		foreignKey = @ForeignKey(name = "fk_MyLesson_Member"))
-	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Member member;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "lessonId",
 		foreignKey = @ForeignKey(name = "fk_MyLesson_Lesson"))
-	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Lesson lesson;
 }

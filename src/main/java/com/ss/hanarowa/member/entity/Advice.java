@@ -38,6 +38,5 @@ public class Advice extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "memberId",
 		foreignKey = @ForeignKey(name = "fk_Advice_Member"))
-	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Member member;
 }

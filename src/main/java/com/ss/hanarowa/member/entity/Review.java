@@ -36,12 +36,10 @@ public class Review {
 	@ManyToOne
 	@JoinColumn(name = "memberId",
 		foreignKey = @ForeignKey(name = "fk_Review_Member"))
-	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Member member;
 
 	@ManyToOne
 	@JoinColumn(name = "lessonId",
 		foreignKey = @ForeignKey(name = "fk_Review_Lesson"))
-	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Lesson lesson;
 }
