@@ -1,13 +1,10 @@
 package com.ss.hanarowa.lesson.entity;
 
-
-
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import com.ss.hanarowa.BaseEntity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
@@ -16,35 +13,24 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@EqualsAndHashCode(callSuper = true)
-@Builder
-@Data
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-public class Curriculum extends BaseEntity {
+@Builder
+@Getter @Setter
+public class RoomTime extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-
-	@Column(nullable = false, length = 100)
-	private String content;
-
-	// @ManyToOne(fetch = FetchType.LAZY)
-	// @JoinColumn(name = "lessonId",
-	// 	foreignKey = @ForeignKey(name = "fk_Curriculum_Lesson"))
-	// @OnDelete(action = OnDeleteAction.CASCADE)
-	// private Lesson lesson;
+	private long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "lessonGisuId",
-		foreignKey = @ForeignKey(name = "fk_Curriculum_LessonGisu"))
-	private LessonGisu lessonGisu;
+	@JoinColumn(name = "lessonRoomId",
+		foreignKey = @ForeignKey(name="fk_RoomTime_LessonRoom"))
+	private LessonRoom lessonRoom;
 }

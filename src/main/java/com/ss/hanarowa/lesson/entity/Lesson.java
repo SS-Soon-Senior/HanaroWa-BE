@@ -70,7 +70,7 @@ public class Lesson {
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Branch branch;
 
-	@OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL)
-	@Builder.Default
-	private List<Curriculum> curriculums = new ArrayList<>();
+	// @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL)
+	// @Builder.Default
+	// private List<Curriculum> curriculums = new ArrayList<>();
 }

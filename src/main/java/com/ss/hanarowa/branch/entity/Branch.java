@@ -59,7 +59,6 @@ public class Branch {
 	@OneToMany(mappedBy = "branch", cascade = CascadeType.ALL)
 	private List<Member> members = new ArrayList<>();
 
-
 	@OneToMany(mappedBy = "branch", cascade = CascadeType.ALL)
 	private List<Lesson> lessons = new ArrayList<>();
 }
