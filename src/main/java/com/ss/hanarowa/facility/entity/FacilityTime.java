@@ -34,11 +34,11 @@ public class FacilityTime extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "facilityId",
-		foreignKey = @ForeignKey(name = "fk_FacilityTime_Facility"))
+		foreignKey = @ForeignKey(name = "fk_FacilityTime_Facility"), nullable = false)
 	private Facility facility;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "memberId",
-		foreignKey = @ForeignKey(name = "fk_FacilityTime_Member"))
+		foreignKey = @ForeignKey(name = "fk_FacilityTime_Member"), nullable = false)
 	private Member member;
 }

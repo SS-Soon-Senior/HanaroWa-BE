@@ -62,7 +62,7 @@ public class Member {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "branchId",
-		foreignKey = @ForeignKey(name = "fk_Member_Branch"))
+		foreignKey = @ForeignKey(name = "fk_Member_Branch"), nullable = false)
 	private Branch branch;
 
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)

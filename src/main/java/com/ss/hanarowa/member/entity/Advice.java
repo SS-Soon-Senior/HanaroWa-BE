@@ -37,6 +37,6 @@ public class Advice extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "memberId",
-		foreignKey = @ForeignKey(name = "fk_Advice_Member"))
+		foreignKey = @ForeignKey(name = "fk_Advice_Member"), nullable = false)
 	private Member member;
 }

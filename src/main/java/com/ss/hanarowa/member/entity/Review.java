@@ -35,11 +35,11 @@ public class Review {
 
 	@ManyToOne
 	@JoinColumn(name = "memberId",
-		foreignKey = @ForeignKey(name = "fk_Review_Member"))
+		foreignKey = @ForeignKey(name = "fk_Review_Member"), nullable = false)
 	private Member member;
 
 	@ManyToOne
 	@JoinColumn(name = "lessonId",
-		foreignKey = @ForeignKey(name = "fk_Review_Lesson"))
+		foreignKey = @ForeignKey(name = "fk_Review_Lesson"), nullable = false)
 	private Lesson lesson;
 }

@@ -32,11 +32,11 @@ public class MyLesson {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "memberId",
-		foreignKey = @ForeignKey(name = "fk_MyLesson_Member"))
+		foreignKey = @ForeignKey(name = "fk_MyLesson_Member"), nullable = false)
 	private Member member;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "lessonId",
-		foreignKey = @ForeignKey(name = "fk_MyLesson_Lesson"))
+		foreignKey = @ForeignKey(name = "fk_MyLesson_Lesson"), nullable = false)
 	private Lesson lesson;
 }
