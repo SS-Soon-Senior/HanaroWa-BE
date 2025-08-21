@@ -7,6 +7,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import com.ss.hanarowa.branch.entity.Branch;
+import com.ss.hanarowa.member.entity.Member;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -49,15 +50,6 @@ public class Lesson {
 	@Column(nullable = false)
 	private String description;
 
-	@Column(nullable = false, length = 15)
-	private String lessonRoom;
-
-	@Column(nullable = false)
-	private int capacity;
-
-	@Column(nullable = false)
-	private int lessonPrice;
-
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Category category;
@@ -65,12 +57,13 @@ public class Lesson {
 	private String lessonImg;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "branchId",
+	@JoinColumn(name = "branchId", nullable = false,
 		foreignKey = @ForeignKey(name = "fk_Lesson_Branch"))
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Branch branch;
 
-	// @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL)
-	// @Builder.Default
-	// private List<Curriculum> curriculums = new ArrayList<>();
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "memberId",
+		foreignKey = @ForeignKey(name = "fk_Lesson_Member"))
+	private Member member;
 }

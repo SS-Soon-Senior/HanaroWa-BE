@@ -47,12 +47,12 @@ public class LessonGisu {
 	private List<Curriculum> curriculums = new ArrayList<>();
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "lessonId",
+	@JoinColumn(name = "lessonId", nullable = false,
 		foreignKey = @ForeignKey(name="fk_LessonGisu_Lesson"))
 	private Lesson lesson;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "lessonRoomId",
+	@JoinColumn(name = "lessonRoomId", nullable = false,
 		foreignKey = @ForeignKey(name="fk_LessonGisu_LessonRoom"))
 	private LessonRoom lessonRoom;
 }

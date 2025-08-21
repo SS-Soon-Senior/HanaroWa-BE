@@ -30,7 +30,7 @@ public class RoomTime extends BaseEntity {
 	private long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "lessonRoomId",
+	@JoinColumn(name = "lessonRoomId", nullable = false,
 		foreignKey = @ForeignKey(name="fk_RoomTime_LessonRoom"))
 	private LessonRoom lessonRoom;
 }

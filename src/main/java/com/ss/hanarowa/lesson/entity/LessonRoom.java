@@ -44,7 +44,7 @@ public class LessonRoom {
 	private List<RoomTime> roomTimes = new ArrayList<>();
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "branchId",
+	@JoinColumn(name = "branchId", nullable = false,
 		foreignKey = @ForeignKey(name = "fk_LessonRoom_Branch"))
 	private Branch branch;
 }

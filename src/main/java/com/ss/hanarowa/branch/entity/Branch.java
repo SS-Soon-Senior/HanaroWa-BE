@@ -47,7 +47,7 @@ public class Branch {
 	private String telNumber;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "locationId",
+	@JoinColumn(name = "locationId", nullable = false,
 		foreignKey = @ForeignKey(name="fk_Branch_Location"))
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Location location;

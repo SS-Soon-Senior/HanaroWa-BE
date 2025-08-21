@@ -37,14 +37,8 @@ public class Curriculum extends BaseEntity {
 	@Column(nullable = false, length = 100)
 	private String content;
 
-	// @ManyToOne(fetch = FetchType.LAZY)
-	// @JoinColumn(name = "lessonId",
-	// 	foreignKey = @ForeignKey(name = "fk_Curriculum_Lesson"))
-	// @OnDelete(action = OnDeleteAction.CASCADE)
-	// private Lesson lesson;
-
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "lessonGisuId",
+	@JoinColumn(name = "lessonGisuId", nullable = false,
 		foreignKey = @ForeignKey(name = "fk_Curriculum_LessonGisu"))
 	private LessonGisu lessonGisu;
 }

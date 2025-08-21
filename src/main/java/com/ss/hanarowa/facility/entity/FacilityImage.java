@@ -35,7 +35,7 @@ public class FacilityImage {
 	private String facilityImage;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "facilityId",
+	@JoinColumn(name = "facilityId", nullable = false,
 		foreignKey = @ForeignKey(name="fk_FacilityImage_Facility"))
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Facility facility;

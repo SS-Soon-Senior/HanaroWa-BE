@@ -9,6 +9,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import com.ss.hanarowa.branch.entity.Branch;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
@@ -34,8 +35,11 @@ public class Facility {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
+	@Column(nullable = false, length = 15)
+	private String name;
+
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "branchId",
+	@JoinColumn(name = "branchId", nullable = false,
 		foreignKey = @ForeignKey(name="fk_Facility_Branch"))
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Branch branch;
