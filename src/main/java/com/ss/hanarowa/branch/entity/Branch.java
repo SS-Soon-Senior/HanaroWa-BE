@@ -3,9 +3,6 @@ package com.ss.hanarowa.branch.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import com.ss.hanarowa.facility.entity.Facility;
 import com.ss.hanarowa.lesson.entity.Lesson;
 import com.ss.hanarowa.member.entity.Member;
