@@ -48,7 +48,13 @@ public class Member {
 
 	private String password;
 
-	@Column
+	// 소셜 로그인
+	@Column(length = 20)
+	private String provider;
+
+	private String providerId;
+
+	@Column(nullable = false)
 	private String phoneNumber;
 
 	private LocalDate deletedAt;
