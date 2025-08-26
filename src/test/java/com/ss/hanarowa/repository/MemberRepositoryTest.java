@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.ss.hanarowa.member.entity.Member;
+import com.ss.hanarowa.member.entity.Role;
 import com.ss.hanarowa.member.repository.MemberRepository;
 
 class MemberRepositoryTest extends RepositoryTest{
@@ -17,12 +18,15 @@ class MemberRepositoryTest extends RepositoryTest{
 		Member m = Member.builder()
 			.email("yo@naver.com")
 			.name("yoyo")
-			.password("dodo").build();
+			.password("dodo")
+			.role(Role.USERS)
+			.build();
 
 		Member mbr = Member.builder()
 			.email("yo2@naver.com")
 			.name("momo")
 			.password("dododo")
+			.role(Role.USERS)
 			.build();
 
 		Member savedM = memberRepository.save(m);

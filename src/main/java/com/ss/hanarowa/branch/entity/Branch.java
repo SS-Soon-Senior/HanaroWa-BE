@@ -53,8 +53,10 @@ public class Branch {
 	private List<Facility> facilities = new ArrayList<>();
 
 	@OneToMany(mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
+	@Builder.Default
 	private List<Member> members = new ArrayList<>();
 
 	@OneToMany(mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
+	@Builder.Default
 	private List<Lesson> lessons = new ArrayList<>();
 }
