@@ -54,7 +54,7 @@ public class Member {
 
 	private String providerId;
 
-	@Column(nullable = false)
+	@Column
 	private String phoneNumber;
 
 	private LocalDate deletedAt;
