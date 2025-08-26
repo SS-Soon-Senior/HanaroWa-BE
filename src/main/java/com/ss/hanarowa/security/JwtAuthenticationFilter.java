@@ -3,7 +3,6 @@ package com.ss.hanarowa.security;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
@@ -13,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ss.hanarowa.member.dto.MemberAuthDTO;
 import com.ss.hanarowa.member.dto.MemberRegistDTO;
 import com.ss.hanarowa.member.entity.Role;
 
@@ -25,10 +25,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
 	private final String[] excludePatterns = {
-		"/api/subscriber/login",  // spring-security
+		"/api/member/regist",  // 회원가입
 		"/api/subscriber/signup",
 		"/api/public/**",
-		"/api/auth/**",  // signin / signup
+		"/api/auth/**",
 		"/favicon.ico",
 		"/actuator/**",
 		"/*.html",
@@ -62,7 +62,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			String name = (String)claims.get("name");
 			// boolean social = (Boolean)claims.get("social");
 			Role role = (Role)claims.get("role");
-			MemberRegistDTO dto = new MemberRegistDTO(email, "", name, role);
+			MemberAuthDTO dto = new MemberAuthDTO(email, "", name, role);
 			UsernamePasswordAuthenticationToken authenticationToken = new
 				UsernamePasswordAuthenticationToken(dto, null, dto.getAuthorities());
 
