@@ -10,6 +10,9 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import com.ss.hanarowa.member.entity.Member;
 
+import lombok.Getter;
+
+@Getter
 public class CustomOAuth2User implements OAuth2User {
 	private final Member member;
 	private final Map<String, Object> attributes;
@@ -33,11 +36,6 @@ public class CustomOAuth2User implements OAuth2User {
 	@Override
 	public String getName() {
 		return member.getName();
-	}
-
-	@Override
-	public Member getMember() {
-		return member;
 	}
 
 	public String getPhoneNumber(){
