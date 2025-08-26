@@ -3,7 +3,7 @@ package com.ss.hanarowa.response.code.status;
 import org.springframework.http.HttpStatus;
 
 import com.ss.hanarowa.response.code.BaseErrorCode;
-import com.ss.hanarowa.response.code.ErrorReasonDTO;
+import com.ss.hanarowa.response.code.ReasonDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,8 +24,8 @@ public enum ErrorStatus implements BaseErrorCode {
 	private final String message;
 
 	@Override
-	public ErrorReasonDTO getReasonHttpStatus() {
-		return ErrorReasonDTO.builder()
+	public ReasonDTO getReasonHttpStatus() {
+		return ReasonDTO.builder()
 							 .isSuccess(false)
 							 .code(code)
 							 .message(message)

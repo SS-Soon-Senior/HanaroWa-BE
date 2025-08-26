@@ -1,6 +1,6 @@
 package com.ss.hanarowa.response.code;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class ReasonDTO {
-	private HttpStatus httpStatus;
+	private HttpStatusCode httpStatusCode;
 
 	private final boolean isSuccess;
 	private final String code;
