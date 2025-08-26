@@ -14,7 +14,8 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hana7.springdemo.jpa.dto.SubscriberDTO;
+import com.ss.hanarowa.member.dto.MemberRegistDTO;
+import com.ss.hanarowa.member.entity.Role;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -34,7 +35,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		"/*.html",
 		"/swagger-ui/**",
 		"/v3/api-docs/**",
-		"/broadcast/**"
+		"/hanarowa/api-docs/**",
+		"/broadcast/**",
+		"/swagger.html"
+
 	};
 
 	@Override
@@ -56,10 +60,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			Map<String, Object> claims = JwtUtil.validateToken(authHeader.substring(7));
 
 			String email = (String)claims.get("email");
-			String nickname = (String)claims.get("nickname");
-			boolean social = (Boolean)claims.get("social");
-			List<String> roleNames = (List<String>)claims.get("roleNames");
-			SubscriberDTO dto = new SubscriberDTO(email, "", nickname, social, roleNames);
+			String name = (String)claims.get("name");
+			// boolean social = (Boolean)claims.get("social");
+			Role role = (Role)claims.get("role");
+			MemberRegistDTO dto = new MemberRegistDTO(email, "", name, role);
 			UsernamePasswordAuthenticationToken authenticationToken = new
 				UsernamePasswordAuthenticationToken(dto, null, dto.getAuthorities());
 
