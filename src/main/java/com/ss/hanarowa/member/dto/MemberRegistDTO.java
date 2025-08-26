@@ -47,7 +47,7 @@ public class MemberRegistDTO extends User{
 	public Map<String, Object> getClaims() {
 		Map<String, Object> map = new HashMap<>();
 		map.put("email", email);
-		map.put("pwd", password);
+		map.put("password", password);
 		map.put("name", name);
 		map.put("role", role);
 
