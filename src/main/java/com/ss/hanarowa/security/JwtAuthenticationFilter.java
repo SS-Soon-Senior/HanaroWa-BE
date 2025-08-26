@@ -14,7 +14,6 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hana7.springdemo.jpa.dto.SubscriberDTO;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

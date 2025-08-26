@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.ss.hanarowa.member.entity.Member;
 import com.ss.hanarowa.member.repository.MemberRepository;
+import com.ss.hanarowa.security.CustomOAuth2User;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +28,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 		Member member = principal.getMember();
 
 		String redirectUrl;
-		if (member.getPhone() == null || member.getBirth() == null) {
+		if (member.getPhoneNumber() == null || member.getBirth() == null) {
 			redirectUrl = "http://localhost:3000/auth/signup/info";
 		} else {
 			redirectUrl = "http://localhost:3000";
