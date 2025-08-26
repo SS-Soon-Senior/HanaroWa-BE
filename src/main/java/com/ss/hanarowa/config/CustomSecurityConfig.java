@@ -19,10 +19,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.hana7.springdemo.security.JwtAuthenticationFilter;
-import com.hana7.springdemo.security.handler.CustomAccessDeiniedHandler;
-import com.hana7.springdemo.security.handler.LoginFailureHandler;
-import com.hana7.springdemo.security.handler.LoginSuccessHandler;
+import com.ss.hanarowa.security.JwtAuthenticationFilter;
+import com.ss.hanarowa.security.handler.CustomAccessDeiniedHandler;
+import com.ss.hanarowa.security.handler.LoginFailureHandler;
+import com.ss.hanarowa.security.handler.LoginSuccessHandler;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -41,7 +41,7 @@ public class CustomSecurityConfig {
 			.cors(config -> config.configurationSource(corsConfigurationSource()))
 			.sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.formLogin(form -> form
-				.loginPage("/api/subscriber/login")
+				.loginPage("/auth/login")
 				// .loginProcessingUrl("/api/subscriber/login")
 				.successHandler(new LoginSuccessHandler())
 				.failureHandler(new LoginFailureHandler())
