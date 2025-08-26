@@ -12,7 +12,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hana7.springdemo.jpa.dto.SubscriberDTO;
 

@@ -34,6 +34,9 @@ public class Facility {
 	@Column(nullable = false, length = 15)
 	private String name;
 
+	@Column(nullable = false, length = 255)
+	private String description;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "branchId", nullable = false,
 		foreignKey = @ForeignKey(name="fk_Facility_Branch"))
