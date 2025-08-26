@@ -26,10 +26,12 @@ public class MemberServiceImpl implements MemberService {
 		});
 
 		memberRegistDTO.setPassword(passwordEncoder.encode(memberRegistDTO.getPassword()));
+
 		Member member = Member.builder()
 			.email(memberRegistDTO.getEmail())
 			.name(memberRegistDTO.getName())
 			.password(memberRegistDTO.getPassword())
+			.role(memberRegistDTO.getRole())
 			.build();
 
 		memberRepository.save(member);
