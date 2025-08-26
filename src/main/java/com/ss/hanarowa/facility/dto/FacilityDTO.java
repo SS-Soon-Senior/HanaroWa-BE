@@ -2,16 +2,16 @@ package com.ss.hanarowa.facility.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter @Setter
 public class FacilityDTO {
 	private long facilityId;
 	private String facilityName;
-	private String description;
-	private long branchId;
+	private String facilityDescription;
 }

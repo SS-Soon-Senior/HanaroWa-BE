@@ -1,4 +1,8 @@
 package com.ss.hanarowa.facility.repository;
 
-public class FacilityRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.ss.hanarowa.facility.entity.Facility;
+
+public interface FacilityRepository extends JpaRepository<Facility, Long> {
 }
