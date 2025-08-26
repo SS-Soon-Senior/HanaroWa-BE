@@ -1,6 +1,7 @@
 package com.ss.hanarowa.response.code.status;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 
 import com.ss.hanarowa.response.code.BaseErrorCode;
 import com.ss.hanarowa.response.code.ReasonDTO;
@@ -19,16 +20,17 @@ public enum ErrorStatus implements BaseErrorCode {
 	MEMBER_NOT_AUTHORITY(HttpStatus.FORBIDDEN, "MEMBER403", "권한이 없습니다."),
 	MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER404", "해당 유저가 없습니다");
 
-	private final HttpStatus httpStatus;
+	private final HttpStatusCode httpStatusCode;
 	private final String code;
 	private final String message;
 
 	@Override
 	public ReasonDTO getReasonHttpStatus() {
 		return ReasonDTO.builder()
-							 .isSuccess(false)
-							 .code(code)
-							 .message(message)
-							 .build();
+						.httpStatusCode(httpStatusCode)
+						.isSuccess(false)
+						.code(code)
+						.message(message)
+						.build();
 	}
 }

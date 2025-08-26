@@ -1,6 +1,7 @@
 package com.ss.hanarowa.response.code.status;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 
 import com.ss.hanarowa.response.code.BaseCode;
 import com.ss.hanarowa.response.code.ReasonDTO;
@@ -14,17 +15,17 @@ public enum SuccessStatus implements BaseCode {
 
 	SUCCESS(HttpStatus.OK, "COMMON 200", "성공입니다.");
 
-	private final HttpStatus status;
+	private final HttpStatusCode httpStatusCode;
 	private final String code;
 	private final String message;
 
 	@Override
 	public ReasonDTO getReasonHttpStatus() {
 		return ReasonDTO.builder()
-						.message(message)
+						.httpStatusCode(httpStatusCode)
+						.isSuccess(false)
 						.code(code)
-						.isSuccess(true)
-						.httpStatusCode(status)
+						.message(message)
 						.build();
 	}
 }
