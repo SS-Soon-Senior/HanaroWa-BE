@@ -1,5 +1,5 @@
 package com.ss.hanarowa.response.code;
 
 public interface BaseCode {
-	public ReasonDTO getReasonHttpStatus();
+	public ReasonDTO getReason();
 }

@@ -20,7 +20,7 @@ public enum SuccessStatus implements BaseCode {
 	private final String message;
 
 	@Override
-	public ReasonDTO getReasonHttpStatus() {
+	public ReasonDTO getReason() {
 		return ReasonDTO.builder()
 						.httpStatusCode(httpStatusCode)
 						.isSuccess(false)
