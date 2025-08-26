@@ -48,6 +48,12 @@ public class Member {
 
 	private String password;
 
+	// 소셜 로그인
+	@Column(length = 20)
+	private String provider;
+
+	private String providerId;
+
 	@Column(nullable = false)
 	private String phoneNumber;
 
