@@ -43,12 +43,12 @@ public class Member {
 	@Column(nullable = false)
 	private String email;
 
-	@Column(nullable = false)
+	@Column
 	private LocalDate birth;
 
 	private String password;
 
-	@Column(nullable = false)
+	@Column
 	private String phoneNumber;
 
 	private LocalDate deletedAt;
