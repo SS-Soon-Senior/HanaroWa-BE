@@ -9,6 +9,7 @@ import javax.crypto.SecretKey;
 
 import org.springframework.security.core.Authentication;
 
+import com.ss.hanarowa.member.dto.MemberAuthDTO;
 import com.ss.hanarowa.member.dto.MemberRegistDTO;
 import com.ss.hanarowa.security.exception.CustomJwtException;
 
@@ -62,8 +63,8 @@ public class JwtUtil {
 	}
 
 	public static Map<String, Object> authenticationToClaims(Authentication authentication) {
-		MemberRegistDTO d = (MemberRegistDTO)authentication.getPrincipal();
-		MemberRegistDTO dto = new MemberRegistDTO(d.getEmail(), "", d.getName(),d.getRole());
+		MemberAuthDTO d = (MemberAuthDTO)authentication.getPrincipal();
+		MemberAuthDTO dto = new MemberAuthDTO(d.getEmail(), "", d.getName(),d.getRole());
 		Map<String, Object> claims = dto.getClaims();
 		String accessToken = JwtUtil.generateToken(claims, 10);
 		String refreshToken = JwtUtil.generateToken(claims, 60 * 24);
