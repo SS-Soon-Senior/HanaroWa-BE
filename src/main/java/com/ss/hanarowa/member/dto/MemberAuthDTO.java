@@ -1,22 +1,26 @@
 package com.ss.hanarowa.member.dto;
 
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+
 import com.ss.hanarowa.member.entity.Role;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Builder
-@AllArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
-public class MemberRegistDTO{
+public class MemberAuthDTO extends User {
+	private Long id;
+
 	private String name;
 
 	@Email(message = "올바른 이메일 형식이어야 합니다.")
@@ -30,7 +34,24 @@ public class MemberRegistDTO{
 	)
 	private String password;
 
-	@Builder.Default
-	private Role role = Role.USERS;
+	private Role role;
 
+
+	public MemberAuthDTO(String email, String name, String password, Role role) {
+		super(email, password, Collections.singletonList(new SimpleGrantedAuthority(role.name())));
+		this.email = email;
+		this.password = password;
+		this.name = name;
+		this.role = role;
+	}
+
+	public Map<String, Object> getClaims() {
+		Map<String, Object> map = new HashMap<>();
+		map.put("email", email);
+		map.put("password", password);
+		map.put("name", name);
+		map.put("role", role);
+
+		return map;
+	}
 }
