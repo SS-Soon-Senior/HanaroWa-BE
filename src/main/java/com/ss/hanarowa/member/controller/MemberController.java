@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ss.hanarowa.member.dto.MemberAuthDTO;
 import com.ss.hanarowa.member.dto.MemberInfoDTO;
 import com.ss.hanarowa.member.dto.MemberRegistDTO;
 import com.ss.hanarowa.member.service.MemberService;
@@ -36,7 +37,7 @@ public class MemberController {
 	@Operation(summary = "전화번호, 생일등록")
 	@Tag(name = "추가정보등록")
 	public  ResponseEntity<?> info(@Valid @RequestBody MemberInfoDTO memberInfoDTO, Authentication authentication) {
-		MemberRegistDTO member = (MemberRegistDTO)authentication.getPrincipal();
+		MemberAuthDTO member = (MemberAuthDTO)authentication.getPrincipal();
 		Long id = member.getId();
 
 		memberService.infoRegist(memberInfoDTO, id);
