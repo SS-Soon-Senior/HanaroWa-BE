@@ -9,4 +9,6 @@ public interface FacilityService {
 	List<FacilityResponseDTO> getAllFacilities(long branchId);
 
 	FacilityDetailResponseDTO getDetailFacility(Long facilityId);
+
+	void deleteFacilityReservation(Long reservationId);
 }

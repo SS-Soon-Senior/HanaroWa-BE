@@ -3,6 +3,8 @@ package com.ss.hanarowa.domain.facility.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,5 +38,12 @@ public class FacilityController {
 	public ResponseEntity<ApiResponse<FacilityDetailResponseDTO>> getDetailFacility(@PathVariable Long facilityId) {
 		FacilityDetailResponseDTO facilityDetailResponseDTO = facilityService.getDetailFacility(facilityId);
 		return ResponseEntity.ok(ApiResponse.onSuccess(facilityDetailResponseDTO));
+	}
+
+	@DeleteMapping("/{reservationId}")
+	@Tag(name = "시설 예약 취소")
+	public ResponseEntity<ApiResponse<Void>> deleteFacilityReservation(@PathVariable Long reservationId){
+		facilityService.deleteFacilityReservation(reservationId);
+		return ResponseEntity.ok(ApiResponse.onSuccess(null));
 	}
 }
