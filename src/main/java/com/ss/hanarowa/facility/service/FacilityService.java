@@ -2,8 +2,8 @@ package com.ss.hanarowa.facility.service;
 
 import java.util.List;
 
-import com.ss.hanarowa.facility.dto.FacilityDTO;
+import com.ss.hanarowa.facility.dto.reponse.FacilityResponseDTO;
 
 public interface FacilityService {
-	List<FacilityDTO> getAllFacilities();
+	List<FacilityResponseDTO> getAllFacilities(long branchId);
 }
