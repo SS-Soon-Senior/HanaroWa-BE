@@ -1,4 +1,4 @@
-package com.ss.hanarowa.admin.dto;
+package com.ss.hanarowa.admin.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AdminLessonListDTO {
+public class AdminLessonListResponseDTO {
 	String lessonName;
 	String instructor;
 	String instruction;
