@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import com.ss.hanarowa.response.ApiResponse;
-import com.ss.hanarowa.response.code.status.ErrorStatus;
+import com.ss.hanarowa.global.response.ApiResponse;
+import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -84,4 +84,3 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 			.body(body);
 	}
 }
-

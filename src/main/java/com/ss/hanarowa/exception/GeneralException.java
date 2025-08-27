@@ -1,7 +1,7 @@
 package com.ss.hanarowa.exception;
 
-import com.ss.hanarowa.response.code.BaseErrorCode;
-import com.ss.hanarowa.response.code.ReasonDTO;
+import com.ss.hanarowa.global.response.code.BaseErrorCode;
+import com.ss.hanarowa.global.response.code.ReasonDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
