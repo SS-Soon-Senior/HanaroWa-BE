@@ -1,16 +1,9 @@
 package com.ss.hanarowa.domain.lesson.dto.response;
 
-import com.ss.hanarowa.domain.branch.entity.Branch;
-import com.ss.hanarowa.domain.lesson.entity.Category;
-import com.ss.hanarowa.domain.member.entity.Member;
+import java.util.List;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import com.ss.hanarowa.domain.lesson.entity.Category;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,6 +22,7 @@ public class LessonDetailResponseDTO {
 	private String description;
 	private Category category;
 	private String lessonImg;
-	private Branch branch;
-	private Member member;
+	
+	// Curriculum 정보
+	private List<CurriculumResponseDTO> curriculums;
 }

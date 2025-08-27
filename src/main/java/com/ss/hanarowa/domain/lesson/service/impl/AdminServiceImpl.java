@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ss.hanarowa.domain.lesson.dto.request.LessonGisuStateUpdateRequestDto;
 import com.ss.hanarowa.domain.lesson.dto.response.AdminLessonListResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.CurriculumResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonDetailResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuStateUpdateResponseDto;
 import com.ss.hanarowa.domain.lesson.entity.Lesson;
@@ -70,7 +71,18 @@ public class AdminServiceImpl implements AdminService {
 	public LessonDetailResponseDTO getLessonDetail(Long lessonId) {
 		Lesson lesson = lessonRepository.findById(lessonId)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.LESSON_NOT_FOUND));
+
+		List<LessonGisu> lessonGisus = lessonGisuRepository.findByLessonId(lessonId);
+		List<CurriculumResponseDTO> curriculums = new ArrayList<>();
 		
+		for (LessonGisu lessonGisu : lessonGisus) {
+			for (var curriculum : lessonGisu.getCurriculums()) {
+				curriculums.add(CurriculumResponseDTO.builder()
+					.id(curriculum.getId())
+					.content(curriculum.getContent())
+					.build());
+			}
+		}
 		return LessonDetailResponseDTO.builder()
 			.lessonName(lesson.getLessonName())
 			.instructor(lesson.getInstructor())
@@ -78,8 +90,7 @@ public class AdminServiceImpl implements AdminService {
 			.description(lesson.getDescription())
 			.category(lesson.getCategory())
 			.lessonImg(lesson.getLessonImg())
-			.branch(lesson.getBranch())
-			.member(lesson.getMember())
+			.curriculums(curriculums)
 			.build();
 	}
 }

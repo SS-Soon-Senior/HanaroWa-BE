@@ -1,5 +1,6 @@
 package com.ss.hanarowa.domain.lesson.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ss.hanarowa.domain.branch.entity.Branch;
 import com.ss.hanarowa.domain.member.entity.Member;
 
@@ -25,6 +26,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Lesson {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
