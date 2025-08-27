@@ -61,6 +61,7 @@ public class MemberController {
 	}
 
 	@PatchMapping
+	@Tag(name = "회원 정보 수정")
 	public ResponseEntity<?> modifyInfo(@Valid @RequestBody MemberInfoDTO memberInfoDTO, Authentication authentication) {
 		String email = authentication.getName();
 		Member member = memberRepository.getMemberByEmail(email);
