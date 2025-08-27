@@ -11,13 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ss.hanarowa.domain.member.dto.MemberRegistDTO;
-import com.ss.hanarowa.domain.member.dto.ModifyPasswdRequestDTO;
 import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.repository.MemberRepository;
 import com.ss.hanarowa.domain.member.dto.MemberInfoDTO;
 import com.ss.hanarowa.domain.member.service.MemberService;
-import com.ss.hanarowa.global.exception.GeneralException;
-import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 import com.ss.hanarowa.global.util.Format;
 
 import lombok.RequiredArgsConstructor;
@@ -102,6 +99,19 @@ public class MemberServiceImpl implements MemberService {
 		}
 
 		member.setPassword(passwordEncoder.encode(passwdRequestDTO.getNewPassword()));
+		memberRepository.save(member);
+	}
+
+
+	@Override
+	public void updateMemberBranch(long branchId, long id) {
+		Member member = memberRepository.findById(id)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+
+		Branch branch = branchRepository.findById(branchId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.BRANCH_NOT_FOUND));
+
+		member.setBranch(branch);
 		memberRepository.save(member);
 	}
 

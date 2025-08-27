@@ -36,6 +36,5 @@ public class FacilityController {
 	public ResponseEntity<ApiResponse<FacilityDetailResponseDTO>> getDetailFacility(@PathVariable Long facilityId) {
 		FacilityDetailResponseDTO facilityDetailResponseDTO = facilityService.getDetailFacility(facilityId);
 		return ResponseEntity.ok(ApiResponse.onSuccess(facilityDetailResponseDTO));
-
 	}
 }

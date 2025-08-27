@@ -9,13 +9,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.hanarowa.domain.member.dto.MemberRegistDTO;
-import com.ss.hanarowa.domain.member.dto.ModifyPasswdRequestDTO;
 import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.repository.MemberRepository;
 import com.ss.hanarowa.domain.member.dto.MemberInfoDTO;
 import com.ss.hanarowa.domain.member.service.MemberService;
 import com.ss.hanarowa.global.response.ApiResponse;
-import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -84,4 +82,22 @@ public class MemberController {
 		memberService.modifyPassword(modifyDTO, member.getId());
 		return ResponseEntity.ok(ApiResponse.onSuccess("비밀번호 수정 완료"));
 	}
+	/**
+	 * 지점 선택/수정
+	 */
+	@PostMapping("/branch/{branchId}")
+	@Operation(summary = "지점 선택하기/수정 API", description = "하나로와 내 지점을 선택/수정합니다.")
+	@Tag(name = "지점 선택")
+	public ResponseEntity<ApiResponse<Void>> updateBranch(
+		@PathVariable Long branchId,
+		Authentication authentication) {
+
+		String email = authentication.getName();
+		Member member = memberRepository.getMemberByEmail(email);
+
+		memberService.updateMemberBranch(branchId, member.getId());
+
+		return ResponseEntity.ok(ApiResponse.onSuccess(null));
+	}
+
 }

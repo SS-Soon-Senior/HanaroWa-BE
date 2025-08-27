@@ -68,6 +68,18 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 		return buildResponseEntity(ErrorStatus.MEMBER_NOT_AUTHORITY, null);
 	}
 
+	// GeneralException 처리
+	@ExceptionHandler(GeneralException.class)
+	public ResponseEntity<Object> handleGeneralException(GeneralException ex) {
+		return ResponseEntity
+			.status(ex.getReason().getHttpStatusCode())
+			.body(ApiResponse.onFailure(
+				ex.getReason().getCode(),
+				ex.getReason().getMessage(),
+				null
+			));
+	}
+
 	// 서버 에러
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<Object> handleException(Exception ex) {
