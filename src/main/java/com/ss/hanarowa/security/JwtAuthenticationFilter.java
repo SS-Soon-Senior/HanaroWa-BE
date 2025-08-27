@@ -25,56 +25,61 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
 	private final String[] excludePatterns = {
-		"/api/member/regist",  // 회원가입
-		"/api/member/info",
-		"/api/auth/signin",
-		"/api/public/**",
-		"/api/auth/**",
-		"/favicon.ico",
-		"/actuator/**",
-		"/*.html",
-		"/swagger-ui/**",
-		"/v3/api-docs/**",
-		"/hanarowa/api-docs/**",
-		"/broadcast/**",
-		"/swagger.html"
-
+		"/api/member/regist", "/api/member/info", "/api/auth/signin", "/api/public/**",
+		"/api/auth/**", "/favicon.ico", "/actuator/**", "/*.html", "/swagger-ui/**",
+		"/v3/api-docs/**", "/hanarowa/api-docs/**", "/broadcast/**", "/swagger.html"
 	};
 
 	@Override
 	protected boolean shouldNotFilter(@NonNull HttpServletRequest request) throws ServletException {
 		String path = request.getRequestURI();
-		System.out.println("** path = " + path);
-		boolean isNotNeed = Arrays.stream(excludePatterns)
+		return Arrays.stream(excludePatterns)
 			.anyMatch(pattern -> pathMatcher.match(pattern, path));
-		System.out.println("isNotNeed = " + isNotNeed);
-		return isNotNeed;
 	}
 
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
 		@NonNull FilterChain filterChain) throws ServletException, IOException {
+
 		String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+			filterChain.doFilter(request, response);
+			return;
+		}
+
 		try {
-			System.out.println("** JwtAuthenticationFilter.doFilterInternal:" + authHeader.substring(7));
-			Map<String, Object> claims = JwtUtil.validateToken(authHeader.substring(7));
+			String token = authHeader.substring(7);
+			Map<String, Object> claims = JwtUtil.validateToken(token);
 
-			String email = (String)claims.get("email");
+			String email = (String) claims.get("email");
+			String roleStr = (String) claims.get("role");
+			Role role = Role.valueOf(roleStr);
 
-			Role role = (Role)claims.get("role");
 			MemberAuthDTO dto = new MemberAuthDTO(email, "", role);
-			UsernamePasswordAuthenticationToken authenticationToken = new
-				UsernamePasswordAuthenticationToken(dto, null, dto.getAuthorities());
+
+			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+				dto, null, dto.getAuthorities()
+			);
 
 			SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+
+			filterChain.doFilter(request, response);
+
 		} catch (Exception e) {
-			e.printStackTrace(System.out);
-			response.setContentType("application/json");
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.setContentType("application/json;charset=UTF-8");
+
 			ObjectMapper objectMapper = new ObjectMapper();
 			PrintWriter out = response.getWriter();
-			out.println(objectMapper.writeValueAsString(Map.of("error", "ERROR_ACCESS_TOKEN")));
+
+			String errorMessage;
+			errorMessage = "INVALID_TOKEN";
+
+			out.println(objectMapper.writeValueAsString(Map.of("error", errorMessage, "message", e.getMessage())));
+			out.flush();
 			out.close();
 		}
-		filterChain.doFilter(request, response);
 	}
 }
