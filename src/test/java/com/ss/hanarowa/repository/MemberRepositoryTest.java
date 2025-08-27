@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.ss.hanarowa.member.entity.Member;
-import com.ss.hanarowa.member.entity.Role;
-import com.ss.hanarowa.member.repository.MemberRepository;
+import com.ss.hanarowa.domain.member.entity.Member;
+import com.ss.hanarowa.domain.member.entity.Role;
+import com.ss.hanarowa.domain.member.repository.MemberRepository;
 
 class MemberRepositoryTest extends RepositoryTest{
 	@Autowired
