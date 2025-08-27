@@ -3,6 +3,7 @@ package com.ss.hanarowa.domain.member.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -69,6 +70,24 @@ public class MemberController {
 		memberService.modifyInfo(memberInfoDTO, member.getId());
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(memberInfoDTO));
+	}
+
+	/**
+	 * 지점 선택/수정
+	 */
+	@PostMapping("/branch/{branchId}")
+	@Operation(summary = "지점 선택하기/수정 API", description = "하나로와 내 지점을 선택/수정합니다.")
+	@Tag(name = "지점 선택")
+	public ResponseEntity<ApiResponse<Void>> updateBranch(
+		@PathVariable Long branchId,
+		Authentication authentication) {
+
+		String email = authentication.getName();
+		Member member = memberRepository.getMemberByEmail(email);
+
+		memberService.updateMemberBranch(branchId, member.getId());
+
+		return ResponseEntity.ok(ApiResponse.onSuccess(null));
 	}
 
 }
