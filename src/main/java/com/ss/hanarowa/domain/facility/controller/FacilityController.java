@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ss.hanarowa.domain.facility.dto.reponse.FacilityDetailResponseDTO;
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityResponseDTO;
 import com.ss.hanarowa.domain.facility.service.FacilityService;
 import com.ss.hanarowa.global.response.ApiResponse;
@@ -27,6 +28,13 @@ public class FacilityController {
 	@Tag(name = "시설 리스트 목록")
 	public ResponseEntity<ApiResponse<List<FacilityResponseDTO>>> getFacilityByBranchId(@PathVariable Long branchId) {
 		List<FacilityResponseDTO> list = facilityService.getAllFacilities(branchId);
-		return ResponseEntity.ok(ApiResponse.onSuccess(list,"시설 리스트 목록 출력"));
+		return ResponseEntity.ok(ApiResponse.onSuccess(list));
+	}
+
+	@GetMapping("/detail/{facilityId}")
+	@Tag(name = "시설 상세보기")
+	public ResponseEntity<ApiResponse<FacilityDetailResponseDTO>> getDetailFacility(@PathVariable Long facilityId) {
+		FacilityDetailResponseDTO facilityDetailResponseDTO = facilityService.getDetailFacility(facilityId);
+		return ResponseEntity.ok(ApiResponse.onSuccess(facilityDetailResponseDTO));
 	}
 }
