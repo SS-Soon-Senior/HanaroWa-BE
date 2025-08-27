@@ -1,4 +1,4 @@
-package com.ss.hanarowa.exception;
+package com.ss.hanarowa.global.exception;
 
 import java.nio.file.AccessDeniedException;
 import java.util.LinkedHashMap;

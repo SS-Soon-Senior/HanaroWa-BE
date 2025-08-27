@@ -1,4 +1,4 @@
-package com.ss.hanarowa.exception;
+package com.ss.hanarowa.global.exception;
 
 import com.ss.hanarowa.global.response.code.BaseErrorCode;
 import com.ss.hanarowa.global.response.code.ReasonDTO;
