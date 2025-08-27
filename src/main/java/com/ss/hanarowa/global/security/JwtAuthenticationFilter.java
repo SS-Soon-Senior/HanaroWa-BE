@@ -24,19 +24,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
 	private final String[] excludePatterns = {
-		"/api/member/regist",  // 회원가입
-		"/api/subscriber/signup",
-		"/api/public/**",
-		"/api/auth/**",
+		// "/api/member/regist",  // 회원가입
+		// "/api/subscriber/signup",
+		// "/api/public/**",
+		// "/api/auth/**",
 		"/favicon.ico",
 		"/actuator/**",
-		"/*.html",
+		// "/*.html",
 		"/swagger-ui/**",
 		"/v3/api-docs/**",
 		"/hanarowa/api-docs/**",
 		"/broadcast/**",
 		"/swagger.html",
-		"/facility/**"
+
 	};
 
 	@Override
@@ -51,11 +51,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		@NonNull FilterChain filterChain) throws ServletException, IOException {
 
 		String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-
-		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-			filterChain.doFilter(request, response);
-			return;
-		}
 
 		try {
 			String token = authHeader.substring(7);
