@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.dto.MemberAuthDTO;
 import com.ss.hanarowa.domain.member.repository.MemberRepository;
+import com.ss.hanarowa.global.exception.GeneralException;
+import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +20,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Member member = memberRepository.getMemberByEmail(username);
+		Member member = memberRepository.findByEmail(username).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
 		if (member == null)
 			throw new UsernameNotFoundException(username + " is Not Found!!");

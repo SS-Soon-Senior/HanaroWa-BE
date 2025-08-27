@@ -9,4 +9,6 @@ public interface MemberService {
 	void withdraw(long id);
 	void modifyInfo(MemberInfoDTO memberInfoDTO, long id);
 	void updateMemberBranch(long branchId, long memberId);
+
+	Long getMemberIdByEmail(String email);
 }

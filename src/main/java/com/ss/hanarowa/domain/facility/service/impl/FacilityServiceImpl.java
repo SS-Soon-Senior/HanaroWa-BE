@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityDetailResponseDTO;
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityResponseDTO;
+import com.ss.hanarowa.domain.facility.dto.request.FacilityReservationDTO;
 import com.ss.hanarowa.domain.facility.entity.Facility;
 import com.ss.hanarowa.domain.facility.entity.FacilityTime;
 import com.ss.hanarowa.domain.facility.repository.FacilityRepository;
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class FacilityServiceImpl implements FacilityService {
 	private final FacilityRepository facilityRepository;
 	private final FacilityTimeRepository facilityTimeRepository;
+	private final MemberRepository memberRepository;
 
 	@Override
 	public List<FacilityResponseDTO> getAllFacilities(long branchId) {
@@ -34,6 +36,20 @@ public class FacilityServiceImpl implements FacilityService {
 	@Override
 	public void deleteFacilityReservation(Long reservationId) throws GeneralException{
 		facilityTimeRepository.deleteById(reservationId);
+	}
+
+	@Override
+	public void reservateFacility(FacilityReservationDTO facilityReservationDTO, Long memberId) {
+		Facility facility = facilityRepository.findById(facilityReservationDTO.getFacilityId()).orElseThrow(()->new GeneralException(ErrorStatus.FACILITY_NOT_FOUND));
+		Member member = memberRepository.findById(memberId).orElseThrow(() ->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+		FacilityTime facilityTime = FacilityTime.builder()
+			.facility(facility)
+			.member(member)
+			.startedAt(facilityReservationDTO.getStartedAt())
+			.endedAt(facilityReservationDTO.getEndedAt())
+			.build();
+
+		facilityTimeRepository.save(facilityTime);
 	}
 
 	@Override

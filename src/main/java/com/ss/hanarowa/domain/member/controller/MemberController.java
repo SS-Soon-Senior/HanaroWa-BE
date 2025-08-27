@@ -14,7 +14,9 @@ import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.repository.MemberRepository;
 import com.ss.hanarowa.domain.member.dto.MemberInfoDTO;
 import com.ss.hanarowa.domain.member.service.MemberService;
+import com.ss.hanarowa.global.exception.GeneralException;
 import com.ss.hanarowa.global.response.ApiResponse;
+import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -44,7 +46,7 @@ public class MemberController {
 	public ResponseEntity<?> info(@Valid @RequestBody MemberInfoDTO memberInfoDTO, Authentication authentication) {
 		String email = authentication.getName();
 
-		Member member = memberRepository.getMemberByEmail(email);
+		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
 		memberService.infoRegist(memberInfoDTO, member.getId());
 
@@ -56,7 +58,7 @@ public class MemberController {
 	public void withDraw(Authentication authentication) {
 		String email = authentication.getName();
 
-		Member member = memberRepository.getMemberByEmail(email);
+		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
 		memberService.withdraw(member.getId());
 	}
@@ -65,7 +67,7 @@ public class MemberController {
 	@Tag(name = "회원 정보 수정")
 	public ResponseEntity<?> modifyInfo(@Valid @RequestBody MemberInfoDTO memberInfoDTO, Authentication authentication) {
 		String email = authentication.getName();
-		Member member = memberRepository.getMemberByEmail(email);
+		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
 		memberService.modifyInfo(memberInfoDTO, member.getId());
 
@@ -83,7 +85,7 @@ public class MemberController {
 		Authentication authentication) {
 
 		String email = authentication.getName();
-		Member member = memberRepository.getMemberByEmail(email);
+		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
 		memberService.updateMemberBranch(branchId, member.getId());
 
