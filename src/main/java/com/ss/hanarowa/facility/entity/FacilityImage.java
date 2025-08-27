@@ -1,5 +1,7 @@
 package com.ss.hanarowa.facility.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -28,6 +30,7 @@ public class FacilityImage {
 	private String facilityImage;
 
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JsonBackReference
 	@JoinColumn(name = "facilityId", nullable = false,
 		foreignKey = @ForeignKey(name="fk_FacilityImage_Facility"))
 	private Facility facility;

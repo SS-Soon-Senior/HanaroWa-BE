@@ -12,7 +12,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ss.hanarowa.member.dto.MemberAuthDTO;
 import com.ss.hanarowa.member.dto.MemberRegistDTO;
@@ -40,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		"/broadcast/**",
 		"/swagger.html",
 		"/admin/**"
-
+		"/facility/**"
 	};
 
 	@Override
