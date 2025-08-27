@@ -24,13 +24,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
 	private final String[] excludePatterns = {
-		// "/api/member/regist",  // 회원가입
-		// "/api/subscriber/signup",
-		// "/api/public/**",
-		// "/api/auth/**",
+		"/api/member/regist",  // 회원가입
+		"/api/auth/**",
 		"/favicon.ico",
 		"/actuator/**",
-		// "/*.html",
 		"/swagger-ui/**",
 		"/v3/api-docs/**",
 		"/hanarowa/api-docs/**",
