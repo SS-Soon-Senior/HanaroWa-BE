@@ -11,9 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AdminLessonListResponseDTO {
-	String lessonName;
-	String instructor;
-	String instruction;
-	String lessonImg;
+public class CurriculumResponseDTO {
+	private Long id;
+	private String content;
 }

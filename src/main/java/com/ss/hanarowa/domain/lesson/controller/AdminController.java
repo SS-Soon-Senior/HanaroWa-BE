@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.hanarowa.domain.lesson.dto.request.LessonGisuStateUpdateRequestDto;
 import com.ss.hanarowa.domain.lesson.dto.response.AdminLessonListResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.LessonDetailResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuStateUpdateResponseDto;
 import com.ss.hanarowa.domain.lesson.service.AdminService;
 import com.ss.hanarowa.global.response.ApiResponse;
@@ -56,5 +57,12 @@ public class AdminController {
 		LessonGisuStateUpdateResponseDto result = adminService.updateLessonGisuState(lessonGisuId, request);
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(result));
+	}
+
+	@PreAuthorize("hasRole('ADMIN')")
+	@Operation(summary="관리자 강좌 상세 보기")
+	@GetMapping("/{lessonId}")
+	public ResponseEntity<ApiResponse<LessonDetailResponseDTO>> getLessonDetail(@PathVariable Long lessonId){
+		return ResponseEntity.ok(ApiResponse.onSuccess(adminService.getLessonDetail(lessonId)));
 	}
 }
