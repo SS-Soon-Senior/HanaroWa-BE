@@ -1,5 +1,10 @@
 package com.ss.hanarowa.domain.member.service.impl;
 
+import static java.time.LocalDate.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +48,15 @@ public class MemberServiceImpl implements MemberService {
 
 		member.setBirth(memberInfoDTO.getBirth());
 		member.setPhoneNumber(memberInfoDTO.getPhoneNumber());
+
+		memberRepository.save(member);
+	}
+
+	@Override
+	public void withdraw(long id) {
+		Member member = memberRepository.findById(id).orElseThrow();
+
+		member.setDeletedAt(LocalDateTime.now());
 
 		memberRepository.save(member);
 	}
