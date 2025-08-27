@@ -84,8 +84,8 @@ public class MemberServiceImpl implements MemberService {
 
 
 	@Override
-	public void updateMemberBranch(long branchId, long memberId) {
-		Member member = memberRepository.findById(memberId)
+	public void updateMemberBranch(long branchId, long id) {
+		Member member = memberRepository.findById(id)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
 		Branch branch = branchRepository.findById(branchId)
