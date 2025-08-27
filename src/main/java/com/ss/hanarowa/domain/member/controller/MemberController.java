@@ -2,6 +2,7 @@ package com.ss.hanarowa.domain.member.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,6 +47,16 @@ public class MemberController {
 		memberService.infoRegist(memberInfoDTO, member.getId());
 
 		return ResponseEntity.ok("추가정보 등록 성공");
+	}
+
+	@PatchMapping("/withdraw")
+	@Tag(name = "회원탈퇴")
+	public void withDraw(Authentication authentication) {
+		String email = authentication.getName();
+
+		Member member = memberRepository.getMemberByEmail(email);
+
+		memberService.withdraw(member.getId());
 	}
 
 }
