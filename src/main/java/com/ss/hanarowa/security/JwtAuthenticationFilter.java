@@ -3,7 +3,6 @@ package com.ss.hanarowa.security;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
@@ -14,7 +13,6 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ss.hanarowa.member.dto.MemberAuthDTO;
-import com.ss.hanarowa.member.dto.MemberRegistDTO;
 import com.ss.hanarowa.member.entity.Role;
 
 import jakarta.servlet.FilterChain;
@@ -45,39 +43,53 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	@Override
 	protected boolean shouldNotFilter(@NonNull HttpServletRequest request) throws ServletException {
 		String path = request.getRequestURI();
-		System.out.println("** path = " + path);
-		boolean isNotNeed = Arrays.stream(excludePatterns)
+		return Arrays.stream(excludePatterns)
 			.anyMatch(pattern -> pathMatcher.match(pattern, path));
-		System.out.println("isNotNeed = " + isNotNeed);
-		return isNotNeed;
 	}
 
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
 		@NonNull FilterChain filterChain) throws ServletException, IOException {
+
 		String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+			filterChain.doFilter(request, response);
+			return;
+		}
+
 		try {
-			System.out.println("** JwtAuthenticationFilter.doFilterInternal:" + authHeader.substring(7));
-			Map<String, Object> claims = JwtUtil.validateToken(authHeader.substring(7));
+			String token = authHeader.substring(7);
+			Map<String, Object> claims = JwtUtil.validateToken(token);
 
-			String email = (String)claims.get("email");
-			String name = (String)claims.get("name");
-			// boolean social = (Boolean)claims.get("social");
-			Role role = (Role)claims.get("role");
-			MemberAuthDTO dto = new MemberAuthDTO(email, "", name, role);
-			UsernamePasswordAuthenticationToken authenticationToken = new
-				UsernamePasswordAuthenticationToken(dto, null, dto.getAuthorities());
+			String email = (String) claims.get("email");
+			String roleStr = (String) claims.get("role");
+			Role role = Role.valueOf(roleStr);
 
-			// 올바른 Authorization을 저장하여 어디서든 불러올 수 있다!
+			MemberAuthDTO dto = new MemberAuthDTO(email, "", role);
+
+			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+				dto, null, dto.getAuthorities()
+			);
+
 			SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+
+			filterChain.doFilter(request, response);
+
 		} catch (Exception e) {
-			e.printStackTrace(System.out);
-			response.setContentType("application/json");
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.setContentType("application/json;charset=UTF-8");
+
 			ObjectMapper objectMapper = new ObjectMapper();
 			PrintWriter out = response.getWriter();
-			out.println(objectMapper.writeValueAsString(Map.of("error", "ERROR_ACCESS_TOKEN")));
+
+			String errorMessage;
+			errorMessage = "INVALID_TOKEN";
+
+			out.println(objectMapper.writeValueAsString(Map.of("error", errorMessage, "message", e.getMessage())));
+			out.flush();
 			out.close();
 		}
-		filterChain.doFilter(request, response);
 	}
 }
