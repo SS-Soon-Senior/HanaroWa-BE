@@ -31,6 +31,6 @@ public class AdminController {
 	public ResponseEntity<ApiResponse<List<AdminLessonListResponseDTO>>> getAdminAllLessons(){
 		log.info("[관리자] Controller : 강좌 목록 전체 가져오기");
 		List<AdminLessonListResponseDTO> list = adminService.getAllLessons();
-		return ResponseEntity.ok(ApiResponse.onSuccess(list,"강좌 전체 목록 가져오기"));
+		return ResponseEntity.ok(ApiResponse.onSuccess(list));
 	}
 }

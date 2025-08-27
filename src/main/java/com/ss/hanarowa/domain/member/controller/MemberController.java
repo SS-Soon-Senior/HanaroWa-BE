@@ -68,7 +68,7 @@ public class MemberController {
 
 		memberService.modifyInfo(memberInfoDTO, member.getId());
 
-		return ResponseEntity.ok(ApiResponse.onSuccess(memberInfoDTO,"회원정보 수정 성공"));
+		return ResponseEntity.ok(ApiResponse.onSuccess(memberInfoDTO));
 	}
 
 }
