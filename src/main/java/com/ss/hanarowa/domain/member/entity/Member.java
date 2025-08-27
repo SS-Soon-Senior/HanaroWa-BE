@@ -1,6 +1,7 @@
 package com.ss.hanarowa.domain.member.entity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +58,8 @@ public class Member {
 	@Column
 	private String phoneNumber;
 
-	private LocalDate deletedAt;
+	@Column(columnDefinition = "DATETIME(0)")
+	private LocalDateTime deletedAt;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)

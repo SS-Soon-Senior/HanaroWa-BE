@@ -1,4 +1,4 @@
-package com.ss.hanarowa.domain.admin.controller;
+package com.ss.hanarowa.domain.lesson.controller;
 
 import java.util.List;
 
@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ss.hanarowa.domain.admin.dto.response.AdminLessonListResponseDTO;
-import com.ss.hanarowa.domain.admin.service.AdminService;
+import com.ss.hanarowa.domain.lesson.dto.response.AdminLessonListResponseDTO;
+import com.ss.hanarowa.domain.lesson.service.AdminService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

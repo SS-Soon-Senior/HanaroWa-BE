@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityResponseDTO;
 import com.ss.hanarowa.domain.facility.service.FacilityService;
+import com.ss.hanarowa.global.response.ApiResponse;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +25,8 @@ public class FacilityController {
 
 	@GetMapping("/{branchId}")
 	@Tag(name = "시설 리스트 목록")
-	public ResponseEntity<List<FacilityResponseDTO>> getFacilityByBranchId(@PathVariable Long branchId) {
+	public ResponseEntity<ApiResponse<List<FacilityResponseDTO>>> getFacilityByBranchId(@PathVariable Long branchId) {
 		List<FacilityResponseDTO> list = facilityService.getAllFacilities(branchId);
-		return ResponseEntity.ok(list);
+		return ResponseEntity.ok(ApiResponse.onSuccess(list,"시설 리스트 목록 출력"));
 	}
 }
