@@ -25,7 +25,7 @@ public class MemberRegistDTO{
 
 	@NotBlank(message = "비밀번호는 필수입력 값입니다.")
 	@Pattern(
-		regexp = "^(?=.*[가-힣a-zA-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{6,20}$",
+		regexp = "^(?=.*[가-힣A-Za-z])(?=.*\\d)[가-힣A-Za-z\\d]{6,20}$",
 		message = "비밀번호는 6~20자 사이이며, 문자, 숫자, 특수문자를 각각 최소 1개 포함해야 합니다."
 	)
 	private String password;
