@@ -1,11 +1,11 @@
-package com.ss.hanarowa.domain.admin.service.impl;
+package com.ss.hanarowa.domain.lesson.service.impl;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.ss.hanarowa.domain.admin.dto.response.AdminLessonListResponseDTO;
-import com.ss.hanarowa.domain.admin.service.AdminService;
+import com.ss.hanarowa.domain.lesson.dto.response.AdminLessonListResponseDTO;
+import com.ss.hanarowa.domain.lesson.service.AdminService;
 import com.ss.hanarowa.domain.lesson.repository.LessonRepository;
 
 import lombok.RequiredArgsConstructor;

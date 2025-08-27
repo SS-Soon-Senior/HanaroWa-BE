@@ -1,4 +1,4 @@
-package com.ss.hanarowa.domain.admin.dto.response;
+package com.ss.hanarowa.domain.lesson.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
