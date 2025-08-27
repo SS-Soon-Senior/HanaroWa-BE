@@ -3,6 +3,7 @@ package com.ss.hanarowa.global.response.code.status;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 
+import com.ss.hanarowa.domain.facility.entity.Facility;
 import com.ss.hanarowa.global.response.code.BaseErrorCode;
 import com.ss.hanarowa.global.response.code.ReasonDTO;
 
@@ -20,7 +21,10 @@ public enum ErrorStatus implements BaseErrorCode {
 	MEMBER_PASSWORD_UNMATCHED(HttpStatus.UNAUTHORIZED, "MEMBER401", "비밀번호가 일치하지 않습니다."),
 	MEMBER_PASSWORD_WRONG(HttpStatus.UNAUTHORIZED, "MEMBER401", "비밀번호가 틀렸습니다."),
 	MEMBER_NOT_AUTHORITY(HttpStatus.FORBIDDEN, "MEMBER403", "권한이 없습니다."),
-	MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER404", "해당 유저가 없습니다");
+	MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER404", "해당 유저가 없습니다."),
+
+	FACILITY_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER404", "해당 시설이 없습니다.")
+	;
 
 	private final HttpStatusCode httpStatusCode;
 	private final String code;
