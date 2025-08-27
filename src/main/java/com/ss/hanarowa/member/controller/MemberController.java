@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ss.hanarowa.member.dto.MemberAuthDTO;
 import com.ss.hanarowa.member.dto.MemberInfoDTO;
 import com.ss.hanarowa.member.dto.MemberRegistDTO;
+import com.ss.hanarowa.member.entity.Member;
+import com.ss.hanarowa.member.repository.MemberRepository;
 import com.ss.hanarowa.member.service.MemberService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class MemberController {
 	private final MemberService memberService;
+	private final MemberRepository memberRepository;
 
 	@PostMapping("/regist")
 	@Tag(name = "회원가입")
@@ -36,11 +39,12 @@ public class MemberController {
 	@PostMapping("/info")
 	@Operation(summary = "전화번호, 생일등록")
 	@Tag(name = "추가정보등록")
-	public  ResponseEntity<?> info(@Valid @RequestBody MemberInfoDTO memberInfoDTO, Authentication authentication) {
-		MemberAuthDTO member = (MemberAuthDTO)authentication.getPrincipal();
-		Long id = member.getId();
+	public ResponseEntity<?> info(@Valid @RequestBody MemberInfoDTO memberInfoDTO, Authentication authentication) {
+		String email = authentication.getName();
 
-		memberService.infoRegist(memberInfoDTO, id);
+		Member member = memberRepository.getMemberByEmail(email);
+
+		memberService.infoRegist(memberInfoDTO, member.getId());
 
 		return ResponseEntity.ok("추가정보 등록 성공");
 	}

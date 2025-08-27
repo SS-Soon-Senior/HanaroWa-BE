@@ -27,12 +27,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final String[] excludePatterns = {
 		"/api/member/regist",  // 회원가입
-		"/api/subscriber/signup",
+		"/api/member/info",
+		"/api/auth/signin",
 		"/api/public/**",
 		"/api/auth/**",
 		"/favicon.ico",
 		"/actuator/**",
 		"/*.html",
+		"/api/auth/signin",
 		"/swagger-ui/**",
 		"/v3/api-docs/**",
 		"/hanarowa/api-docs/**",
@@ -60,14 +62,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			Map<String, Object> claims = JwtUtil.validateToken(authHeader.substring(7));
 
 			String email = (String)claims.get("email");
-			String name = (String)claims.get("name");
-			// boolean social = (Boolean)claims.get("social");
+
 			Role role = (Role)claims.get("role");
-			MemberAuthDTO dto = new MemberAuthDTO(email, "", name, role);
+			MemberAuthDTO dto = new MemberAuthDTO(email, "", role);
 			UsernamePasswordAuthenticationToken authenticationToken = new
 				UsernamePasswordAuthenticationToken(dto, null, dto.getAuthorities());
 
-			// 올바른 Authorization을 저장하여 어디서든 불러올 수 있다!
 			SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
