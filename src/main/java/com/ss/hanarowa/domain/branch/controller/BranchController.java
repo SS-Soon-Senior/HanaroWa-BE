@@ -33,8 +33,8 @@ public class BranchController {
 	@GetMapping("/")
 	@Tag(name = "지점 전체 목록 조회")
 	@Operation(summary = "지점 목록 조회 API", description = "하나로와에서 이용할 수 있는 지점을 조회합니다.")
-	public ApiResponse<List<BranchResponseDTO>> getBranchs() {
+	public ResponseEntity<ApiResponse<List<BranchResponseDTO>>> getBranchs() {
 		List<BranchResponseDTO> branchList = branchService.getAllBranches();
-		return ApiResponse.onSuccess(branchList);
+		return ResponseEntity.ok(ApiResponse.onSuccess(branchList));
 	}
 }
