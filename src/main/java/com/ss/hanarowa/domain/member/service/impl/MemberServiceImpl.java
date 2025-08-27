@@ -84,12 +84,23 @@ public class MemberServiceImpl implements MemberService {
 	public void modifyPassword(ModifyPasswdRequestDTO passwdRequestDTO, long id) {
 		Member member = memberRepository.findById(id).orElseThrow();
 
+		// 현재 비밀번호 확인
 		if(!passwordEncoder.matches(passwdRequestDTO.getCurrentPassword(), member.getPassword())) {
 			throw new GeneralException(ErrorStatus.MEMBER_PASSWORD_WRONG);
 		}
+
+		// 새 비밀번호의 유효성 확인
+		String regex = "^(?=.*[가-힣a-zA-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{6,20}$";
+		if (!passwdRequestDTO.getNewPassword().matches(regex)) {
+			throw new GeneralException(ErrorStatus.MEMBER_PASSWORD_INVALID);
+		}
+
+
+		// 새 비밀번호, 새 비밀번호 확인이 같은지
 		if(!Objects.equals(passwdRequestDTO.getNewPassword(), passwdRequestDTO.getCheckNewPassword())) {
 			throw new GeneralException(ErrorStatus.MEMBER_PASSWORD_UNMATCHED);
 		}
+
 		member.setPassword(passwordEncoder.encode(passwdRequestDTO.getNewPassword()));
 		memberRepository.save(member);
 	}

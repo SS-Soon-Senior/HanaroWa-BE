@@ -1,15 +1,15 @@
 package com.ss.hanarowa.global.exception;
 
-import java.nio.file.AccessDeniedException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.naming.AuthenticationException;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +18,8 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.ss.hanarowa.global.response.ApiResponse;
+import com.ss.hanarowa.global.response.code.BaseErrorCode;
+import com.ss.hanarowa.global.response.code.ReasonDTO;
 import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 
 import jakarta.validation.ConstraintViolationException;
@@ -71,6 +73,17 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 	public ResponseEntity<Object> handleException(Exception ex) {
 		log.error("Unexpected Exception", ex);
 		return buildResponseEntity(ErrorStatus._INTERNAL_SERVER_ERROR, ex.getMessage());
+	}
+
+	@ExceptionHandler(GeneralException.class)
+	public ResponseEntity<Object> handleGeneralException(GeneralException ex) {
+		return ResponseEntity
+			.status(ex.getReason().getHttpStatusCode())
+			.body(ApiResponse.onFailure(
+				ex.getReason().getCode(),
+				ex.getReason().getMessage(),
+				null
+			));
 	}
 
 	private ResponseEntity<Object> buildResponseEntity(ErrorStatus status, Object data) {

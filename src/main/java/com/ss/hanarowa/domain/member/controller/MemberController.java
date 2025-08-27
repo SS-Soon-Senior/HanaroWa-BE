@@ -82,6 +82,6 @@ public class MemberController {
 		Member member = memberRepository.getMemberByEmail(email);
 
 		memberService.modifyPassword(modifyDTO, member.getId());
-		return ResponseEntity.ok(ApiResponse.onSuccess(member));
+		return ResponseEntity.ok(ApiResponse.onSuccess("비밀번호 수정 완료"));
 	}
 }

@@ -19,6 +19,7 @@ public enum ErrorStatus implements BaseErrorCode {
 	//멤버 관련 에러
 	MEMBER_BAD_REQUEST(HttpStatus.BAD_REQUEST,"MEMBER400","잘못된 요청입니다."),
 	MEMBER_PASSWORD_UNMATCHED(HttpStatus.UNAUTHORIZED, "MEMBER401", "비밀번호가 일치하지 않습니다."),
+	MEMBER_PASSWORD_INVALID(HttpStatus.UNAUTHORIZED, "MEMBER401", "비밀번호는 6~20자 사이이며, 문자, 숫자, 특수문자를 각각 최소 1개 포함해야 합니다."),
 	MEMBER_PASSWORD_WRONG(HttpStatus.UNAUTHORIZED, "MEMBER401", "비밀번호가 틀렸습니다."),
 	MEMBER_NOT_AUTHORITY(HttpStatus.FORBIDDEN, "MEMBER403", "권한이 없습니다."),
 	MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER404", "해당 유저가 없습니다."),
