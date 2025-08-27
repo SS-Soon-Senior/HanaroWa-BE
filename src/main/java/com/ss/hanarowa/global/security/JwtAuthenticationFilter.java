@@ -36,8 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		"/hanarowa/api-docs/**",
 		"/broadcast/**",
 		"/swagger.html",
-		// "/admin/**",
-		// "/facility/**"
+
 	};
 
 	@Override
