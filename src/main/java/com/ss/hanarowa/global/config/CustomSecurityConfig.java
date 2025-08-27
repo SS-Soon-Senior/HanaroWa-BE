@@ -19,17 +19,23 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.ss.hanarowa.global.security.CustomOAuth2UserService;
 import com.ss.hanarowa.global.security.JwtAuthenticationFilter;
 import com.ss.hanarowa.global.security.handler.CustomAccessDeiniedHandler;
 import com.ss.hanarowa.global.security.handler.LoginFailureHandler;
 import com.ss.hanarowa.global.security.handler.LoginSuccessHandler;
+import com.ss.hanarowa.global.security.handler.OAuth2SuccessHandler;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 @Configuration
 @Log4j2
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class CustomSecurityConfig {
+	private final CustomOAuth2UserService customOAuth2UserService;
+	private final OAuth2SuccessHandler oAuth2SuccessHandler;
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		log.info("--- securityConfig");
@@ -46,7 +52,10 @@ public class CustomSecurityConfig {
 			)
 			.exceptionHandling(config -> config.accessDeniedHandler(new CustomAccessDeiniedHandler()))
 			.addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-
+			http.oauth2Login(oauth2 -> oauth2
+				.userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
+				.successHandler(oAuth2SuccessHandler)
+			);
 		return http.build();
 	}
 
