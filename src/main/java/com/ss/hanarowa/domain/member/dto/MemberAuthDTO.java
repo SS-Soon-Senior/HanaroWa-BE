@@ -23,7 +23,7 @@ public class MemberAuthDTO extends User {
 	private Role role;
 
 	public MemberAuthDTO(String email, String password, Role role) {
-		super(email, password, Collections.singleton(new SimpleGrantedAuthority(role.name())));
+		super(email, password, Collections.singleton(new SimpleGrantedAuthority("ROLE_"+role.name())));
 		this.email = email;
 		this.password = password;
 		this.role = role;
