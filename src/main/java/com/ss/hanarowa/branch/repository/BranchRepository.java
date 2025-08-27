@@ -5,6 +5,4 @@ import com.ss.hanarowa.branch.entity.Branch;
 
 public interface BranchRepository extends JpaRepository<Branch, Long> {
 
-
-
 }
