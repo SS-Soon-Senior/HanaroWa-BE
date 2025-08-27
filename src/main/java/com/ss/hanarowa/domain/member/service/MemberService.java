@@ -8,4 +8,5 @@ public interface MemberService {
 	void infoRegist(MemberInfoDTO memberInfoDTO, long id);
 	void withdraw(long id);
 	void modifyInfo(MemberInfoDTO memberInfoDTO, long id);
+	void updateMemberBranch(long branchId, long memberId);
 }
