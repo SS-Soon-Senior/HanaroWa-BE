@@ -4,6 +4,11 @@ import java.util.List;
 
 import com.ss.hanarowa.domain.facility.entity.FacilityImage;
 
+import lombok.Builder;
+import lombok.Getter;
+
+@Builder
+@Getter
 public class FacilityDetailResponseDTO {
 	private long facilityId;
 	private String facilityName;
