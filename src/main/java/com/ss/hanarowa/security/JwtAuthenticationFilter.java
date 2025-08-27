@@ -11,7 +11,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ss.hanarowa.member.dto.MemberAuthDTO;
 import com.ss.hanarowa.member.entity.Role;
@@ -25,9 +24,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
 	private final String[] excludePatterns = {
-		"/api/member/regist", "/api/member/info", "/api/auth/signin", "/api/public/**",
-		"/api/auth/**", "/favicon.ico", "/actuator/**", "/*.html", "/swagger-ui/**",
-		"/v3/api-docs/**", "/hanarowa/api-docs/**", "/broadcast/**", "/swagger.html"
+		"/api/member/regist",  // 회원가입
+		"/api/subscriber/signup",
+		"/api/public/**",
+		"/api/auth/**",
+		"/favicon.ico",
+		"/actuator/**",
+		"/*.html",
+		"/swagger-ui/**",
+		"/v3/api-docs/**",
+		"/hanarowa/api-docs/**",
+		"/broadcast/**",
+		"/swagger.html",
+		"/admin/**"
+		"/facility/**"
 	};
 
 	@Override
