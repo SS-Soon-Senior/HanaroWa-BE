@@ -5,10 +5,15 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ss.hanarowa.domain.lesson.dto.request.LessonGisuStateUpdateRequestDto;
 import com.ss.hanarowa.domain.lesson.dto.response.AdminLessonListResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuStateUpdateResponseDto;
 import com.ss.hanarowa.domain.lesson.service.AdminService;
 import com.ss.hanarowa.global.response.ApiResponse;
 
@@ -32,5 +37,24 @@ public class AdminController {
 		log.info("[관리자] Controller : 강좌 목록 전체 가져오기");
 		List<AdminLessonListResponseDTO> list = adminService.getAllLessons();
 		return ResponseEntity.ok(ApiResponse.onSuccess(list));
+	}
+
+	/**
+	 * 강좌 개설 신청 승인/거절 API
+	 * @param lessonGisuId
+	 * @param request
+	 * @return
+	 */
+
+	@PreAuthorize("hasRole('ADMIN')")
+	@Operation(summary = "강좌 개설 신청 상태 변경 (승인/거절)")
+	@PatchMapping("/{lessonGisuId}/state")
+	public ResponseEntity<ApiResponse<LessonGisuStateUpdateResponseDto>> updateLessonState(
+		@PathVariable Long lessonGisuId,
+		@RequestBody LessonGisuStateUpdateRequestDto request) {
+
+		LessonGisuStateUpdateResponseDto result = adminService.updateLessonGisuState(lessonGisuId, request);
+
+		return ResponseEntity.ok(ApiResponse.onSuccess(result));
 	}
 }

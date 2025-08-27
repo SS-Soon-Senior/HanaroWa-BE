@@ -6,6 +6,8 @@ import java.util.List;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
@@ -39,6 +41,10 @@ public class LessonGisu {
 	@Column(nullable = false, length = 50)
 	private String duration;
 
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'PENDING'")
+	private LessonState lessonState;
+
 	@OneToMany(mappedBy = "lessonGisu", cascade = CascadeType.ALL)
 	@Builder.Default
 	private List<Curriculum> curriculums = new ArrayList<>();
@@ -52,4 +58,8 @@ public class LessonGisu {
 	@JoinColumn(name = "lessonRoomId", nullable = false,
 		foreignKey = @ForeignKey(name="fk_LessonGisu_LessonRoom"))
 	private LessonRoom lessonRoom;
+
+	public void updateState(LessonState lessonState) {
+		this.lessonState = lessonState;
+	}
 }
