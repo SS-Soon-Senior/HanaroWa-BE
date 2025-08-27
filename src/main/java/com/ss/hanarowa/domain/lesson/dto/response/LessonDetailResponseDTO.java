@@ -23,6 +23,6 @@ public class LessonDetailResponseDTO {
 	private Category category;
 	private String lessonImg;
 	
-	// Curriculum 정보
-	private List<CurriculumResponseDTO> curriculums;
+	// LessonGisu 정보 (기간, 상태, 커리큘럼 포함)
+	private List<LessonGisuResponseDTO> lessonGisus;
 }

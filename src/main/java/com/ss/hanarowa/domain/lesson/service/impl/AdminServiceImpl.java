@@ -10,6 +10,7 @@ import com.ss.hanarowa.domain.lesson.dto.request.LessonGisuStateUpdateRequestDto
 import com.ss.hanarowa.domain.lesson.dto.response.AdminLessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.CurriculumResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonDetailResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuStateUpdateResponseDto;
 import com.ss.hanarowa.domain.lesson.entity.Lesson;
 import com.ss.hanarowa.domain.lesson.entity.LessonGisu;
@@ -73,16 +74,28 @@ public class AdminServiceImpl implements AdminService {
 			.orElseThrow(() -> new GeneralException(ErrorStatus.LESSON_NOT_FOUND));
 
 		List<LessonGisu> lessonGisus = lessonGisuRepository.findByLessonId(lessonId);
-		List<CurriculumResponseDTO> curriculums = new ArrayList<>();
+		List<LessonGisuResponseDTO> lessonGisuDTOs = new ArrayList<>();
 		
 		for (LessonGisu lessonGisu : lessonGisus) {
+			List<CurriculumResponseDTO> curriculums = new ArrayList<>();
+			
 			for (var curriculum : lessonGisu.getCurriculums()) {
 				curriculums.add(CurriculumResponseDTO.builder()
 					.id(curriculum.getId())
 					.content(curriculum.getContent())
 					.build());
 			}
+			
+			lessonGisuDTOs.add(LessonGisuResponseDTO.builder()
+				.id(lessonGisu.getId())
+				.capacity(lessonGisu.getCapacity())
+				.lessonFee(lessonGisu.getLessonFee())
+				.duration(lessonGisu.getDuration())
+				.lessonState(lessonGisu.getLessonState())
+				.curriculums(curriculums)
+				.build());
 		}
+		
 		return LessonDetailResponseDTO.builder()
 			.lessonName(lesson.getLessonName())
 			.instructor(lesson.getInstructor())
@@ -90,7 +103,7 @@ public class AdminServiceImpl implements AdminService {
 			.description(lesson.getDescription())
 			.category(lesson.getCategory())
 			.lessonImg(lesson.getLessonImg())
-			.curriculums(curriculums)
+			.lessonGisus(lessonGisuDTOs)
 			.build();
 	}
 }
