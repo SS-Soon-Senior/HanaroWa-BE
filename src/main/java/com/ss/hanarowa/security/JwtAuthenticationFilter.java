@@ -3,7 +3,6 @@ package com.ss.hanarowa.security;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
@@ -15,7 +14,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ss.hanarowa.member.dto.MemberAuthDTO;
-import com.ss.hanarowa.member.dto.MemberRegistDTO;
 import com.ss.hanarowa.member.entity.Role;
 
 import jakarta.servlet.FilterChain;
