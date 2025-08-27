@@ -27,6 +27,6 @@ public class FacilityController {
 	@Tag(name = "시설 리스트 목록")
 	public ResponseEntity<ApiResponse<List<FacilityResponseDTO>>> getFacilityByBranchId(@PathVariable Long branchId) {
 		List<FacilityResponseDTO> list = facilityService.getAllFacilities(branchId);
-		return ResponseEntity.ok(ApiResponse.onSuccess(list,"시설 리스트 목록 출력"));
+		return ResponseEntity.ok(ApiResponse.onSuccess(list));
 	}
 }
