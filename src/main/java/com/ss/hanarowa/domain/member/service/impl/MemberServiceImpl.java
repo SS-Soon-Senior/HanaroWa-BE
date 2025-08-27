@@ -10,11 +10,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ss.hanarowa.domain.branch.entity.Branch;
+import com.ss.hanarowa.domain.branch.repository.BranchRepository;
 import com.ss.hanarowa.domain.member.dto.MemberRegistDTO;
+import com.ss.hanarowa.domain.member.dto.ModifyPasswdRequestDTO;
 import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.repository.MemberRepository;
 import com.ss.hanarowa.domain.member.dto.MemberInfoDTO;
 import com.ss.hanarowa.domain.member.service.MemberService;
+import com.ss.hanarowa.global.exception.GeneralException;
+import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 import com.ss.hanarowa.global.util.Format;
 
 import lombok.RequiredArgsConstructor;
@@ -24,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class MemberServiceImpl implements MemberService {
 	private final MemberRepository memberRepository;
+	private final BranchRepository branchRepository;
 	private final PasswordEncoder passwordEncoder;
 
 	@Override

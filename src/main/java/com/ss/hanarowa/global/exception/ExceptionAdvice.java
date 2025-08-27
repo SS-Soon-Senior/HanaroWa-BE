@@ -87,16 +87,6 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 		return buildResponseEntity(ErrorStatus._INTERNAL_SERVER_ERROR, ex.getMessage());
 	}
 
-	@ExceptionHandler(GeneralException.class)
-	public ResponseEntity<Object> handleGeneralException(GeneralException ex) {
-		return ResponseEntity
-			.status(ex.getReason().getHttpStatusCode())
-			.body(ApiResponse.onFailure(
-				ex.getReason().getCode(),
-				ex.getReason().getMessage(),
-				null
-			));
-	}
 
 	private ResponseEntity<Object> buildResponseEntity(ErrorStatus status, Object data) {
 		ApiResponse<Object> body = ApiResponse.onFailure(
