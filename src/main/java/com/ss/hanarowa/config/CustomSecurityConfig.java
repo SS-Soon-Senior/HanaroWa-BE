@@ -41,8 +41,6 @@ public class CustomSecurityConfig {
 			.cors(config -> config.configurationSource(corsConfigurationSource()))
 			.sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.formLogin(form -> form
-				// .loginPage("/auth/login")
-				.loginProcessingUrl("/api/auth/signin")
 				.successHandler(new LoginSuccessHandler())
 				.failureHandler(new LoginFailureHandler())
 			)
