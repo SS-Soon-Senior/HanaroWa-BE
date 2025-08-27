@@ -13,6 +13,7 @@ import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.repository.MemberRepository;
 import com.ss.hanarowa.domain.member.dto.MemberInfoDTO;
 import com.ss.hanarowa.domain.member.service.MemberService;
+import com.ss.hanarowa.global.response.ApiResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -57,6 +58,17 @@ public class MemberController {
 		Member member = memberRepository.getMemberByEmail(email);
 
 		memberService.withdraw(member.getId());
+	}
+
+	@PatchMapping
+	@Tag(name = "회원 정보 수정")
+	public ResponseEntity<?> modifyInfo(@Valid @RequestBody MemberInfoDTO memberInfoDTO, Authentication authentication) {
+		String email = authentication.getName();
+		Member member = memberRepository.getMemberByEmail(email);
+
+		memberService.modifyInfo(memberInfoDTO, member.getId());
+
+		return ResponseEntity.ok(ApiResponse.onSuccess(memberInfoDTO));
 	}
 
 }

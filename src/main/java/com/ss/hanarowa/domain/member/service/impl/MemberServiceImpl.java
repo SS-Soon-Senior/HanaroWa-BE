@@ -4,6 +4,7 @@ import static java.time.LocalDate.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.repository.MemberRepository;
 import com.ss.hanarowa.domain.member.dto.MemberInfoDTO;
 import com.ss.hanarowa.domain.member.service.MemberService;
+import com.ss.hanarowa.global.util.Format;
 
 import lombok.RequiredArgsConstructor;
 
@@ -46,7 +48,7 @@ public class MemberServiceImpl implements MemberService {
 	public void infoRegist(MemberInfoDTO memberInfoDTO, long id) {
 		Member member = memberRepository.findById(id).orElseThrow();
 
-		member.setBirth(memberInfoDTO.getBirth());
+		member.setBirth(Format.getBirthAsLocalDate(memberInfoDTO.getBirth()));
 		member.setPhoneNumber(memberInfoDTO.getPhoneNumber());
 
 		memberRepository.save(member);
@@ -57,6 +59,20 @@ public class MemberServiceImpl implements MemberService {
 		Member member = memberRepository.findById(id).orElseThrow();
 
 		member.setDeletedAt(LocalDateTime.now());
+
+		memberRepository.save(member);
+	}
+
+	@Override
+	public void modifyInfo(MemberInfoDTO memberInfoDTO, long id) {
+		Member member = memberRepository.findById(id).orElseThrow();
+
+		if(Format.getBirthAsLocalDate(memberInfoDTO.getBirth()) != member.getBirth()){
+			member.setBirth(Format.getBirthAsLocalDate(memberInfoDTO.getBirth()));
+		}
+		if(!Objects.equals(memberInfoDTO.getPhoneNumber(), member.getPhoneNumber())){
+			member.setPhoneNumber(memberInfoDTO.getPhoneNumber());
+		}
 
 		memberRepository.save(member);
 	}
