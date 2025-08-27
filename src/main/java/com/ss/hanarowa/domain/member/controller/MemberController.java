@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.hanarowa.domain.member.dto.MemberRegistDTO;
+import com.ss.hanarowa.domain.member.dto.ModifyPasswdRequestDTO;
 import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.repository.MemberRepository;
 import com.ss.hanarowa.domain.member.dto.MemberInfoDTO;
@@ -26,12 +27,12 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/api/member")
 @RequiredArgsConstructor
+@Tag(name = "회원", description = "회원 관련 API")
 public class MemberController {
 	private final MemberService memberService;
 	private final MemberRepository memberRepository;
 
 	@PostMapping("/regist")
-	@Tag(name = "회원가입")
 	@Operation(summary = "일반 회원가입")
 	public ResponseEntity<?> regist(@Valid @RequestBody MemberRegistDTO memberRegistDTO) {
 		memberService.credentialRegist(memberRegistDTO);
@@ -40,7 +41,6 @@ public class MemberController {
 
 	@PostMapping("/info")
 	@Operation(summary = "전화번호, 생일등록")
-	@Tag(name = "추가정보등록")
 	public ResponseEntity<?> info(@Valid @RequestBody MemberInfoDTO memberInfoDTO, Authentication authentication) {
 		String email = authentication.getName();
 
@@ -52,7 +52,7 @@ public class MemberController {
 	}
 
 	@PatchMapping("/withdraw")
-	@Tag(name = "회원탈퇴")
+	@Operation(summary = "회원탈퇴")
 	public void withDraw(Authentication authentication) {
 		String email = authentication.getName();
 
@@ -62,7 +62,7 @@ public class MemberController {
 	}
 
 	@PatchMapping
-	@Tag(name = "회원 정보 수정")
+	@Operation(summary = "회원 정보 수정")
 	public ResponseEntity<?> modifyInfo(@Valid @RequestBody MemberInfoDTO memberInfoDTO, Authentication authentication) {
 		String email = authentication.getName();
 		Member member = memberRepository.getMemberByEmail(email);
@@ -72,12 +72,23 @@ public class MemberController {
 		return ResponseEntity.ok(ApiResponse.onSuccess(memberInfoDTO));
 	}
 
+	@PatchMapping("/password")
+	@Operation(summary = "비밀번호 수정")
+	public ResponseEntity<?> modifyPassword(@Valid @RequestBody ModifyPasswdRequestDTO modifyDTO, Authentication authentication) {
+
+		String email = authentication.getName();
+
+		Member member = memberRepository.getMemberByEmail(email);
+
+		memberService.modifyPassword(modifyDTO, member.getId());
+		return ResponseEntity.ok(ApiResponse.onSuccess("비밀번호 수정 완료"));
+	}
 	/**
 	 * 지점 선택/수정
 	 */
 	@PostMapping("/branch/{branchId}")
 	@Operation(summary = "지점 선택하기/수정 API", description = "하나로와 내 지점을 선택/수정합니다.")
-	@Tag(name = "지점 선택")
+	@Tag(name = "지점", description = "지점 관련 API")
 	public ResponseEntity<ApiResponse<Void>> updateBranch(
 		@PathVariable Long branchId,
 		Authentication authentication) {
