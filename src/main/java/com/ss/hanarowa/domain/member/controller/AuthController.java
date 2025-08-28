@@ -6,12 +6,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ss.hanarowa.domain.member.dto.LoginRequestDTO;
+import com.ss.hanarowa.domain.member.dto.request.LoginRequestDTO;
 import com.ss.hanarowa.global.security.JwtUtil;
 
 import io.swagger.v3.oas.annotations.Parameter;
