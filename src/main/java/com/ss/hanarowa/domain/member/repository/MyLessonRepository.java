@@ -12,4 +12,5 @@ public interface MyLessonRepository extends JpaRepository<MyLesson, Long> {
 	int countByLessonGisu(LessonGisu lessonGisu);
 	int countByLessonGisuId(Long lessonGisuId);
 	List<MyLesson> findAllByLessonGisuId(Long lessonGisuId);
+	List<MyLesson> findAllByMemberId(Long memberId);
 }
