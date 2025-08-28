@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/member")
+@RequestMapping("/member")
 @RequiredArgsConstructor
 @Tag(name = "회원", description = "회원 관련 API")
 public class MemberController {
@@ -80,7 +80,7 @@ public class MemberController {
 
 		String email = authentication.getName();
 
-		Member member = memberRepository.getMemberByEmail(email);
+		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
 		memberService.modifyPassword(modifyDTO, member.getId());
 		return ResponseEntity.ok(ApiResponse.onSuccess("비밀번호 수정 완료"));
