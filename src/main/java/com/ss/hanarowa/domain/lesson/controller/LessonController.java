@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +22,7 @@ import com.ss.hanarowa.domain.lesson.dto.response.OfferedLessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.service.LessonService;
 import com.ss.hanarowa.domain.lesson.service.ReviewService;
 import com.ss.hanarowa.domain.member.entity.Member;
+import com.ss.hanarowa.domain.member.repository.MemberRepository;
 import com.ss.hanarowa.global.exception.GeneralException;
 import com.ss.hanarowa.global.response.ApiResponse;
 import com.ss.hanarowa.global.response.code.status.ErrorStatus;
