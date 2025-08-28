@@ -7,20 +7,25 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ss.hanarowa.domain.lesson.dto.request.LessonGisuStateUpdateRequestDto;
+import com.ss.hanarowa.domain.lesson.dto.request.UpdateLessonDetailRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.AdminLessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.CurriculumResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonDetailResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuStateUpdateResponseDto;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonMemberResponseDTO;
+import com.ss.hanarowa.domain.branch.repository.BranchRepository;
+import com.ss.hanarowa.domain.lesson.entity.Curriculum;
 import com.ss.hanarowa.domain.lesson.entity.Lesson;
 import com.ss.hanarowa.domain.lesson.entity.LessonGisu;
+import com.ss.hanarowa.domain.lesson.repository.CurriculumRepository;
 import com.ss.hanarowa.domain.lesson.repository.LessonGisuRepository;
 import com.ss.hanarowa.domain.lesson.service.AdminLessonService;
 import com.ss.hanarowa.domain.lesson.repository.LessonRepository;
 import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.entity.MyLesson;
 import com.ss.hanarowa.domain.member.repository.MyLessonRepository;
+import com.ss.hanarowa.domain.lesson.repository.LessonRoomRepository;
 import com.ss.hanarowa.global.exception.GeneralException;
 import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 
@@ -32,6 +37,7 @@ import lombok.RequiredArgsConstructor;
 public class AdminLessonServiceImpl implements AdminLessonService {
 	private final LessonRepository lessonRepository;
 	private final LessonGisuRepository lessonGisuRepository;
+	private final CurriculumRepository curriculumRepository;
 	private final MyLessonRepository myLessonRepository;
 
 	@Override
@@ -127,5 +133,43 @@ public class AdminLessonServiceImpl implements AdminLessonService {
 				m.getBirth()
 			))
 			.toList();
+	}
+
+	@Override
+	@Transactional
+	public LessonDetailResponseDTO updateLessonDetail(Long lessonId, UpdateLessonDetailRequestDTO requestDTO) {
+		Lesson lesson = lessonRepository.findById(lessonId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.LESSON_NOT_FOUND));
+
+		lesson.setLessonName(requestDTO.getLessonName());
+		lesson.setInstructor(requestDTO.getInstructor());
+		lesson.setInstruction(requestDTO.getInstruction());
+		lesson.setDescription(requestDTO.getDescription());
+		lesson.setCategory(requestDTO.getCategory());
+		lesson.setLessonImg(requestDTO.getLessonImg());
+
+		lessonRepository.save(lesson);
+
+		for (UpdateLessonDetailRequestDTO.UpdateLessonGisuDTO gisuDTO : requestDTO.getLessonGisus()) {
+			LessonGisu lessonGisu = lessonGisuRepository.findById(gisuDTO.getId())
+				.orElseThrow(() -> new GeneralException(ErrorStatus.LESSONGISU_NOT_FOUND));
+
+			lessonGisu.setCapacity(gisuDTO.getCapacity());
+			lessonGisu.setLessonFee(gisuDTO.getLessonFee());
+			lessonGisu.setDuration(gisuDTO.getDuration());
+			lessonGisu.setLessonState(gisuDTO.getLessonState());
+
+			lessonGisuRepository.save(lessonGisu);
+
+			for (UpdateLessonDetailRequestDTO.UpdateCurriculumDTO curriculumDTO : gisuDTO.getCurriculums()) {
+				Curriculum curriculum = curriculumRepository.findById(curriculumDTO.getId())
+					.orElseThrow(() -> new GeneralException(ErrorStatus.CURRICULUM_NOT_FOUND));
+
+				curriculum.setContent(curriculumDTO.getContent());
+				curriculumRepository.save(curriculum);
+			}
+		}
+
+		return getLessonDetail(lessonId);
 	}
 }
