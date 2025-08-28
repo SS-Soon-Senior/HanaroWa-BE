@@ -13,4 +13,6 @@ public interface FacilityTimeRepository extends JpaRepository<FacilityTime, Long
 	
 	// 모든 예약 내역을 최신순으로 조회 (ID 기준)
 	List<FacilityTime> findAllByOrderByIdDesc();
+
+	List<FacilityTime> findAllByMemberId(Long memberId);
 }
