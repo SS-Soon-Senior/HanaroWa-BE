@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.hanarowa.domain.lesson.dto.request.ReviewRequestDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.LessonListByBranchIdResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.LessonMoreDetailResponseDTO;
+import com.ss.hanarowa.domain.lesson.service.LessonService;
 import com.ss.hanarowa.domain.lesson.service.ReviewService;
 import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.repository.MemberRepository;
@@ -32,7 +35,6 @@ public class LessonController {
 	private final LessonService lessonService;
 	private final ReviewService reviewService;
 	private final MemberRepository memberRepository;
-	private final LessonService lessonService;
 
 	@PostMapping("/{lessonGisuId}/review")
 	@Operation(summary = "강좌 기수 리뷰 작성", description = "사용자가 특정 강좌 기수에 대한 리뷰를 작성합니다.")
@@ -55,10 +57,10 @@ public class LessonController {
 		return ResponseEntity.ok(ApiResponse.onSuccess(lessonService.getLessonMoreDetail(lessonId)));
 	}
 
-	@GetMapping("/{branchId}")
+	@GetMapping("/list/{branchId}")
 	@Operation(summary = "지점별 강좌 목록 가져오기", description = "사용자가 지점별 강좌 목록 최신순으로 가져오기 조회합니다.")
-	public ResponseEntity<ApiResponse<LessonListByBranchId>> getLessonListByBranchId(@PathVariable Long branchId) {
-		LessonListByBranchId lessonList = lessonService.getLessonListByBranchId(branchId);
+	public ResponseEntity<ApiResponse<LessonListByBranchIdResponseDTO>> getLessonListByBranchId(@PathVariable Long branchId) {
+		LessonListByBranchIdResponseDTO lessonList = lessonService.getLessonListByBranchId(branchId);
 		return ResponseEntity.ok(ApiResponse.onSuccess(lessonList));
 	}
 
