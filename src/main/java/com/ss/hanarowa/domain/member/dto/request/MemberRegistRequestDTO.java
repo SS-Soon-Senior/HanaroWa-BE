@@ -1,4 +1,4 @@
-package com.ss.hanarowa.domain.member.dto;
+package com.ss.hanarowa.domain.member.dto.request;
 
 import com.ss.hanarowa.domain.member.entity.Role;
 
@@ -16,7 +16,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class MemberRegistDTO{
+public class MemberRegistRequestDTO {
 	private String name;
 
 	@Email(message = "올바른 이메일 형식이어야 합니다.")
