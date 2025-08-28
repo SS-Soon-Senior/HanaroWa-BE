@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class AdminLessonLessonServiceImpl implements AdminLessonService {
+public class AdminLessonServiceImpl implements AdminLessonService {
 	private final LessonRepository lessonRepository;
 	private final LessonGisuRepository lessonGisuRepository;
 	private final MyLessonRepository myLessonRepository;
