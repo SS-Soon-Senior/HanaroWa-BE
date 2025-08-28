@@ -83,6 +83,6 @@ public class AdminLessonController {
 	@PatchMapping("/{lessonId}")
 	public ResponseEntity<ApiResponse<LessonDetailResponseDTO>> updateLessonDetail(@PathVariable Long lessonId, @Valid @RequestBody UpdateLessonDetailRequestDTO requestDTO){
 		log.info("[관리자] Controller : 강좌 상세 수정 - lessonId: {}, requestDTO: {}", lessonId, requestDTO);
-		return ResponseEntity.ok(ApiResponse.onSuccess(adminService.updateLessonDetail(lessonId,requestDTO)));
+		return ResponseEntity.ok(ApiResponse.onSuccess(adminLessonService.updateLessonDetail(lessonId,requestDTO)));
 	}
 }
