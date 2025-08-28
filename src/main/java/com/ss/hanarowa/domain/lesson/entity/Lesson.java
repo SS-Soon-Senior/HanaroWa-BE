@@ -23,8 +23,9 @@ import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-
+import lombok.Setter;
 
 @Entity
 @Data
@@ -32,6 +33,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@Getter @Setter
 public class Lesson {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,7 +42,7 @@ public class Lesson {
 	@Column(nullable = false, length = 30)
 	private String lessonName;
 
-	@Column(nullable = false, length = 15)
+	@Column(length = 15)
 	private String instructor;
 
 	@Column(nullable = false)
