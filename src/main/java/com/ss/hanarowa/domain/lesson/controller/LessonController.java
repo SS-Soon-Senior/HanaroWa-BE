@@ -2,6 +2,7 @@ package com.ss.hanarowa.domain.lesson.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -9,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.hanarowa.domain.lesson.dto.request.ReviewRequestDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.LessonListByBranchId;
+import com.ss.hanarowa.domain.lesson.service.LessonService;
 import com.ss.hanarowa.domain.lesson.service.ReviewService;
 import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.repository.MemberRepository;
@@ -28,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/lesson")
 @Tag(name = "강좌", description = "강좌 관련 API")
 public class LessonController {
+	private final LessonService lessonService;
 	private final ReviewService reviewService;
 	private final MemberRepository memberRepository;
 
@@ -45,4 +49,12 @@ public class LessonController {
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(null));
 	}
+
+	@GetMapping("/{branchId}")
+	@Operation(summary = "지점별 강좌 목록 가져오기", description = "사용자가 지점별 강좌 목록 최신순으로 가져오기 조회합니다.")
+	public ResponseEntity<ApiResponse<LessonListByBranchId>> getLessonListByBranchId(@PathVariable Long branchId) {
+		LessonListByBranchId lessonList = lessonService.getLessonListByBranchId(branchId);
+		return ResponseEntity.ok(ApiResponse.onSuccess(lessonList));
+	}
+
 }
