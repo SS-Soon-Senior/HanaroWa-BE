@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/admin/lesson")
 @RequiredArgsConstructor
-public class AdminController {
+public class AdminLessonController {
 	private final AdminService adminService;
 
 	@PreAuthorize("hasRole('ADMIN')")

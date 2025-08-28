@@ -1,9 +1,13 @@
 package com.ss.hanarowa.domain.lesson.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ss.hanarowa.domain.branch.entity.Branch;
 import com.ss.hanarowa.domain.member.entity.Member;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,6 +19,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -59,4 +64,8 @@ public class Lesson {
 	@JoinColumn(name = "memberId",
 		foreignKey = @ForeignKey(name = "fk_Lesson_Member"))
 	private Member member;
+
+	@OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL)
+	@Builder.Default
+	private List<LessonGisu> lessonGisus = new ArrayList<>();
 }
