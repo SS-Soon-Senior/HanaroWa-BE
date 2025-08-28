@@ -1,5 +1,6 @@
 package com.ss.hanarowa.domain.lesson.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ss.hanarowa.global.entity.BaseEntity;
 
 import jakarta.persistence.Column;
@@ -17,13 +18,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @EqualsAndHashCode(callSuper = true)
-@Builder
+@SuperBuilder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Curriculum extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

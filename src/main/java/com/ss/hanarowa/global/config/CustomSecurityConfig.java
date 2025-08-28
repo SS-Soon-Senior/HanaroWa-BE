@@ -36,6 +36,8 @@ import lombok.extern.log4j.Log4j2;
 public class CustomSecurityConfig {
 	private final CustomOAuth2UserService customOAuth2UserService;
 	private final OAuth2SuccessHandler oAuth2SuccessHandler;
+	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+	private final CustomAccessDeiniedHandler customAccessDeiniedHandler;
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		log.info("--- securityConfig");
@@ -46,12 +48,25 @@ public class CustomSecurityConfig {
 			.csrf(AbstractHttpConfigurer::disable)
 			.cors(config -> config.configurationSource(corsConfigurationSource()))
 			.sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.formLogin(form -> form
-				.successHandler(new LoginSuccessHandler())
-				.failureHandler(new LoginFailureHandler())
+			.formLogin(AbstractHttpConfigurer::disable)
+			.httpBasic(AbstractHttpConfigurer::disable)
+			.authorizeHttpRequests(auth -> auth
+				.requestMatchers(
+					"/member/regist",
+					"/auth/**",
+					"/favicon.ico",
+					"/actuator/**",
+					"/swagger-ui/**",
+					"/v3/api-docs/**",
+					"/hanarowa/api-docs/**",
+					"/v3/api-docs/**",
+					"/broadcast/**",
+					"/swagger.html"
+				).permitAll()
+				.anyRequest().authenticated()
 			)
-			.exceptionHandling(config -> config.accessDeniedHandler(new CustomAccessDeiniedHandler()))
-			.addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+			.exceptionHandling(config -> config.accessDeniedHandler(customAccessDeiniedHandler))
+			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 			http.oauth2Login(oauth2 -> oauth2
 				.userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
 				.successHandler(oAuth2SuccessHandler)
