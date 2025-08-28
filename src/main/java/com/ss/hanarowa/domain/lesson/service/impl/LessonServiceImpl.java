@@ -4,12 +4,17 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.ss.hanarowa.domain.lesson.dto.request.AppliedLessonRequestDTO;
+import com.ss.hanarowa.domain.lesson.dto.request.OfferedLessonRequestDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.LessonListResponseDTO;
+import com.ss.hanarowa.domain.lesson.entity.Lesson;
+import com.ss.hanarowa.domain.lesson.entity.LessonGisu;
+import com.ss.hanarowa.domain.lesson.entity.LessonRoom;
 import com.ss.hanarowa.domain.branch.entity.Branch;
 import com.ss.hanarowa.domain.branch.repository.BranchRepository;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonInfoResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListByBranchIdResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListSearchResponseDTO;
-import com.ss.hanarowa.domain.lesson.entity.Lesson;
 import com.ss.hanarowa.domain.lesson.repository.LessonRepository;
 import com.ss.hanarowa.domain.lesson.service.LessonService;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonMoreDetailResponseDTO;
@@ -63,12 +68,12 @@ public class LessonServiceImpl implements LessonService {
 					.build();
 			})
 			.collect(Collectors.toList());
-		
+
 		// 전체 리뷰 정보 수집 (Lesson에 따른 모든 LessonGisu의 리뷰)
 		List<Review> allReviews = lesson.getLessonGisus().stream()
 			.flatMap(lessonGisu -> reviewRepository.findByLessonGisu(lessonGisu).stream())
 			.toList();
-		
+
 		// Review 엔티티를 ReviewResponseDTO로 변환
 		List<ReviewResponseDTO> reviewDTOs = allReviews.stream()
 			.map(review -> ReviewResponseDTO.builder()
@@ -79,12 +84,12 @@ public class LessonServiceImpl implements LessonService {
 				.lessonGisuId(review.getLessonGisu().getId())
 				.build())
 			.collect(Collectors.toList());
-		
+
 		double averageRating = allReviews.stream()
 			.mapToInt(Review::getRating)
 			.average()
 			.orElse(0.0);
-		
+
 		return LessonMoreDetailResponseDTO.builder()
 			.lessonName(lesson.getLessonName())
 			.instructor(lesson.getInstructor())
@@ -99,14 +104,53 @@ public class LessonServiceImpl implements LessonService {
 			.build();
 	}
 
+	// 신청 강좌 목록
 	@Override
-	public List<MyLesson> getAllAppliedLessons() {
-		return myLessonRepository.findAll();
+	public List<LessonListResponseDTO> getAllAppliedLessons(Long memberId, AppliedLessonRequestDTO req){
+		List<MyLesson> myLessons = myLessonRepository.findAllByMemberId(memberId);
+
+		if(myLessons.isEmpty()){
+			throw new GeneralException(ErrorStatus.APPLIED_NOT_FOUND);
+		}
+
+		return myLessons.stream().map(myLesson -> {
+			LessonGisu gisu = myLesson.getLessonGisu();
+			Lesson lesson = gisu.getLesson();
+			LessonRoom room = gisu.getLessonRoom();
+
+			return LessonListResponseDTO.builder()
+										.lessonId(lesson.getId())
+										.lessonGisuId(gisu.getId())
+										.lessonState(gisu.getLessonState())
+										.startedAt(gisu.getStartedAt())
+										.lessonName(lesson.getLessonName())
+										.instructorName(lesson.getMember().getName()) //일단 외부강사 말고 개설 강좌만
+										.duration(gisu.getDuration())
+										.lessonRoomName(room.getName())
+										//리뷰 추가해야함
+										.build();
+		}).toList();
 	}
 
+	// 개설 강좌 목록
 	@Override
-	public List<Lesson> getAllOfferedLessons() {
-		return lessonRepository.findAll();
+	public List<LessonListResponseDTO> getAllOfferedLessons(Long memberId, OfferedLessonRequestDTO req){
+		List<Lesson> offeredLessons = lessonRepository.findAllByMemberId(memberId);
+
+		return offeredLessons.stream().flatMap(lesson -> lesson.getLessonGisus().stream().map(gisu -> { LessonRoom room = gisu.getLessonRoom();
+
+			return LessonListResponseDTO.builder()
+										.lessonId(lesson.getId())
+										.lessonGisuId(gisu.getId())
+										.lessonState(gisu.getLessonState())
+										.startedAt(gisu.getStartedAt())
+										.lessonName(lesson.getLessonName())
+										.instructorName(lesson.getMember().getName())
+										.duration(gisu.getDuration())
+										.lessonRoomName(room.getName())
+										.build();
+			})
+		).toList();
 	}
 
 	@Override
@@ -114,16 +158,16 @@ public class LessonServiceImpl implements LessonService {
 		// 지점 조회
 		Branch branch = branchRepository.findById(branchId)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.BRANCH_NOT_FOUND));
-		
+
 		// 지점별 강좌 목록 조회 (최신순)
 		List<Lesson> lessons = lessonRepository.findByBranchIdOrderByIdDesc(branchId);
-		
+
 		// 각 강좌별 LessonGisu 정보 및 수강 인원 수 조회
 		List<LessonInfoResponseDTO> lessonInfos = lessons.stream()
 			.flatMap(lesson -> lesson.getLessonGisus().stream())
 			.map(lessonGisu -> {
 				int currentEnrollment = myLessonRepository.countByLessonGisu(lessonGisu);
-				
+
 				return LessonInfoResponseDTO.builder()
 					.lessonId(lessonGisu.getLesson().getId())
 					.lessonGisuId(lessonGisu.getId())
@@ -149,20 +193,20 @@ public class LessonServiceImpl implements LessonService {
 	@Override
 	public List<LessonListSearchResponseDTO> getLessonListSearch(String query) {
 		List<Lesson> lessons;
-		
+
 		// query가 null이거나 빈 문자열이면 전체 강좌 조회, 아니면 검색
 		if (query == null || query.trim().isEmpty()) {
 			lessons = lessonRepository.findAllByOrderByIdDesc();
 		} else {
 			lessons = lessonRepository.findByLessonNameContainingOrderByIdDesc(query.trim());
 		}
-		
+
 		// 각 강좌별 LessonGisu 정보 및 수강 인원 수 조회
 		return lessons.stream()
 			.flatMap(lesson -> lesson.getLessonGisus().stream())
 			.map(lessonGisu -> {
 				int currentEnrollment = myLessonRepository.countByLessonGisu(lessonGisu);
-				
+
 				return LessonListSearchResponseDTO.builder()
 					.branchId(lessonGisu.getLesson().getBranch().getId())
 					.locationName(lessonGisu.getLesson().getBranch().getLocation().getName())

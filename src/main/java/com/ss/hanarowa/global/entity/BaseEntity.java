@@ -28,7 +28,7 @@ public class BaseEntity {
 	@Column(nullable = false, columnDefinition = "DATETIME(0)")
 	private LocalDateTime startedAt;
 
-	@Column(nullable=false, columnDefinition = "DATETIME(0)")
+	@Column(columnDefinition = "DATETIME(0)")
 	private LocalDateTime endedAt;
 
 }

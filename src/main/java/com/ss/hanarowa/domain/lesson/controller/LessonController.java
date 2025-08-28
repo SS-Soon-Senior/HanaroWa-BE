@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,10 +13,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ss.hanarowa.domain.lesson.dto.request.AppliedLessonRequestDTO;
+import com.ss.hanarowa.domain.lesson.dto.request.OfferedLessonRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.request.ReviewRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListByBranchIdResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListSearchResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.AppliedLessonListResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.LessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonMoreDetailResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.OfferedLessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.service.LessonService;
 import com.ss.hanarowa.domain.lesson.service.ReviewService;
 import com.ss.hanarowa.domain.member.entity.Member;
@@ -73,4 +79,30 @@ public class LessonController {
 		return ResponseEntity.ok(ApiResponse.onSuccess(lessonList));
 	}
 
+
+	@Operation(summary="신청 강좌 목록 보기")
+	@GetMapping("/reservation/applied")
+	public ResponseEntity<AppliedLessonListResponseDTO> getAllAppliedLessons(@PathVariable Long memberId,
+		@AuthenticationPrincipal Member currentUser, AppliedLessonRequestDTO req){
+
+		if(!currentUser.getId().equals(memberId)){
+			throw new GeneralException(ErrorStatus.LESSONLIST_NOT_AUTHORITY);
+		}
+
+		List<LessonListResponseDTO> appliedLessons = lessonService.getAllAppliedLessons(memberId, req);
+		return ResponseEntity.ok(new AppliedLessonListResponseDTO(appliedLessons));
+	}
+
+	@Operation(summary="개설 강좌 목록 보기")
+	@GetMapping("/reservation/offered")
+	public ResponseEntity<OfferedLessonListResponseDTO> getAllOfferedLessons(@PathVariable Long memberId,
+		@AuthenticationPrincipal Member currentUser, OfferedLessonRequestDTO req){
+
+		if(!currentUser.getId().equals(memberId)){
+			throw new GeneralException(ErrorStatus.LESSONLIST_NOT_AUTHORITY);
+		}
+
+		List<LessonListResponseDTO> offeredLessons = lessonService.getAllOfferedLessons(memberId, req);
+		return ResponseEntity.ok(new OfferedLessonListResponseDTO(offeredLessons));
+	}
 }
