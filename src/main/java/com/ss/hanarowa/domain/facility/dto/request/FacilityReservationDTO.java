@@ -12,7 +12,9 @@ import lombok.Getter;
 public class FacilityReservationDTO {
 		private long facilityId;
 
-		private LocalDateTime startedAt;
+		private String reservationDate;
 
-		private LocalDateTime endedAt;
+		private String startTime;
+
+		private String endTime;
 }

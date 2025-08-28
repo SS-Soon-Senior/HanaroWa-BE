@@ -1,5 +1,7 @@
 package com.ss.hanarowa.domain.facility.service.impl;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,11 +44,20 @@ public class FacilityServiceImpl implements FacilityService {
 	public void reservateFacility(FacilityReservationDTO facilityReservationDTO, Long memberId) {
 		Facility facility = facilityRepository.findById(facilityReservationDTO.getFacilityId()).orElseThrow(()->new GeneralException(ErrorStatus.FACILITY_NOT_FOUND));
 		Member member = memberRepository.findById(memberId).orElseThrow(() ->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+		String reservationDate = facilityReservationDTO.getReservationDate();
+		String startTime = facilityReservationDTO.getStartTime();
+		String endTime = facilityReservationDTO.getEndTime();
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+		LocalDateTime reservationDateTime = LocalDateTime.parse(reservationDate + " " + startTime, formatter);
+		LocalDateTime reservationEndTime = LocalDateTime.parse(reservationDate + " " + endTime, formatter);
+
+
 		FacilityTime facilityTime = FacilityTime.builder()
 			.facility(facility)
 			.member(member)
-			.startedAt(facilityReservationDTO.getStartedAt())
-			.endedAt(facilityReservationDTO.getEndedAt())
+			.startedAt(reservationDateTime)
+			.endedAt(reservationEndTime)
 			.build();
 
 		facilityTimeRepository.save(facilityTime);
