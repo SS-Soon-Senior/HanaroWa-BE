@@ -31,7 +31,7 @@ public class LessonController {
 	private final ReviewService reviewService;
 	private final MemberRepository memberRepository;
 
-	@PostMapping("/lesson/{lessonId}/review")
+	@PostMapping("/{lessonId}/review")
 	@Operation(summary = "강좌 리뷰 작성", description = "사용자가 특정 강좌에 대한 리뷰를 작성합니다.")
 	public ResponseEntity<ApiResponse<Void>> createReview(
 		@PathVariable Long lessonId,
