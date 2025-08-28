@@ -27,9 +27,8 @@ public class ReviewServiceImpl implements ReviewService {
     private final LessonGisuRepository lessonGisuRepository;
 
     @Override
-    public void createReview(Long lessonGisuId, Long memberId, ReviewRequestDTO reviewRequestDTO) {
-        Member member = memberRepository.findById(memberId)
-            .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+    public void createReview(Long lessonGisuId, String email, ReviewRequestDTO reviewRequestDTO) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
         
         LessonGisu lessonGisu = lessonGisuRepository.findById(lessonGisuId)
             .orElseThrow(() -> new GeneralException(ErrorStatus.LESSON_NOT_FOUND));

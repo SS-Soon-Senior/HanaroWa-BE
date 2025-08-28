@@ -61,4 +61,5 @@ public class FacilityController {
 		facilityService.reservateFacility(facilityReservationDTO, memberId);
 		return ResponseEntity.ok(ApiResponse.onSuccess(null));
 	}
+
 }

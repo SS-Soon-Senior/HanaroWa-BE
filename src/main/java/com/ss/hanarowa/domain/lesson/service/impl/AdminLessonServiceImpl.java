@@ -13,6 +13,7 @@ import com.ss.hanarowa.domain.lesson.dto.response.CurriculumResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonDetailResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuStateUpdateResponseDto;
+import com.ss.hanarowa.domain.lesson.dto.response.LessonMemberResponseDTO;
 import com.ss.hanarowa.domain.branch.entity.Branch;
 import com.ss.hanarowa.domain.branch.repository.BranchRepository;
 import com.ss.hanarowa.domain.lesson.entity.Curriculum;
@@ -22,7 +23,11 @@ import com.ss.hanarowa.domain.lesson.entity.LessonRoom;
 import com.ss.hanarowa.domain.lesson.entity.LessonState;
 import com.ss.hanarowa.domain.lesson.repository.CurriculumRepository;
 import com.ss.hanarowa.domain.lesson.repository.LessonGisuRepository;
+import com.ss.hanarowa.domain.lesson.service.AdminLessonService;
 import com.ss.hanarowa.domain.lesson.repository.LessonRepository;
+import com.ss.hanarowa.domain.member.entity.Member;
+import com.ss.hanarowa.domain.member.entity.MyLesson;
+import com.ss.hanarowa.domain.member.repository.MyLessonRepository;
 import com.ss.hanarowa.domain.lesson.repository.LessonRoomRepository;
 import com.ss.hanarowa.domain.lesson.service.AdminService;
 import com.ss.hanarowa.global.exception.GeneralException;
@@ -33,12 +38,13 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class AdminServiceImpl implements AdminService {
+public class AdminLessonServiceImpl implements AdminLessonService {
 	private final LessonRepository lessonRepository;
 	private final LessonGisuRepository lessonGisuRepository;
 	private final CurriculumRepository curriculumRepository;
 	private final BranchRepository branchRepository;
 	private final LessonRoomRepository lessonRoomRepository;
+	private final MyLessonRepository myLessonRepository;
 
 	@Override
 	public List<AdminLessonListResponseDTO> getAllLessons() {
@@ -117,41 +123,59 @@ public class AdminServiceImpl implements AdminService {
 			.build();
 	}
 
+	private Member getMember(MyLesson myLesson) {
+		return myLesson.getMember();
+	}
+
+	@Override
+	public List<LessonMemberResponseDTO> findAllByLessonGisuId(long lessonGisuId) {
+		return myLessonRepository.findAllByLessonGisuId(lessonGisuId).stream()
+			.map(MyLesson::getMember)               // 바로 member 추출
+			.map(m -> new LessonMemberResponseDTO(
+				m.getName(),
+				m.getBranch().getName(), // null-safe
+				m.getPhoneNumber(),
+				m.getEmail(),
+				m.getBirth()
+			))
+			.toList();
+	}
+
 	@Override
 	@Transactional
 	public LessonDetailResponseDTO updateLessonDetail(Long lessonId, UpdateLessonDetailRequestDTO requestDTO) {
 		Lesson lesson = lessonRepository.findById(lessonId)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.LESSON_NOT_FOUND));
-		
+
 		lesson.setLessonName(requestDTO.getLessonName());
 		lesson.setInstructor(requestDTO.getInstructor());
 		lesson.setInstruction(requestDTO.getInstruction());
 		lesson.setDescription(requestDTO.getDescription());
 		lesson.setCategory(requestDTO.getCategory());
 		lesson.setLessonImg(requestDTO.getLessonImg());
-		
+
 		lessonRepository.save(lesson);
-		
+
 		for (UpdateLessonDetailRequestDTO.UpdateLessonGisuDTO gisuDTO : requestDTO.getLessonGisus()) {
 			LessonGisu lessonGisu = lessonGisuRepository.findById(gisuDTO.getId())
 				.orElseThrow(() -> new GeneralException(ErrorStatus.LESSONGISU_NOT_FOUND));
-			
+
 			lessonGisu.setCapacity(gisuDTO.getCapacity());
 			lessonGisu.setLessonFee(gisuDTO.getLessonFee());
 			lessonGisu.setDuration(gisuDTO.getDuration());
 			lessonGisu.setLessonState(gisuDTO.getLessonState());
-			
+
 			lessonGisuRepository.save(lessonGisu);
-			
+
 			for (UpdateLessonDetailRequestDTO.UpdateCurriculumDTO curriculumDTO : gisuDTO.getCurriculums()) {
 				Curriculum curriculum = curriculumRepository.findById(curriculumDTO.getId())
 					.orElseThrow(() -> new GeneralException(ErrorStatus.CURRICULUM_NOT_FOUND));
-				
+
 				curriculum.setContent(curriculumDTO.getContent());
 				curriculumRepository.save(curriculum);
 			}
 		}
-		
+
 		return getLessonDetail(lessonId);
 	}
 }

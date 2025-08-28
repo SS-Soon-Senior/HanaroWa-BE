@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,7 +17,8 @@ import com.ss.hanarowa.domain.lesson.dto.request.UpdateLessonDetailRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.AdminLessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonDetailResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuStateUpdateResponseDto;
-import com.ss.hanarowa.domain.lesson.service.AdminService;
+import com.ss.hanarowa.domain.lesson.dto.response.LessonMemberResponseDTO;
+import com.ss.hanarowa.domain.lesson.service.AdminLessonService;
 import com.ss.hanarowa.global.response.ApiResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,14 +32,14 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/admin/lesson")
 @RequiredArgsConstructor
 public class AdminLessonController {
-	private final AdminService adminService;
+	private final AdminLessonService adminLessonService;
 
 	@PreAuthorize("hasRole('ADMIN')")
 	@Operation(summary ="강좌 개설 신청 내역")
 	@GetMapping
 	public ResponseEntity<ApiResponse<List<AdminLessonListResponseDTO>>> getAdminAllLessons(){
 		log.info("[관리자] Controller : 강좌 목록 전체 가져오기");
-		List<AdminLessonListResponseDTO> list = adminService.getAllLessons();
+		List<AdminLessonListResponseDTO> list = adminLessonService.getAllLessons();
 		return ResponseEntity.ok(ApiResponse.onSuccess(list));
 	}
 
@@ -57,7 +57,7 @@ public class AdminLessonController {
 		@PathVariable Long lessonGisuId,
 		@RequestBody LessonGisuStateUpdateRequestDto request) {
 
-		LessonGisuStateUpdateResponseDto result = adminService.updateLessonGisuState(lessonGisuId, request);
+		LessonGisuStateUpdateResponseDto result = adminLessonService.updateLessonGisuState(lessonGisuId, request);
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(result));
 	}
@@ -66,8 +66,17 @@ public class AdminLessonController {
 	@Operation(summary="관리자 강좌 상세 보기")
 	@GetMapping("/{lessonId}")
 	public ResponseEntity<ApiResponse<LessonDetailResponseDTO>> getLessonDetail(@PathVariable Long lessonId){
-		return ResponseEntity.ok(ApiResponse.onSuccess(adminService.getLessonDetail(lessonId)));
+		return ResponseEntity.ok(ApiResponse.onSuccess(adminLessonService.getLessonDetail(lessonId)));
 	}
+
+	@PreAuthorize("hasRole('ADMIN')")
+	@Operation(summary = "관리자 강좌별 신청 회원 현황")
+	@GetMapping("/{lessonGisuId}/member")
+	public ResponseEntity<ApiResponse<List<LessonMemberResponseDTO>>> getLessonMembers(@PathVariable Long lessonGisuId){
+		List<LessonMemberResponseDTO> result = adminLessonService.findAllByLessonGisuId(lessonGisuId);
+		return ResponseEntity.ok(ApiResponse.onSuccess(result));
+	}
+
 
 	@PreAuthorize("hasRole('ADMIN')")
 	@Operation(summary="관리자 강좌 상세 수정하기")
