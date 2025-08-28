@@ -1,6 +1,8 @@
 package com.ss.hanarowa.domain.facility.service.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityDetailResponseDTO;
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityResponseDTO;
+import com.ss.hanarowa.domain.facility.dto.reponse.FacilityTimeResponseDTO;
 import com.ss.hanarowa.domain.facility.dto.request.FacilityReservationDTO;
 import com.ss.hanarowa.domain.facility.entity.Facility;
 import com.ss.hanarowa.domain.facility.entity.FacilityTime;
@@ -67,11 +70,27 @@ public class FacilityServiceImpl implements FacilityService {
 	public FacilityDetailResponseDTO getDetailFacility(Long facilityId) throws GeneralException{
 		Facility facility = facilityRepository.findById(facilityId)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.FACILITY_NOT_FOUND));
+
+		LocalDateTime startDateTime = LocalDate.now().atStartOfDay();
+		LocalDateTime endDateTime = LocalDate.now().plusDays(3).atTime(LocalTime.MAX);
+
+		List<FacilityTime> facilityTimes = facilityTimeRepository.findFacilityTimesByFacilityAndStartedAtBetween(facility, startDateTime, endDateTime);
+
+		List<FacilityTimeResponseDTO> timeResponseDTOS = facilityTimes.stream().map(f -> FacilityTimeResponseDTO.builder()
+			.date(f.getEndedAt().format(DateTimeFormatter.ofPattern("MM-dd")))
+			.endTime(f.getEndedAt().minusHours(1).format(
+				DateTimeFormatter.ofPattern("HH:mm")))
+			.startTime(f.getStartedAt().format(
+				DateTimeFormatter.ofPattern("HH:mm")))
+			.build()
+		).toList();
+
 		return FacilityDetailResponseDTO.builder()
 			.facilityName(facility.getName())
 			.facilityImages(facility.getFacilityImages())
 			.facilityDescription(facility.getDescription())
 			.facilityId(facility.getId())
+			.facilityTimes(timeResponseDTOS)
 			.build();
 	}
 
