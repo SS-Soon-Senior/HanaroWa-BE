@@ -21,10 +21,11 @@ public class JwtRefreshController {
 		@RequestParam String refreshToken) {
 		if (refreshToken == null)
 			throw new GeneralException(ErrorStatus.TOKEN_NOT_FOUND);
+		System.out.println(authHeader);
 
-		if (authHeader == null || authHeader.length() < 7)
+		if (authHeader == null || authHeader.length() < 7) {
 			throw new GeneralException(ErrorStatus.TOKEN_INVALID);
-
+		}
 		String accessToken = authHeader.substring(7);
 		if (!didExpireToken(accessToken)) {
 			return ResponseEntity.ok(Map.of("accessToken", accessToken, "refreshToken", refreshToken));
@@ -32,12 +33,14 @@ public class JwtRefreshController {
 
 		Map<String, Object> claim = JwtUtil.validateToken(refreshToken);
 		String newAccessToken = JwtUtil.generateToken(claim, 10);
-		String newRefreshToken = isSomeLeftTime((long)claim.get("exp"))
+		Number expNumber = (Number) claim.get("exp");
+		String newRefreshToken = isSomeLeftTime(expNumber.longValue())
 			? JwtUtil.generateToken(claim, 60 * 24)
 			: refreshToken;
 
-		return ResponseEntity.ok(Map.of("accessToken", newAccessToken, "refreshToken", newRefreshToken));
+		//newRefreshToken DB에 저장?
 
+		return ResponseEntity.ok(Map.of("accessToken", newAccessToken, "refreshToken", newRefreshToken));
 	}
 
 	private boolean isSomeLeftTime(long exp) {

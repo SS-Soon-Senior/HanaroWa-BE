@@ -8,6 +8,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,12 +42,7 @@ public class AuthController {
 	@PostMapping("/signin")
 	@Tag(name = "로그인", description = "사용자 로그인")
 	@Transactional
-	public ResponseEntity<?> signin(@Parameter(example = """
-		{
-		  "email": "youngkyun@hana.com",
-		  "pwd": "1234"
-		}
-		""")LoginRequestDTO loginRequest) {
+	public ResponseEntity<?> signin(@RequestBody LoginRequestDTO loginRequest) {
 		try {
 			Authentication authenticate = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(
