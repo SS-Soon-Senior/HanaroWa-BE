@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,34 +21,20 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+@Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-	private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
-	private final String[] excludePatterns = {
-		"/api/member/regist",  // 회원가입
-		"/api/auth/**",
-		"/favicon.ico",
-		"/actuator/**",
-		"/swagger-ui/**",
-		"/v3/api-docs/**",
-		"/hanarowa/api-docs/**",
-		"/broadcast/**",
-		"/swagger.html",
-
-	};
-
-	@Override
-	protected boolean shouldNotFilter(@NonNull HttpServletRequest request) throws ServletException {
-		String path = request.getRequestURI();
-		return Arrays.stream(excludePatterns)
-			.anyMatch(pattern -> pathMatcher.match(pattern, path));
-	}
 
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
 		@NonNull FilterChain filterChain) throws ServletException, IOException {
 
 		String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+			filterChain.doFilter(request, response);
+			return;
+		}
 
 		try {
 			String token = authHeader.substring(7);

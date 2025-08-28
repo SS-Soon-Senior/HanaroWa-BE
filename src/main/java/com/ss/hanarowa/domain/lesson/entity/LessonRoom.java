@@ -3,6 +3,7 @@ package com.ss.hanarowa.domain.lesson.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ss.hanarowa.domain.branch.entity.Branch;
 
 import jakarta.persistence.CascadeType;
@@ -27,6 +28,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @Getter @Setter
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class LessonRoom {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
