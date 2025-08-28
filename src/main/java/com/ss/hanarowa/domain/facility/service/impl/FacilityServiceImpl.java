@@ -10,11 +10,15 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import com.ss.hanarowa.domain.branch.entity.Branch;
+import com.ss.hanarowa.domain.branch.entity.Location;
 import com.ss.hanarowa.domain.facility.dto.reponse.AdminFacilityResponseDTO;
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityDetailResponseDTO;
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityImageResponseDTO;
+import com.ss.hanarowa.domain.facility.dto.reponse.FacilityReservationResponseDTO;
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityResponseDTO;
 
 import com.ss.hanarowa.domain.facility.dto.request.FacilityReservationDTO;
@@ -145,4 +149,39 @@ public class FacilityServiceImpl implements FacilityService {
 			.collect(Collectors.toList());
 	}
 
+	@Override
+	public List<FacilityReservationResponseDTO> getAllMyFacilityReservations(Long memberId, Authentication authentication) {
+
+		if (authentication == null || !authentication.isAuthenticated()) {
+			throw new GeneralException(ErrorStatus.MEMBER_NOT_FOUND);
+		}
+
+		String email = authentication.getName();
+		Member currentUser = memberRepository.findByEmail(email)
+											 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_AUTHORITY));
+
+		if (!currentUser.getId().equals(memberId)) {
+			throw new GeneralException(ErrorStatus.LESSONLIST_NOT_AUTHORITY);
+		}
+
+		List<FacilityTime> reservations = facilityTimeRepository.findAllByMemberId(memberId);
+		if (reservations.isEmpty()) {
+			throw new GeneralException(ErrorStatus.FACILITY_NOT_FOUND);
+		}
+
+		return reservations.stream().map(reservation -> {
+			Facility facility = reservation.getFacility();
+			Branch branch = facility.getBranch();
+			Location location = branch.getLocation();
+
+			return FacilityReservationResponseDTO.builder()
+												 .facilityId(facility.getId())
+												 .facilityName(facility.getName())
+												 .startedAt(reservation.getStartedAt())
+												 .duration(reservation.getStartedAt() + " ~ " + reservation.getEndedAt())
+												 .placeName(location.getName() + " " + branch.getName())
+												 .build();
+		}).toList();
+	}
 }
+

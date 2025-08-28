@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityDetailResponseDTO;
+import com.ss.hanarowa.domain.facility.dto.reponse.FacilityReservationResponseDTO;
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityResponseDTO;
 import com.ss.hanarowa.domain.facility.dto.request.FacilityReservationDTO;
 import com.ss.hanarowa.domain.facility.service.FacilityService;
@@ -62,6 +63,18 @@ public class FacilityController {
 
 		facilityService.reservateFacility(facilityReservationDTO, memberId);
 		return ResponseEntity.ok(ApiResponse.onSuccess(null));
+	}
+
+	@GetMapping("/reservation/{memberId}")
+	@Operation(summary = "시설 예약 목록 조회", description = "시설 예약 목록을 조회합니다.")
+	public ResponseEntity<ApiResponse<List<FacilityReservationResponseDTO>>> getAllMyFacilityReservations(
+		@PathVariable Long memberId,
+		Authentication authentication) {
+
+		List<FacilityReservationResponseDTO> reservations =
+			facilityService.getAllMyFacilityReservations(memberId, authentication);
+
+		return ResponseEntity.ok(ApiResponse.onSuccess(reservations));
 	}
 
 }
