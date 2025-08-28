@@ -11,7 +11,8 @@ import lombok.NoArgsConstructor;
 @Getter
 public class LessonInfoResponseDTO {
 
-	private long id; //LessonGisu의 아이디
+	private long lessonId; //Lesson의 아이디
+	private long lessonGisuId;  //LessonGisu의 아이디
 	private String lessonName; // 강좌의 이름
 	private String instructor; //강사
 	private String lessonImg; // 이미지
