@@ -1,5 +1,7 @@
 package com.ss.hanarowa.domain.lesson.dto.response;
 
+import com.ss.hanarowa.domain.lesson.entity.Category;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,4 +22,5 @@ public class LessonInfoResponseDTO {
 	private int lessonFee; // 수강료
 	private int capacity; //LessonGisu 의 capacity
 	private int currentStudentCount; // 현재 수강중인 인원
+	private Category lessonCategory; //강좌 카테고리 아이디
 }
