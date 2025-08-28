@@ -1,6 +1,5 @@
-package com.ss.hanarowa.domain.member.dto;
+package com.ss.hanarowa.domain.member.dto.request;
 
-import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
