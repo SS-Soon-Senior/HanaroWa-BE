@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.hanarowa.domain.lesson.dto.request.LessonGisuStateUpdateRequestDto;
+import com.ss.hanarowa.domain.lesson.dto.request.UpdateLessonDetailRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.AdminLessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonDetailResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuStateUpdateResponseDto;
@@ -64,5 +65,13 @@ public class AdminLessonController {
 	@GetMapping("/{lessonId}")
 	public ResponseEntity<ApiResponse<LessonDetailResponseDTO>> getLessonDetail(@PathVariable Long lessonId){
 		return ResponseEntity.ok(ApiResponse.onSuccess(adminService.getLessonDetail(lessonId)));
+	}
+
+	@PreAuthorize("hasRole('ADMIN')")
+	@Operation(summary="관리자 강좌 상세 수정하기")
+	@PatchMapping("/{lessonId}")
+	public ResponseEntity<ApiResponse<LessonDetailResponseDTO>> updateLessonDetail(@PathVariable Long lessonId, @RequestBody UpdateLessonDetailRequestDTO requestDTO){
+		log.info("[관리자] Controller : 강좌 상세 수정 - lessonId: {}, requestDTO: {}", lessonId, requestDTO);
+		return ResponseEntity.ok(ApiResponse.onSuccess(adminService.updateLessonDetail(lessonId,requestDTO)));
 	}
 }

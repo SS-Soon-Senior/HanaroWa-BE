@@ -11,6 +11,7 @@ scr/main/generated
 src/main/resources/static/origin
 src/main/resources/static/upload
 data.sql
+application.properties
 
 ### STS ###
 .apt_generated

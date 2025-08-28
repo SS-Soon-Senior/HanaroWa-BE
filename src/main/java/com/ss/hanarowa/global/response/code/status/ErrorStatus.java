@@ -33,6 +33,8 @@ public enum ErrorStatus implements BaseErrorCode {
 	//강좌 관련 에러
 	LESSONGISU_NOT_FOUND(HttpStatus.NOT_FOUND, "LESSONGISU404", "해당 강좌 기수를 찾을 수 없습니다."),
 	LESSON_NOT_FOUND(HttpStatus.NOT_FOUND, "LESSON404", "해당 강좌를 찾을 수 없습니다."),
+	LESSONROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "LESSON_ROOM404", "해당 강의실을 찾을 수 없습니다."),
+	CURRICULUM_NOT_FOUND(HttpStatus.NOT_FOUND,"CURRICULUM404","해당 커리큘럼을 찾을 수 없습니다."),
 	//리뷰 관련 에러
 	REVIEW_BAD_REQUEST(HttpStatus.BAD_REQUEST, "REVIEW400", "평점은 1점 이상이어야 합니다.");
 

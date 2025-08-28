@@ -2,6 +2,7 @@ package com.ss.hanarowa.domain.lesson.service;
 
 import java.util.List;
 
+import com.ss.hanarowa.domain.lesson.dto.request.UpdateLessonDetailRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonDetailResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonMoreDetailResponseDTO;
 import com.ss.hanarowa.domain.lesson.entity.Lesson;
