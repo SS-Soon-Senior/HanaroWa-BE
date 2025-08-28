@@ -80,6 +80,7 @@ public class LessonController {
 		return ResponseEntity.ok(ApiResponse.onSuccess(lessonList));
 	}
 
+
 	@Operation(summary="신청 강좌 목록 보기")
 	@GetMapping("/reservation/applied/{memberId}")
 	public ResponseEntity<AppliedLessonListResponseDTO> getAllAppliedLessons(
@@ -122,6 +123,17 @@ public class LessonController {
 
 		List<LessonListResponseDTO> offeredLessons = lessonService.getAllOfferedLessons(memberId);
 		return ResponseEntity.ok(new OfferedLessonListResponseDTO(offeredLessons));
+	}
+	@PostMapping("/{lessonGisuId}")
+	@Operation(summary = "강좌 수강 신청", description = "사용자가 특정 강좌 기수에 대한 수강을 신청합니다.")
+	public ResponseEntity<ApiResponse<String>> applyForLesson( // 메서드 이름 변경
+		@PathVariable Long lessonGisuId,
+		Authentication authentication) {
+
+		String email = authentication.getName();
+		lessonService.applyForLesson(lessonGisuId, email); // 서비스 메서드 호출 변경
+		String result = "강좌 기수 ID :" + lessonGisuId.toString();
+		return ResponseEntity.ok(ApiResponse.onSuccess(result));
 	}
 
 }
