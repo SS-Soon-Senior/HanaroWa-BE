@@ -19,4 +19,6 @@ public interface LessonService {
 	LessonListByBranchIdResponseDTO getLessonListByBranchId(Long branchId);
 
 	List<LessonListSearchResponseDTO> getLessonListSearch(String query);
+
+	void enrollForLesson(Long lessonGisuId, String email); // 강좌 신청
 }

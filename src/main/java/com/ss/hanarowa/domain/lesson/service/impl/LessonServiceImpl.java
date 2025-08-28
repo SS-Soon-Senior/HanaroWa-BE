@@ -15,6 +15,9 @@ import com.ss.hanarowa.domain.branch.repository.BranchRepository;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonInfoResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListByBranchIdResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListSearchResponseDTO;
+import com.ss.hanarowa.domain.lesson.entity.Lesson;
+import com.ss.hanarowa.domain.lesson.entity.LessonGisu;
+import com.ss.hanarowa.domain.lesson.repository.LessonGisuRepository;
 import com.ss.hanarowa.domain.lesson.repository.LessonRepository;
 import com.ss.hanarowa.domain.lesson.service.LessonService;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonMoreDetailResponseDTO;
@@ -22,6 +25,8 @@ import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.CurriculumResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.ReviewResponseDTO;
 import com.ss.hanarowa.domain.lesson.entity.Review;
+import com.ss.hanarowa.domain.member.entity.Member;
+import com.ss.hanarowa.domain.member.repository.MemberRepository;
 import com.ss.hanarowa.domain.member.repository.MyLessonRepository;
 import com.ss.hanarowa.domain.lesson.repository.ReviewRepository;
 import com.ss.hanarowa.domain.member.entity.MyLesson;
@@ -39,6 +44,8 @@ public class LessonServiceImpl implements LessonService {
 	private final MyLessonRepository myLessonRepository;
 	private final ReviewRepository reviewRepository;
 	private final BranchRepository branchRepository;
+	private final MemberRepository memberRepository;
+	private final LessonGisuRepository lessonGisuRepository;
 
 	@Override
 	public LessonMoreDetailResponseDTO getLessonMoreDetail(Long lessonId) {
@@ -223,5 +230,31 @@ public class LessonServiceImpl implements LessonService {
 					.build();
 			})
 			.collect(Collectors.toList());
+	}
+
+	@Override
+	public void enrollForLesson(Long lessonGisuId, String email) {
+		Member member = memberRepository.findByEmail(email)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+
+		LessonGisu lessonGisu = lessonGisuRepository.findById(lessonGisuId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.LESSONGISU_NOT_FOUND));
+
+		if (member.getMyLessons().stream().anyMatch(myLesson -> myLesson.getLessonGisu().equals(lessonGisu))) {
+			throw new GeneralException(ErrorStatus.LESSON_ALREADY_ENROLLED);
+		}
+
+		int currentEnrollment = myLessonRepository.countByLessonGisuId(lessonGisuId);
+
+		if (currentEnrollment >= lessonGisu.getCapacity()) {
+			throw new GeneralException(ErrorStatus.LESSON_CAPACITY_EXCEEDED);
+		}
+
+		MyLesson newMyLesson = MyLesson.builder()
+			.member(member)
+			.lessonGisu(lessonGisu)
+			.build();
+
+		myLessonRepository.save(newMyLesson);
 	}
 }
