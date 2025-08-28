@@ -1,17 +1,17 @@
 package com.ss.hanarowa.domain.member.controller;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.hanarowa.domain.member.dto.request.LoginRequestDTO;
+import com.ss.hanarowa.global.exception.GeneralException;
+import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 import com.ss.hanarowa.global.security.JwtUtil;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -41,7 +41,7 @@ public class AuthController {
 			// accessToken, refreshToken, userinfo
 			return ResponseEntity.ok(JwtUtil.authenticationToClaims(authenticate));
 		} catch (AuthenticationException e) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid!");
+			throw new GeneralException(ErrorStatus.MEMBER_AUTHENTICATION_FAILED);
 		}
 	}
 

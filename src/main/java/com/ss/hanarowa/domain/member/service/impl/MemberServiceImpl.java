@@ -2,6 +2,7 @@ package com.ss.hanarowa.domain.member.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,10 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public void credentialRegist(MemberRegistRequestDTO memberRegistRequestDTO) {
-		memberRepository.findByEmail(memberRegistRequestDTO.getEmail()).orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_EMAIL_EXIST));
+		Optional<Member> email = memberRepository.findByEmail(memberRegistRequestDTO.getEmail());
+		if (email.isPresent()){
+			throw new GeneralException(ErrorStatus.MEMBER_EMAIL_EXIST);
+		}
 
 		memberRegistRequestDTO.setPassword(passwordEncoder.encode(memberRegistRequestDTO.getPassword()));
 
