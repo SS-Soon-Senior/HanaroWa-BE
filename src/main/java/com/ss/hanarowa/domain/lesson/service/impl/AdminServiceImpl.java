@@ -1,5 +1,6 @@
 package com.ss.hanarowa.domain.lesson.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -7,7 +8,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ss.hanarowa.domain.lesson.dto.request.LessonGisuStateUpdateRequestDto;
 import com.ss.hanarowa.domain.lesson.dto.response.AdminLessonListResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.CurriculumResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.LessonDetailResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuStateUpdateResponseDto;
+import com.ss.hanarowa.domain.lesson.entity.Lesson;
 import com.ss.hanarowa.domain.lesson.entity.LessonGisu;
 import com.ss.hanarowa.domain.lesson.entity.LessonState;
 import com.ss.hanarowa.domain.lesson.repository.LessonGisuRepository;
@@ -27,13 +32,19 @@ public class AdminServiceImpl implements AdminService {
 
 	@Override
 	public List<AdminLessonListResponseDTO> getAllLessons() {
-		return lessonRepository.findAll().stream()
-			.map(l -> new AdminLessonListResponseDTO(
-				l.getLessonName(),
-				l.getInstructor(),
-				l.getInstruction(),
-				l.getLessonImg()
-			))
+		List<Lesson> lessons = lessonRepository.findAll();
+
+		if (lessons.isEmpty()) {
+			throw new GeneralException(ErrorStatus.LESSON_NOT_FOUND);
+		}
+
+		return lessons.stream()
+			.map(l -> AdminLessonListResponseDTO.builder()
+				.lessonName(l.getLessonName())
+				.instructor(l.getInstructor())
+				.instruction(l.getInstruction())
+				.lessonImg(l.getLessonImg())
+				.build())
 			.toList();
 	}
 
@@ -54,6 +65,45 @@ public class AdminServiceImpl implements AdminService {
 		return LessonGisuStateUpdateResponseDto.builder()
 			.lessonGisuId(lessonGisu.getId())
 			.lessonState(lessonGisu.getLessonState().name())
+			.build();
+	}
+
+	@Override
+	public LessonDetailResponseDTO getLessonDetail(Long lessonId) {
+		Lesson lesson = lessonRepository.findById(lessonId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.LESSON_NOT_FOUND));
+
+		List<LessonGisu> lessonGisus = lessonGisuRepository.findByLessonId(lessonId);
+		List<LessonGisuResponseDTO> lessonGisuDTOs = new ArrayList<>();
+		
+		for (LessonGisu lessonGisu : lessonGisus) {
+			List<CurriculumResponseDTO> curriculums = new ArrayList<>();
+			
+			for (var curriculum : lessonGisu.getCurriculums()) {
+				curriculums.add(CurriculumResponseDTO.builder()
+					.id(curriculum.getId())
+					.content(curriculum.getContent())
+					.build());
+			}
+			
+			lessonGisuDTOs.add(LessonGisuResponseDTO.builder()
+				.id(lessonGisu.getId())
+				.capacity(lessonGisu.getCapacity())
+				.lessonFee(lessonGisu.getLessonFee())
+				.duration(lessonGisu.getDuration())
+				.lessonState(lessonGisu.getLessonState())
+				.curriculums(curriculums)
+				.build());
+		}
+		
+		return LessonDetailResponseDTO.builder()
+			.lessonName(lesson.getLessonName())
+			.instructor(lesson.getInstructor())
+			.instruction(lesson.getInstruction())
+			.description(lesson.getDescription())
+			.category(lesson.getCategory())
+			.lessonImg(lesson.getLessonImg())
+			.lessonGisus(lessonGisuDTOs)
 			.build();
 	}
 }

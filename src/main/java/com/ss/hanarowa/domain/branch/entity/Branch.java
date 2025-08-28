@@ -3,6 +3,8 @@ package com.ss.hanarowa.domain.branch.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ss.hanarowa.domain.facility.entity.Facility;
 import com.ss.hanarowa.domain.lesson.entity.Lesson;
 import com.ss.hanarowa.domain.member.entity.Member;
@@ -29,6 +31,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Branch {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,14 +52,17 @@ public class Branch {
 	private Location location;
 
 	@OneToMany(mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
 	@Builder.Default
 	private List<Facility> facilities = new ArrayList<>();
 
 	@OneToMany(mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
 	@Builder.Default
 	private List<Member> members = new ArrayList<>();
 
 	@OneToMany(mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
 	@Builder.Default
 	private List<Lesson> lessons = new ArrayList<>();
 }

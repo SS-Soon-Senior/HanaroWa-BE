@@ -8,6 +8,7 @@ import java.util.List;
 import com.ss.hanarowa.domain.branch.entity.Branch;
 import com.ss.hanarowa.domain.facility.entity.FacilityTime;
 import com.ss.hanarowa.domain.lesson.entity.Lesson;
+import com.ss.hanarowa.domain.lesson.entity.Review;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

@@ -3,16 +3,17 @@ package com.ss.hanarowa.global.security;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.AntPathMatcher;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ss.hanarowa.domain.member.dto.MemberAuthDTO;
+import com.ss.hanarowa.domain.member.dto.response.MemberAuthResponseDTO;
 import com.ss.hanarowa.domain.member.entity.Role;
 
 import jakarta.servlet.FilterChain;
@@ -20,34 +21,31 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+@Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-	private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
-	private final String[] excludePatterns = {
-		"/api/member/regist",  // 회원가입
-		"/api/auth/**",
-		"/favicon.ico",
-		"/actuator/**",
-		"/swagger-ui/**",
-		"/v3/api-docs/**",
-		"/hanarowa/api-docs/**",
-		"/broadcast/**",
-		"/swagger.html",
+	private static final List<String> PERMIT_ALL_URLS = Arrays.asList(
+		"/member/regist",
+		"/auth/signin"
+	);
 
-	};
-
-	@Override
-	protected boolean shouldNotFilter(@NonNull HttpServletRequest request) throws ServletException {
-		String path = request.getRequestURI();
-		return Arrays.stream(excludePatterns)
-			.anyMatch(pattern -> pathMatcher.match(pattern, path));
-	}
 
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
 		@NonNull FilterChain filterChain) throws ServletException, IOException {
 
 		String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+		String path = request.getRequestURI();
+		if (PERMIT_ALL_URLS.contains(path)) {
+			filterChain.doFilter(request, response);
+			return;
+		}
+
+		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+			filterChain.doFilter(request, response);
+			return;
+		}
 
 		try {
 			String token = authHeader.substring(7);
@@ -57,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			String roleStr = (String) claims.get("role");
 			Role role = Role.valueOf(roleStr);
 
-			MemberAuthDTO dto = new MemberAuthDTO(email, "", role);
+			MemberAuthResponseDTO dto = new MemberAuthResponseDTO(email, "", role);
 
 			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
 				dto, null, dto.getAuthorities()

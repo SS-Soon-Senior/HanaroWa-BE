@@ -2,11 +2,16 @@ package com.ss.hanarowa.domain.lesson.service;
 
 import java.util.List;
 
+import com.ss.hanarowa.domain.lesson.dto.request.AppliedLessonRequestDTO;
+import com.ss.hanarowa.domain.lesson.dto.request.OfferedLessonRequestDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.LessonListResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.LessonMoreDetailResponseDTO;
 import com.ss.hanarowa.domain.lesson.entity.Lesson;
-import com.ss.hanarowa.domain.member.entity.MyLesson;
 
 public interface LessonService {
-	List<MyLesson> getAllAppliedLessons(); // 신청 강좌
+	List<LessonListResponseDTO> getAllAppliedLessons(Long memberId, AppliedLessonRequestDTO req); // 신청 강좌
 
-	List<Lesson> getAllOfferedLessons(); //개설 강좌
- }
+	List<LessonListResponseDTO> getAllOfferedLessons(Long memberId, OfferedLessonRequestDTO req); //개설 강좌
+
+	LessonMoreDetailResponseDTO getLessonMoreDetail(Long lessonId);
+}

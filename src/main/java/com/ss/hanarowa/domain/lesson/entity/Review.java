@@ -1,6 +1,6 @@
-package com.ss.hanarowa.domain.member.entity;
+package com.ss.hanarowa.domain.lesson.entity;
 
-import com.ss.hanarowa.domain.lesson.entity.Lesson;
+import com.ss.hanarowa.domain.member.entity.Member;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,7 +36,7 @@ public class Review {
 	private Member member;
 
 	@ManyToOne
-	@JoinColumn(name = "lessonId",
-		foreignKey = @ForeignKey(name = "fk_Review_Lesson"), nullable = false)
-	private Lesson lesson;
+	@JoinColumn(name = "lessonGisuId",
+		foreignKey = @ForeignKey(name = "fk_Review_LessonGisu"), nullable = false)
+	private LessonGisu lessonGisu;
 }

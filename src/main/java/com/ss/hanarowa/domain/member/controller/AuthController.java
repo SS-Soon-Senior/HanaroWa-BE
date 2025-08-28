@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ss.hanarowa.domain.member.dto.LoginRequestDTO;
+import com.ss.hanarowa.domain.member.dto.request.LoginRequestDTO;
 import com.ss.hanarowa.global.security.JwtUtil;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,7 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 	
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
 	private final AuthenticationManager authenticationManager;
@@ -28,7 +28,7 @@ public class AuthController {
 	@Tag(name = "로그인", description = "사용자 로그인")
 	public ResponseEntity<?> signin(@Parameter(example = """
 		{
-		  "email": "admin@gmail.com",
+		  "email": "youngkyun@hana.com",
 		  "pwd": "1234"
 		}
 		""")LoginRequestDTO loginRequest) {
