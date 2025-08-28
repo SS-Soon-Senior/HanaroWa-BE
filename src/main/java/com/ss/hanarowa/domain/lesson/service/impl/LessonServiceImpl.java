@@ -12,6 +12,7 @@ import com.ss.hanarowa.domain.lesson.entity.LessonGisu;
 import com.ss.hanarowa.domain.lesson.entity.LessonRoom;
 import com.ss.hanarowa.domain.lesson.repository.LessonGisuRepository;
 import com.ss.hanarowa.domain.lesson.repository.LessonRepository;
+import com.ss.hanarowa.domain.lesson.service.LessonService;
 import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.entity.MyLesson;
 import com.ss.hanarowa.domain.member.repository.MyLessonRepository;
@@ -20,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class LessonServiceImpl {
+public class LessonServiceImpl implements LessonService {
 	private final LessonRepository lessonRepository;
 	private final MyLessonRepository myLessonRepository;
 
