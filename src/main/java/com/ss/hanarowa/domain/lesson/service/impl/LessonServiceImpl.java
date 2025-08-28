@@ -185,6 +185,7 @@ public class LessonServiceImpl implements LessonService {
 					.duration(lessonGisu.getDuration())
 					.lessonFee(lessonGisu.getLessonFee())
 					.capacity(lessonGisu.getCapacity())
+					.lessonCategory(lessonGisu.getLesson().getCategory())
 					.currentStudentCount(currentEnrollment)
 					.build();
 			})
