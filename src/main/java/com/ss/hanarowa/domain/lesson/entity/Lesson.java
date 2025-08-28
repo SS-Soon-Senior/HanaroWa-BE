@@ -33,7 +33,7 @@ public class Lesson {
 	@Column(nullable = false, length = 30)
 	private String lessonName;
 
-	@Column(nullable = false, length = 15)
+	@Column(length = 15)
 	private String instructor;
 
 	@Column(nullable = false)

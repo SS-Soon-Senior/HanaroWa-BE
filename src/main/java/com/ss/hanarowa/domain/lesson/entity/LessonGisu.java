@@ -3,6 +3,8 @@ package com.ss.hanarowa.domain.lesson.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ss.hanarowa.global.entity.BaseEntity;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,7 +29,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter @Setter
-public class LessonGisu {
+public class LessonGisu extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
