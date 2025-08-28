@@ -14,11 +14,13 @@ import com.ss.hanarowa.domain.ai.service.AIRecService;
 import com.ss.hanarowa.global.response.ApiResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/ai")
 @RequiredArgsConstructor
+@Tag(name = "AI 추천", description = "AI 기반 강좌 및 직업 추천 API")
 public class AIController {
 
 	private final AIRecService aiRecService;
