@@ -58,7 +58,7 @@ public class LessonServiceImpl implements LessonService {
 		// 전체 리뷰 정보 수집 (Lesson에 따른 모든 LessonGisu의 리뷰)
 		List<Review> allReviews = lesson.getLessonGisus().stream()
 			.flatMap(lessonGisu -> reviewRepository.findByLessonGisu(lessonGisu).stream())
-			.collect(Collectors.toList());
+			.toList();
 		
 		// Review 엔티티를 ReviewResponseDTO로 변환
 		List<ReviewResponseDTO> reviewDTOs = allReviews.stream()
