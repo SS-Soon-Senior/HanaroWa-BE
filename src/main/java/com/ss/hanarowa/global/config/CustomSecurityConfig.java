@@ -52,8 +52,8 @@ public class CustomSecurityConfig {
 			.httpBasic(AbstractHttpConfigurer::disable)
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(
-					"/api/member/regist",
-					"/api/auth/**",
+					"/member/regist",
+					"/auth/**",
 					"/favicon.ico",
 					"/actuator/**",
 					"/swagger-ui/**",
