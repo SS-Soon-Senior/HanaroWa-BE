@@ -1,4 +1,4 @@
-package com.ss.hanarowa.domain.member.dto;
+package com.ss.hanarowa.domain.member.dto.response;
 
 
 import java.util.Collections;
@@ -15,14 +15,14 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class MemberAuthDTO extends User {
+public class MemberAuthResponseDTO extends User {
 	private String email;
 
 	private String password;
 
 	private Role role;
 
-	public MemberAuthDTO(String email, String password, Role role) {
+	public MemberAuthResponseDTO(String email, String password, Role role) {
 		super(email, password, Collections.singleton(new SimpleGrantedAuthority("ROLE_"+role.name())));
 		this.email = email;
 		this.password = password;

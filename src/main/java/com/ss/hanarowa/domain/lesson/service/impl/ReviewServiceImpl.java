@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ss.hanarowa.domain.lesson.dto.request.ReviewRequestDTO;
-import com.ss.hanarowa.domain.lesson.entity.Lesson;
+import com.ss.hanarowa.domain.lesson.entity.LessonGisu;
 import com.ss.hanarowa.domain.lesson.entity.Review;
-import com.ss.hanarowa.domain.lesson.repository.LessonRepository;
+import com.ss.hanarowa.domain.lesson.repository.LessonGisuRepository;
 import com.ss.hanarowa.domain.lesson.repository.ReviewRepository;
 import com.ss.hanarowa.domain.lesson.service.ReviewService;
 import com.ss.hanarowa.domain.member.entity.Member;
@@ -24,21 +24,21 @@ import lombok.RequiredArgsConstructor;
 public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
     private final MemberRepository memberRepository;
-    private final LessonRepository lessonRepository;
+    private final LessonGisuRepository lessonGisuRepository;
 
     @Override
-    public void createReview(Long lessonId, Long memberId, ReviewRequestDTO reviewRequestDTO) {
+    public void createReview(Long lessonGisuId, Long memberId, ReviewRequestDTO reviewRequestDTO) {
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
         
-        Lesson lesson = lessonRepository.findById(lessonId)
+        LessonGisu lessonGisu = lessonGisuRepository.findById(lessonGisuId)
             .orElseThrow(() -> new GeneralException(ErrorStatus.LESSON_NOT_FOUND));
 
         Review review = Review.builder()
             .rating(reviewRequestDTO.getRating())
             .reviewTxt(reviewRequestDTO.getReviewTxt())
             .member(member)
-            .lesson(lesson)
+            .lessonGisu(lessonGisu)
             .build();
 
         reviewRepository.save(review);

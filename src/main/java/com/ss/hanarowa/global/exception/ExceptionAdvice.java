@@ -65,7 +65,7 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(AuthenticationException.class)
 	public ResponseEntity<Object> handleAuthentication(AuthenticationException ex) {
-		return buildResponseEntity(ErrorStatus.MEMBER_NOT_AUTHORITY, null);
+		return buildResponseEntity(ErrorStatus.MEMBER_AUTHENTICATION_FAILED, null);
 	}
 
 	// GeneralException 처리

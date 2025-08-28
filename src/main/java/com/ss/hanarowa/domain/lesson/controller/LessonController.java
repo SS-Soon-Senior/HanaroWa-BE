@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.hanarowa.domain.lesson.dto.request.ReviewRequestDTO;
-import com.ss.hanarowa.domain.lesson.dto.response.LessonListByBranchId;
-import com.ss.hanarowa.domain.lesson.service.LessonService;
 import com.ss.hanarowa.domain.lesson.service.ReviewService;
 import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.repository.MemberRepository;
@@ -26,28 +24,35 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Tag(name="[사용자] 강좌")
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/lesson")
-@Tag(name = "강좌", description = "강좌 관련 API")
+@RequiredArgsConstructor
 public class LessonController {
 	private final LessonService lessonService;
 	private final ReviewService reviewService;
 	private final MemberRepository memberRepository;
+	private final LessonService lessonService;
 
-	@PostMapping("/{lessonId}/review")
-	@Operation(summary = "강좌 리뷰 작성", description = "사용자가 특정 강좌에 대한 리뷰를 작성합니다.")
+	@PostMapping("/{lessonGisuId}/review")
+	@Operation(summary = "강좌 기수 리뷰 작성", description = "사용자가 특정 강좌 기수에 대한 리뷰를 작성합니다.")
 	public ResponseEntity<ApiResponse<Void>> createReview(
-		@PathVariable Long lessonId,
+		@PathVariable Long lessonGisuId,
 		@Valid @RequestBody ReviewRequestDTO reviewRequestDTO,
 		Authentication authentication) {
 
 		String email = authentication.getName();
 		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
-		reviewService.createReview(lessonId, member.getId(), reviewRequestDTO);
+		reviewService.createReview(lessonGisuId, member.getId(), reviewRequestDTO);
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(null));
+	}
+
+	@Operation(summary="사용자 강좌 상세 보기")
+	@GetMapping("/{lessonId}")
+	public ResponseEntity<ApiResponse<LessonMoreDetailResponseDTO>> getLessonDetail(@PathVariable Long lessonId){
+		return ResponseEntity.ok(ApiResponse.onSuccess(lessonService.getLessonMoreDetail(lessonId)));
 	}
 
 	@GetMapping("/{branchId}")

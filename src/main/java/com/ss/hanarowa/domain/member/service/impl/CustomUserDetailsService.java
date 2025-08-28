@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.ss.hanarowa.domain.member.entity.Member;
-import com.ss.hanarowa.domain.member.dto.MemberAuthDTO;
+import com.ss.hanarowa.domain.member.dto.response.MemberAuthResponseDTO;
 import com.ss.hanarowa.domain.member.repository.MemberRepository;
 import com.ss.hanarowa.global.exception.GeneralException;
 import com.ss.hanarowa.global.response.code.status.ErrorStatus;
@@ -25,6 +25,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 		if (member == null)
 			throw new UsernameNotFoundException(username + " is Not Found!!");
 
-		return new MemberAuthDTO(member.getEmail(),member.getPassword(), member.getRole());
+		return new MemberAuthResponseDTO(member.getEmail(),member.getPassword(), member.getRole());
 	}
 }
