@@ -3,14 +3,13 @@ package com.ss.hanarowa.domain.lesson.service.impl;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.ss.hanarowa.domain.branch.entity.Branch;
 import com.ss.hanarowa.domain.branch.repository.BranchRepository;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonInfoResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListByBranchIdResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.LessonListSearchResponseDTO;
 import com.ss.hanarowa.domain.lesson.entity.Lesson;
-import com.ss.hanarowa.domain.lesson.entity.LessonGisu;
 import com.ss.hanarowa.domain.lesson.repository.LessonRepository;
 import com.ss.hanarowa.domain.lesson.service.LessonService;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonMoreDetailResponseDTO;
@@ -138,13 +137,47 @@ public class LessonServiceImpl implements LessonService {
 					.build();
 			})
 			.collect(Collectors.toList());
-		
-		// DTO 생성 및 반환
+
 		return LessonListByBranchIdResponseDTO.builder()
 			.branchId(branch.getId())
 			.locationName(branch.getLocation().getName())
 			.branchName(branch.getName())
 			.Lessons(lessonInfos)
 			.build();
+	}
+
+	@Override
+	public List<LessonListSearchResponseDTO> getLessonListSearch(String query) {
+		List<Lesson> lessons;
+		
+		// query가 null이거나 빈 문자열이면 전체 강좌 조회, 아니면 검색
+		if (query == null || query.trim().isEmpty()) {
+			lessons = lessonRepository.findAllByOrderByIdDesc();
+		} else {
+			lessons = lessonRepository.findByLessonNameContainingOrderByIdDesc(query.trim());
+		}
+		
+		// 각 강좌별 LessonGisu 정보 및 수강 인원 수 조회
+		return lessons.stream()
+			.flatMap(lesson -> lesson.getLessonGisus().stream())
+			.map(lessonGisu -> {
+				int currentEnrollment = myLessonRepository.countByLessonGisu(lessonGisu);
+				
+				return LessonListSearchResponseDTO.builder()
+					.branchId(lessonGisu.getLesson().getBranch().getId())
+					.locationName(lessonGisu.getLesson().getBranch().getLocation().getName())
+					.branchName(lessonGisu.getLesson().getBranch().getName())
+					.lessonId(lessonGisu.getLesson().getId())
+					.lessonGisuId(lessonGisu.getId())
+					.lessonName(lessonGisu.getLesson().getLessonName())
+					.instructor(lessonGisu.getLesson().getInstructor())
+					.lessonImg(lessonGisu.getLesson().getLessonImg())
+					.duration(lessonGisu.getDuration())
+					.lessonFee(lessonGisu.getLessonFee())
+					.capacity(lessonGisu.getCapacity())
+					.currentStudentCount(currentEnrollment)
+					.build();
+			})
+			.collect(Collectors.toList());
 	}
 }
