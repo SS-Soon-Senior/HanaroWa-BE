@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ss.hanarowa.domain.lesson.dto.request.AppliedLessonRequestDTO;
-import com.ss.hanarowa.domain.lesson.dto.request.OfferedLessonRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.request.ReviewRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListByBranchIdResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListSearchResponseDTO;
