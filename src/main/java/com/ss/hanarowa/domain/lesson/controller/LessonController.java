@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ss.hanarowa.domain.lesson.dto.request.AppliedLessonRequestDTO;
-import com.ss.hanarowa.domain.lesson.dto.request.OfferedLessonRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.request.ReviewRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListByBranchIdResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListSearchResponseDTO;
@@ -43,6 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 public class LessonController {
 	private final LessonService lessonService;
 	private final ReviewService reviewService;
+	private final MemberRepository memberRepository;
 
 	@PostMapping("/{lessonGisuId}/review")
 	@Operation(summary = "강좌 기수 리뷰 작성", description = "사용자가 특정 강좌 기수에 대한 리뷰를 작성합니다.")
@@ -80,28 +79,46 @@ public class LessonController {
 
 
 	@Operation(summary="신청 강좌 목록 보기")
-	@GetMapping("/reservation/applied")
-	public ResponseEntity<AppliedLessonListResponseDTO> getAllAppliedLessons(@PathVariable Long memberId,
-		@AuthenticationPrincipal Member currentUser, AppliedLessonRequestDTO req){
+	@GetMapping("/reservation/applied/{memberId}")
+	public ResponseEntity<AppliedLessonListResponseDTO> getAllAppliedLessons(
+		@PathVariable Long memberId,
+		Authentication authentication) {
 
-		if(!currentUser.getId().equals(memberId)){
+		if (authentication == null || !authentication.isAuthenticated()) {
+			throw new GeneralException(ErrorStatus.MEMBER_NOT_AUTHORITY);
+		}
+
+		String email = authentication.getName();
+		Member currentUser = memberRepository.findByEmail(email)
+											 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+
+		if (!currentUser.getId().equals(memberId)) {
 			throw new GeneralException(ErrorStatus.LESSONLIST_NOT_AUTHORITY);
 		}
 
-		List<LessonListResponseDTO> appliedLessons = lessonService.getAllAppliedLessons(memberId, req);
+		List<LessonListResponseDTO> appliedLessons = lessonService.getAllAppliedLessons(memberId);
 		return ResponseEntity.ok(new AppliedLessonListResponseDTO(appliedLessons));
 	}
 
 	@Operation(summary="개설 강좌 목록 보기")
-	@GetMapping("/reservation/offered")
-	public ResponseEntity<OfferedLessonListResponseDTO> getAllOfferedLessons(@PathVariable Long memberId,
-		@AuthenticationPrincipal Member currentUser, OfferedLessonRequestDTO req){
+	@GetMapping("/reservation/offered/{memberId}")
+	public ResponseEntity<OfferedLessonListResponseDTO> getAllOfferedLessons(
+		@PathVariable Long memberId,
+		Authentication authentication) {
 
-		if(!currentUser.getId().equals(memberId)){
+		if (authentication == null || !authentication.isAuthenticated()) {
+			throw new GeneralException(ErrorStatus.MEMBER_NOT_AUTHORITY);
+		}
+
+		String email = authentication.getName();
+		Member currentUser = memberRepository.findByEmail(email)
+											 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+
+		if (!currentUser.getId().equals(memberId)) {
 			throw new GeneralException(ErrorStatus.LESSONLIST_NOT_AUTHORITY);
 		}
 
-		List<LessonListResponseDTO> offeredLessons = lessonService.getAllOfferedLessons(memberId, req);
+		List<LessonListResponseDTO> offeredLessons = lessonService.getAllOfferedLessons(memberId);
 		return ResponseEntity.ok(new OfferedLessonListResponseDTO(offeredLessons));
 	}
 	@PostMapping("/{lessonGisuId}")

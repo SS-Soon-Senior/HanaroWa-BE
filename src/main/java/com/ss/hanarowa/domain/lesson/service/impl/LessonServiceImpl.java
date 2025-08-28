@@ -4,8 +4,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.ss.hanarowa.domain.lesson.dto.request.AppliedLessonRequestDTO;
-import com.ss.hanarowa.domain.lesson.dto.request.OfferedLessonRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.entity.Lesson;
 import com.ss.hanarowa.domain.lesson.entity.LessonGisu;
@@ -15,8 +13,6 @@ import com.ss.hanarowa.domain.branch.repository.BranchRepository;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonInfoResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListByBranchIdResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListSearchResponseDTO;
-import com.ss.hanarowa.domain.lesson.entity.Lesson;
-import com.ss.hanarowa.domain.lesson.entity.LessonGisu;
 import com.ss.hanarowa.domain.lesson.repository.LessonGisuRepository;
 import com.ss.hanarowa.domain.lesson.repository.LessonRepository;
 import com.ss.hanarowa.domain.lesson.service.LessonService;
@@ -113,10 +109,10 @@ public class LessonServiceImpl implements LessonService {
 
 	// 신청 강좌 목록
 	@Override
-	public List<LessonListResponseDTO> getAllAppliedLessons(Long memberId, AppliedLessonRequestDTO req){
+	public List<LessonListResponseDTO> getAllAppliedLessons(Long memberId) {
 		List<MyLesson> myLessons = myLessonRepository.findAllByMemberId(memberId);
 
-		if(myLessons.isEmpty()){
+		if (myLessons.isEmpty()) {
 			throw new GeneralException(ErrorStatus.APPLIED_NOT_FOUND);
 		}
 
@@ -131,34 +127,39 @@ public class LessonServiceImpl implements LessonService {
 										.lessonState(gisu.getLessonState())
 										.startedAt(gisu.getStartedAt())
 										.lessonName(lesson.getLessonName())
-										.instructorName(lesson.getMember().getName()) //일단 외부강사 말고 개설 강좌만
+										.instructorName(lesson.getMember().getName())
 										.duration(gisu.getDuration())
 										.lessonRoomName(room.getName())
-										//리뷰 추가해야함
 										.build();
 		}).toList();
 	}
 
 	// 개설 강좌 목록
 	@Override
-	public List<LessonListResponseDTO> getAllOfferedLessons(Long memberId, OfferedLessonRequestDTO req){
+	public List<LessonListResponseDTO> getAllOfferedLessons(Long memberId) {
 		List<Lesson> offeredLessons = lessonRepository.findAllByMemberId(memberId);
 
-		return offeredLessons.stream().flatMap(lesson -> lesson.getLessonGisus().stream().map(gisu -> { LessonRoom room = gisu.getLessonRoom();
+		if (offeredLessons.isEmpty()) {
+			throw new GeneralException(ErrorStatus.OFFERED_NOT_FOUND);
+		}
 
-			return LessonListResponseDTO.builder()
-										.lessonId(lesson.getId())
-										.lessonGisuId(gisu.getId())
-										.lessonState(gisu.getLessonState())
-										.startedAt(gisu.getStartedAt())
-										.lessonName(lesson.getLessonName())
-										.instructorName(lesson.getMember().getName())
-										.duration(gisu.getDuration())
-										.lessonRoomName(room.getName())
-										.build();
-			})
-		).toList();
+		return offeredLessons.stream()
+							 .flatMap(lesson -> lesson.getLessonGisus().stream().map(gisu -> {
+								 LessonRoom room = gisu.getLessonRoom();
+								 return LessonListResponseDTO.builder()
+															 .lessonId(lesson.getId())
+															 .lessonGisuId(gisu.getId())
+															 .lessonState(gisu.getLessonState())
+															 .startedAt(gisu.getStartedAt())
+															 .lessonName(lesson.getLessonName())
+															 .instructorName(lesson.getMember().getName())
+															 .duration(gisu.getDuration())
+															 .lessonRoomName(room.getName())
+															 .build();
+							 }))
+							 .toList();
 	}
+
 
 	@Override
 	public LessonListByBranchIdResponseDTO getLessonListByBranchId(Long branchId){
