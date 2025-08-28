@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -70,7 +72,7 @@ public class AdminLessonController {
 	@PreAuthorize("hasRole('ADMIN')")
 	@Operation(summary="관리자 강좌 상세 수정하기")
 	@PatchMapping("/{lessonId}")
-	public ResponseEntity<ApiResponse<LessonDetailResponseDTO>> updateLessonDetail(@PathVariable Long lessonId, @RequestBody UpdateLessonDetailRequestDTO requestDTO){
+	public ResponseEntity<ApiResponse<LessonDetailResponseDTO>> updateLessonDetail(@PathVariable Long lessonId, @Valid @RequestBody UpdateLessonDetailRequestDTO requestDTO){
 		log.info("[관리자] Controller : 강좌 상세 수정 - lessonId: {}, requestDTO: {}", lessonId, requestDTO);
 		return ResponseEntity.ok(ApiResponse.onSuccess(adminService.updateLessonDetail(lessonId,requestDTO)));
 	}

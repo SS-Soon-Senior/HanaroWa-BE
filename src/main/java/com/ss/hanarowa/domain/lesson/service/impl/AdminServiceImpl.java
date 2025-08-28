@@ -123,52 +123,32 @@ public class AdminServiceImpl implements AdminService {
 		Lesson lesson = lessonRepository.findById(lessonId)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.LESSON_NOT_FOUND));
 		
-		Branch branch = null;
-		if (requestDTO.getBranchId() != null) {
-			branch = branchRepository.findById(requestDTO.getBranchId())
-				.orElseThrow(() -> new GeneralException(ErrorStatus.BRANCH_NOT_FOUND));
-		}
-		
-		if (requestDTO.getLessonName() != null) lesson.setLessonName(requestDTO.getLessonName());
-		if (requestDTO.getInstructor() != null) lesson.setInstructor(requestDTO.getInstructor());
-		if (requestDTO.getInstruction() != null) lesson.setInstruction(requestDTO.getInstruction());
-		if (requestDTO.getDescription() != null) lesson.setDescription(requestDTO.getDescription());
-		if (requestDTO.getCategory() != null) lesson.setCategory(requestDTO.getCategory());
-		if (requestDTO.getLessonImg() != null) lesson.setLessonImg(requestDTO.getLessonImg());
-		if (branch != null) lesson.setBranch(branch);
+		lesson.setLessonName(requestDTO.getLessonName());
+		lesson.setInstructor(requestDTO.getInstructor());
+		lesson.setInstruction(requestDTO.getInstruction());
+		lesson.setDescription(requestDTO.getDescription());
+		lesson.setCategory(requestDTO.getCategory());
+		lesson.setLessonImg(requestDTO.getLessonImg());
 		
 		lessonRepository.save(lesson);
 		
-		if (requestDTO.getLessonGisus() != null) {
-			for (UpdateLessonDetailRequestDTO.UpdateLessonGisuDTO gisuDTO : requestDTO.getLessonGisus()) {
-				LessonGisu lessonGisu = lessonGisuRepository.findById(gisuDTO.getId())
-					.orElseThrow(() -> new GeneralException(ErrorStatus.LESSONGISU_NOT_FOUND));
+		for (UpdateLessonDetailRequestDTO.UpdateLessonGisuDTO gisuDTO : requestDTO.getLessonGisus()) {
+			LessonGisu lessonGisu = lessonGisuRepository.findById(gisuDTO.getId())
+				.orElseThrow(() -> new GeneralException(ErrorStatus.LESSONGISU_NOT_FOUND));
+			
+			lessonGisu.setCapacity(gisuDTO.getCapacity());
+			lessonGisu.setLessonFee(gisuDTO.getLessonFee());
+			lessonGisu.setDuration(gisuDTO.getDuration());
+			lessonGisu.setLessonState(gisuDTO.getLessonState());
+			
+			lessonGisuRepository.save(lessonGisu);
+			
+			for (UpdateLessonDetailRequestDTO.UpdateCurriculumDTO curriculumDTO : gisuDTO.getCurriculums()) {
+				Curriculum curriculum = curriculumRepository.findById(curriculumDTO.getId())
+					.orElseThrow(() -> new GeneralException(ErrorStatus.CURRICULUM_NOT_FOUND));
 				
-				LessonRoom lessonRoom = null;
-				if (gisuDTO.getLessonRoomId() != null) {
-					lessonRoom = lessonRoomRepository.findById(gisuDTO.getLessonRoomId())
-						.orElseThrow(() -> new GeneralException(ErrorStatus.LESSONROOM_NOT_FOUND));
-				}
-				
-				if (gisuDTO.getCapacity() != null) lessonGisu.setCapacity(gisuDTO.getCapacity());
-				if (gisuDTO.getLessonFee() != null) lessonGisu.setLessonFee(gisuDTO.getLessonFee());
-				if (gisuDTO.getDuration() != null) lessonGisu.setDuration(gisuDTO.getDuration());
-				if (gisuDTO.getLessonState() != null) lessonGisu.setLessonState(gisuDTO.getLessonState());
-				if (lessonRoom != null) lessonGisu.setLessonRoom(lessonRoom);
-				
-				lessonGisuRepository.save(lessonGisu);
-				
-				if (gisuDTO.getCurriculums() != null) {
-					for (UpdateLessonDetailRequestDTO.UpdateCurriculumDTO curriculumDTO : gisuDTO.getCurriculums()) {
-						Curriculum curriculum = curriculumRepository.findById(curriculumDTO.getId())
-							.orElseThrow(() -> new GeneralException(ErrorStatus.CURRICULUM_NOT_FOUND));
-						
-						if (curriculumDTO.getContent() != null) {
-							curriculum.setContent(curriculumDTO.getContent());
-						}
-						curriculumRepository.save(curriculum);
-					}
-				}
+				curriculum.setContent(curriculumDTO.getContent());
+				curriculumRepository.save(curriculum);
 			}
 		}
 		
