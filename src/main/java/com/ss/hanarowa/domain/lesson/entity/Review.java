@@ -36,7 +36,7 @@ public class Review {
 	private Member member;
 
 	@ManyToOne
-	@JoinColumn(name = "lessonId",
-		foreignKey = @ForeignKey(name = "fk_Review_Lesson"), nullable = false)
-	private Lesson lesson;
+	@JoinColumn(name = "lessonGisuId",
+		foreignKey = @ForeignKey(name = "fk_Review_LessonGisu"), nullable = false)
+	private LessonGisu lessonGisu;
 }

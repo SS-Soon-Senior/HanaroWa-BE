@@ -12,12 +12,15 @@ import com.ss.hanarowa.domain.lesson.dto.response.CurriculumResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonDetailResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuStateUpdateResponseDto;
+import com.ss.hanarowa.domain.lesson.dto.response.LessonMemberResponseDTO;
 import com.ss.hanarowa.domain.lesson.entity.Lesson;
 import com.ss.hanarowa.domain.lesson.entity.LessonGisu;
-import com.ss.hanarowa.domain.lesson.entity.LessonState;
 import com.ss.hanarowa.domain.lesson.repository.LessonGisuRepository;
-import com.ss.hanarowa.domain.lesson.service.AdminService;
+import com.ss.hanarowa.domain.lesson.service.AdminLessonService;
 import com.ss.hanarowa.domain.lesson.repository.LessonRepository;
+import com.ss.hanarowa.domain.member.entity.Member;
+import com.ss.hanarowa.domain.member.entity.MyLesson;
+import com.ss.hanarowa.domain.member.repository.MyLessonRepository;
 import com.ss.hanarowa.global.exception.GeneralException;
 import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 
@@ -26,9 +29,10 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class AdminServiceImpl implements AdminService {
+public class AdminLessonServiceImpl implements AdminLessonService {
 	private final LessonRepository lessonRepository;
 	private final LessonGisuRepository lessonGisuRepository;
+	private final MyLessonRepository myLessonRepository;
 
 	@Override
 	public List<AdminLessonListResponseDTO> getAllLessons() {
@@ -105,5 +109,23 @@ public class AdminServiceImpl implements AdminService {
 			.lessonImg(lesson.getLessonImg())
 			.lessonGisus(lessonGisuDTOs)
 			.build();
+	}
+
+	private Member getMember(MyLesson myLesson) {
+		return myLesson.getMember();
+	}
+
+	@Override
+	public List<LessonMemberResponseDTO> findAllByLessonGisuId(long lessonGisuId) {
+		return myLessonRepository.findAllByLessonGisuId(lessonGisuId).stream()
+			.map(MyLesson::getMember)               // 바로 member 추출
+			.map(m -> new LessonMemberResponseDTO(
+				m.getName(),
+				m.getBranch().getName(), // null-safe
+				m.getPhoneNumber(),
+				m.getEmail(),
+				m.getBirth()
+			))
+			.toList();
 	}
 }

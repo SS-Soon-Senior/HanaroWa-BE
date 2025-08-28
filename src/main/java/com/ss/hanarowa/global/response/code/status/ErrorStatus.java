@@ -34,7 +34,10 @@ public enum ErrorStatus implements BaseErrorCode {
 	LESSONGISU_NOT_FOUND(HttpStatus.NOT_FOUND, "LESSONGISU404", "해당 강좌 기수를 찾을 수 없습니다."),
 	LESSON_NOT_FOUND(HttpStatus.NOT_FOUND, "LESSON404", "해당 강좌를 찾을 수 없습니다."),
 	//리뷰 관련 에러
-	REVIEW_BAD_REQUEST(HttpStatus.BAD_REQUEST, "REVIEW400", "평점은 1점 이상이어야 합니다.");
+	REVIEW_BAD_REQUEST(HttpStatus.BAD_REQUEST, "REVIEW400", "평점은 1점 이상이어야 합니다."),
+
+	//Gemini API 관련 에러
+	AI_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI500", "AI 서비스 요청 중 오류가 발생했습니다.");
 
 	private final HttpStatusCode httpStatusCode;
 	private final String code;
