@@ -32,25 +32,22 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "회원", description = "회원 관련 API")
 public class MemberController {
 	private final MemberService memberService;
-	private final MemberRepository memberRepository;
 
 	@PostMapping("/regist")
 	@Operation(summary = "일반 회원가입")
-	public ResponseEntity<?> regist(@Valid @RequestBody MemberRegistDTO memberRegistDTO) {
+	public ResponseEntity<ApiResponse<String>> regist(@Valid @RequestBody MemberRegistDTO memberRegistDTO) {
 		memberService.credentialRegist(memberRegistDTO);
-		return ResponseEntity.ok("회원가입 성공");
+		return ResponseEntity.ok(ApiResponse.onSuccess("회원가입 완료"));
 	}
 
 	@PostMapping("/info")
 	@Operation(summary = "전화번호, 생일등록")
-	public ResponseEntity<?> info(@Valid @RequestBody MemberInfoDTO memberInfoDTO, Authentication authentication) {
+	public ResponseEntity<ApiResponse<Void>> info(@Valid @RequestBody MemberInfoDTO memberInfoDTO, Authentication authentication) {
 		String email = authentication.getName();
 
-		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+		memberService.infoRegist(memberInfoDTO, email);
 
-		memberService.infoRegist(memberInfoDTO, member.getId());
-
-		return ResponseEntity.ok("추가정보 등록 성공");
+		return ResponseEntity.ok(ApiResponse.onSuccess(null));
 	}
 
 	@PatchMapping("/withdraw")
@@ -58,31 +55,27 @@ public class MemberController {
 	public void withDraw(Authentication authentication) {
 		String email = authentication.getName();
 
-		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
-
-		memberService.withdraw(member.getId());
+		memberService.withdraw(email);
 	}
 
 	@PatchMapping
 	@Operation(summary = "회원 정보 수정")
-	public ResponseEntity<?> modifyInfo(@Valid @RequestBody MemberInfoDTO memberInfoDTO, Authentication authentication) {
+	public ResponseEntity<ApiResponse<MemberInfoDTO>> modifyInfo(@Valid @RequestBody MemberInfoDTO memberInfoDTO, Authentication authentication) {
 		String email = authentication.getName();
-		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
-		memberService.modifyInfo(memberInfoDTO, member.getId());
+		memberService.modifyInfo(memberInfoDTO, email);
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(memberInfoDTO));
 	}
 
 	@PatchMapping("/password")
 	@Operation(summary = "비밀번호 수정")
-	public ResponseEntity<?> modifyPassword(@Valid @RequestBody ModifyPasswdRequestDTO modifyDTO, Authentication authentication) {
+	public ResponseEntity<ApiResponse<String>> modifyPassword(@Valid @RequestBody ModifyPasswdRequestDTO modifyDTO, Authentication authentication) {
 
 		String email = authentication.getName();
 
-		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
-		memberService.modifyPassword(modifyDTO, member.getId());
+		memberService.modifyPassword(modifyDTO, email);
 		return ResponseEntity.ok(ApiResponse.onSuccess("비밀번호 수정 완료"));
 	}
 	/**
@@ -96,9 +89,8 @@ public class MemberController {
 		Authentication authentication) {
 
 		String email = authentication.getName();
-		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
-		memberService.updateMemberBranch(branchId, member.getId());
+		memberService.updateMemberBranch(branchId, email);
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(null));
 	}

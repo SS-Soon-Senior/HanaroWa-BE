@@ -34,9 +34,7 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public void credentialRegist(MemberRegistDTO memberRegistDTO) {
-		memberRepository.findByEmail(memberRegistDTO.getEmail()).ifPresent(member -> {
-			throw new RuntimeException("이미 존재하는 이메일입니다.");
-		});
+		memberRepository.findByEmail(memberRegistDTO.getEmail()).orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_EMAIL_EXIST));
 
 		memberRegistDTO.setPassword(passwordEncoder.encode(memberRegistDTO.getPassword()));
 
@@ -51,9 +49,8 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public void infoRegist(MemberInfoDTO memberInfoDTO, long id) {
-		Member member = memberRepository.findById(id).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
-
+	public void infoRegist(MemberInfoDTO memberInfoDTO, String email) {
+		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 		member.setBirth(Format.getBirthAsLocalDate(memberInfoDTO.getBirth()));
 		member.setPhoneNumber(memberInfoDTO.getPhoneNumber());
 
@@ -61,8 +58,8 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public void withdraw(long id) {
-		Member member = memberRepository.findById(id).orElseThrow();
+	public void withdraw(String email) {
+		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
 		member.setDeletedAt(LocalDateTime.now());
 
@@ -70,8 +67,8 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public void modifyInfo(MemberInfoDTO memberInfoDTO, long id) {
-		Member member = memberRepository.findById(id).orElseThrow();
+	public void modifyInfo(MemberInfoDTO memberInfoDTO, String email) {
+		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
 		if(Format.getBirthAsLocalDate(memberInfoDTO.getBirth()) != member.getBirth()){
 			member.setBirth(Format.getBirthAsLocalDate(memberInfoDTO.getBirth()));
@@ -84,8 +81,8 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public void modifyPassword(ModifyPasswdRequestDTO passwdRequestDTO, long id) {
-		Member member = memberRepository.findById(id).orElseThrow();
+	public void modifyPassword(ModifyPasswdRequestDTO passwdRequestDTO, String email) {
+		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
 		// 현재 비밀번호 확인
 		if(!passwordEncoder.matches(passwdRequestDTO.getCurrentPassword(), member.getPassword())) {
@@ -110,9 +107,8 @@ public class MemberServiceImpl implements MemberService {
 
 
 	@Override
-	public void updateMemberBranch(long branchId, long id) {
-		Member member = memberRepository.findById(id)
-			.orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+	public void updateMemberBranch(long branchId, String email) {
+		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
 		Branch branch = branchRepository.findById(branchId)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.BRANCH_NOT_FOUND));

@@ -23,13 +23,18 @@ public enum ErrorStatus implements BaseErrorCode {
 	MEMBER_PASSWORD_WRONG(HttpStatus.UNAUTHORIZED, "MEMBER401", "비밀번호가 틀렸습니다."),
 	MEMBER_NOT_AUTHORITY(HttpStatus.FORBIDDEN, "MEMBER403", "권한이 없습니다."),
 	MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER404", "해당 유저가 없습니다"),
+	MEMBER_AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED,"MEMBER401","아이디 또는 비밀번호를 확인해주세요."),
+	MEMBER_EMAIL_EXIST(HttpStatus.CONFLICT, "MEMBER409", "이미 존재하는 이메일입니다"),
+
 	//지점 관련 에러
 	BRANCH_NOT_FOUND(HttpStatus.NOT_FOUND, "BRANCH404", "해당 지점이 없습니다."),
     //시설 관련 에러
 	FACILITY_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER404", "해당 시설이 없습니다."),
 	//강좌 관련 에러
 	LESSONGISU_NOT_FOUND(HttpStatus.NOT_FOUND, "LESSONGISU404", "해당 강좌 기수를 찾을 수 없습니다."),
-	LESSON_NOT_FOUND(HttpStatus.NOT_FOUND, "LESSON404","강좌를 찾을 수 없습니다.");
+	LESSON_NOT_FOUND(HttpStatus.NOT_FOUND, "LESSON404","강좌를 찾을 수 없습니다."),
+	;
+
 
 	private final HttpStatusCode httpStatusCode;
 	private final String code;

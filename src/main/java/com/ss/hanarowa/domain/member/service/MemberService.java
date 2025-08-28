@@ -7,10 +7,10 @@ import com.ss.hanarowa.domain.member.entity.Member;
 
 public interface MemberService {
 	void credentialRegist(MemberRegistDTO memberRegistDTO);
-	void infoRegist(MemberInfoDTO memberInfoDTO, long id);
-	void withdraw(long id);
-	void modifyInfo(MemberInfoDTO memberInfoDTO, long id);
-	void updateMemberBranch(long branchId, long memberId);
-	void modifyPassword(ModifyPasswdRequestDTO passwdRequestDTO, long id);
+	void infoRegist(MemberInfoDTO memberInfoDTO, String email);
+	void withdraw(String email);
+	void modifyInfo(MemberInfoDTO memberInfoDTO, String email);
+	void updateMemberBranch(long branchId, String email);
+	void modifyPassword(ModifyPasswdRequestDTO passwdRequestDTO, String email);
 	Long getMemberIdByEmail(String email);
 }
