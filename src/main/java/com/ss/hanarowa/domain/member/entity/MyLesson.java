@@ -1,6 +1,6 @@
 package com.ss.hanarowa.domain.member.entity;
 
-import com.ss.hanarowa.domain.lesson.entity.Lesson;
+import com.ss.hanarowa.domain.lesson.entity.LessonGisu;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -32,7 +32,7 @@ public class MyLesson { //수강신청 내역(내가 수업을 듣는거)
 	private Member member;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "lessonId",
-		foreignKey = @ForeignKey(name = "fk_MyLesson_Lesson"), nullable = false)
-	private Lesson lesson;
+	@JoinColumn(name = "lessonGisuId",
+		foreignKey = @ForeignKey(name = "fk_MyLesson_LessonGisu"), nullable = false)
+	private LessonGisu lessonGisu;
 }
