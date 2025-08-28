@@ -9,11 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ss.hanarowa.domain.branch.entity.Branch;
 import com.ss.hanarowa.domain.branch.repository.BranchRepository;
-import com.ss.hanarowa.domain.member.dto.MemberRegistDTO;
+import com.ss.hanarowa.domain.member.dto.request.MemberRegistRequestDTO;
 import com.ss.hanarowa.domain.member.dto.request.ModifyPasswdRequestDTO;
 import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.repository.MemberRepository;
-import com.ss.hanarowa.domain.member.dto.MemberInfoDTO;
+import com.ss.hanarowa.domain.member.dto.request.MemberInfoRequestDTO;
 import com.ss.hanarowa.domain.member.service.MemberService;
 import com.ss.hanarowa.global.exception.GeneralException;
 import com.ss.hanarowa.global.response.code.status.ErrorStatus;
@@ -30,26 +30,26 @@ public class MemberServiceImpl implements MemberService {
 	private final PasswordEncoder passwordEncoder;
 
 	@Override
-	public void credentialRegist(MemberRegistDTO memberRegistDTO) {
-		memberRepository.findByEmail(memberRegistDTO.getEmail()).orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_EMAIL_EXIST));
+	public void credentialRegist(MemberRegistRequestDTO memberRegistRequestDTO) {
+		memberRepository.findByEmail(memberRegistRequestDTO.getEmail()).orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_EMAIL_EXIST));
 
-		memberRegistDTO.setPassword(passwordEncoder.encode(memberRegistDTO.getPassword()));
+		memberRegistRequestDTO.setPassword(passwordEncoder.encode(memberRegistRequestDTO.getPassword()));
 
 		Member member = Member.builder()
-			.email(memberRegistDTO.getEmail())
-			.name(memberRegistDTO.getName())
-			.password(memberRegistDTO.getPassword())
-			.role(memberRegistDTO.getRole())
+			.email(memberRegistRequestDTO.getEmail())
+			.name(memberRegistRequestDTO.getName())
+			.password(memberRegistRequestDTO.getPassword())
+			.role(memberRegistRequestDTO.getRole())
 			.build();
 
 		memberRepository.save(member);
 	}
 
 	@Override
-	public void infoRegist(MemberInfoDTO memberInfoDTO, String email) {
+	public void infoRegist(MemberInfoRequestDTO memberInfoRequestDTO, String email) {
 		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
-		member.setBirth(Format.getBirthAsLocalDate(memberInfoDTO.getBirth()));
-		member.setPhoneNumber(memberInfoDTO.getPhoneNumber());
+		member.setBirth(Format.getBirthAsLocalDate(memberInfoRequestDTO.getBirth()));
+		member.setPhoneNumber(memberInfoRequestDTO.getPhoneNumber());
 
 		memberRepository.save(member);
 	}
@@ -64,14 +64,14 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public void modifyInfo(MemberInfoDTO memberInfoDTO, String email) {
+	public void modifyInfo(MemberInfoRequestDTO memberInfoRequestDTO, String email) {
 		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
-		if(Format.getBirthAsLocalDate(memberInfoDTO.getBirth()) != member.getBirth()){
-			member.setBirth(Format.getBirthAsLocalDate(memberInfoDTO.getBirth()));
+		if(Format.getBirthAsLocalDate(memberInfoRequestDTO.getBirth()) != member.getBirth()){
+			member.setBirth(Format.getBirthAsLocalDate(memberInfoRequestDTO.getBirth()));
 		}
-		if(!Objects.equals(memberInfoDTO.getPhoneNumber(), member.getPhoneNumber())){
-			member.setPhoneNumber(memberInfoDTO.getPhoneNumber());
+		if(!Objects.equals(memberInfoRequestDTO.getPhoneNumber(), member.getPhoneNumber())){
+			member.setPhoneNumber(memberInfoRequestDTO.getPhoneNumber());
 		}
 
 		memberRepository.save(member);

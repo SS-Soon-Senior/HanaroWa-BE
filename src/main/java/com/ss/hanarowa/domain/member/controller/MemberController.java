@@ -9,15 +9,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ss.hanarowa.domain.member.dto.MemberRegistDTO;
+import com.ss.hanarowa.domain.member.dto.request.MemberRegistRequestDTO;
 import com.ss.hanarowa.domain.member.dto.request.ModifyPasswdRequestDTO;
-import com.ss.hanarowa.domain.member.entity.Member;
-import com.ss.hanarowa.domain.member.repository.MemberRepository;
-import com.ss.hanarowa.domain.member.dto.MemberInfoDTO;
+import com.ss.hanarowa.domain.member.dto.request.MemberInfoRequestDTO;
 import com.ss.hanarowa.domain.member.service.MemberService;
-import com.ss.hanarowa.global.exception.GeneralException;
 import com.ss.hanarowa.global.response.ApiResponse;
-import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,17 +31,17 @@ public class MemberController {
 
 	@PostMapping("/regist")
 	@Operation(summary = "일반 회원가입")
-	public ResponseEntity<ApiResponse<String>> regist(@Valid @RequestBody MemberRegistDTO memberRegistDTO) {
-		memberService.credentialRegist(memberRegistDTO);
+	public ResponseEntity<ApiResponse<String>> regist(@Valid @RequestBody MemberRegistRequestDTO memberRegistRequestDTO) {
+		memberService.credentialRegist(memberRegistRequestDTO);
 		return ResponseEntity.ok(ApiResponse.onSuccess("회원가입 완료"));
 	}
 
 	@PostMapping("/info")
 	@Operation(summary = "전화번호, 생일등록")
-	public ResponseEntity<ApiResponse<Void>> info(@Valid @RequestBody MemberInfoDTO memberInfoDTO, Authentication authentication) {
+	public ResponseEntity<ApiResponse<Void>> info(@Valid @RequestBody MemberInfoRequestDTO memberInfoRequestDTO, Authentication authentication) {
 		String email = authentication.getName();
 
-		memberService.infoRegist(memberInfoDTO, email);
+		memberService.infoRegist(memberInfoRequestDTO, email);
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(null));
 	}
@@ -60,12 +56,12 @@ public class MemberController {
 
 	@PatchMapping
 	@Operation(summary = "회원 정보 수정")
-	public ResponseEntity<ApiResponse<MemberInfoDTO>> modifyInfo(@Valid @RequestBody MemberInfoDTO memberInfoDTO, Authentication authentication) {
+	public ResponseEntity<ApiResponse<MemberInfoRequestDTO>> modifyInfo(@Valid @RequestBody MemberInfoRequestDTO memberInfoRequestDTO, Authentication authentication) {
 		String email = authentication.getName();
 
-		memberService.modifyInfo(memberInfoDTO, email);
+		memberService.modifyInfo(memberInfoRequestDTO, email);
 
-		return ResponseEntity.ok(ApiResponse.onSuccess(memberInfoDTO));
+		return ResponseEntity.ok(ApiResponse.onSuccess(memberInfoRequestDTO));
 	}
 
 	@PatchMapping("/password")

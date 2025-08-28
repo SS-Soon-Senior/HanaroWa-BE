@@ -11,10 +11,9 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ss.hanarowa.domain.member.dto.MemberAuthDTO;
+import com.ss.hanarowa.domain.member.dto.MemberAuthResponseDTO;
 import com.ss.hanarowa.domain.member.entity.Role;
 
 import jakarta.servlet.FilterChain;
@@ -56,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			String roleStr = (String) claims.get("role");
 			Role role = Role.valueOf(roleStr);
 
-			MemberAuthDTO dto = new MemberAuthDTO(email, "", role);
+			MemberAuthResponseDTO dto = new MemberAuthResponseDTO(email, "", role);
 
 			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
 				dto, null, dto.getAuthorities()
