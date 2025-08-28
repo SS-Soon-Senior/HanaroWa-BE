@@ -15,14 +15,20 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ss.hanarowa.domain.member.dto.response.MemberAuthResponseDTO;
 import com.ss.hanarowa.domain.member.entity.Role;
+import com.ss.hanarowa.global.response.ApiResponse;
+import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 
 import jakarta.servlet.FilterChain;
+import lombok.RequiredArgsConstructor;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+	
+	private final TokenBlacklistService tokenBlacklistService;
 
 	private static final List<String> PERMIT_ALL_URLS = Arrays.asList(
 		"/member/regist",
@@ -49,6 +55,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 		try {
 			String token = authHeader.substring(7);
+			
+			// 블랙리스트 검증
+			if (tokenBlacklistService.isBlacklisted(token)) {
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				response.setContentType("application/json;charset=UTF-8");
+				ObjectMapper objectMapper = new ObjectMapper();
+				PrintWriter out = response.getWriter();
+				
+				ApiResponse<Object> errorResponse = ApiResponse.onFailure(
+					ErrorStatus.TOKEN_BLACKLISTED.getCode(), 
+					ErrorStatus.TOKEN_BLACKLISTED.getMessage(), 
+					null
+				);
+				out.println(objectMapper.writeValueAsString(errorResponse));
+				out.flush();
+				out.close();
+				return;
+			}
+			
 			Map<String, Object> claims = JwtUtil.validateToken(token);
 
 			String email = (String) claims.get("email");
@@ -73,10 +98,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			ObjectMapper objectMapper = new ObjectMapper();
 			PrintWriter out = response.getWriter();
 
-			String errorMessage;
-			errorMessage = "INVALID_TOKEN";
-
-			out.println(objectMapper.writeValueAsString(Map.of("error", errorMessage, "message", e.getMessage())));
+			ApiResponse<Object> errorResponse = ApiResponse.onFailure(
+				ErrorStatus.TOKEN_INVALID.getCode(), 
+				ErrorStatus.TOKEN_INVALID.getMessage(), 
+				null
+			);
+			out.println(objectMapper.writeValueAsString(errorResponse));
 			out.flush();
 			out.close();
 		}

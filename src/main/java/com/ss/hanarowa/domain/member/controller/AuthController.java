@@ -18,6 +18,7 @@ import com.ss.hanarowa.global.exception.GeneralException;
 import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 import com.ss.hanarowa.global.response.ApiResponse;
 import com.ss.hanarowa.global.security.JwtUtil;
+import com.ss.hanarowa.global.security.TokenBlacklistService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -35,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthController {
 	private final AuthenticationManager authenticationManager;
 	private final MemberRepository memberRepository;
+	private final TokenBlacklistService tokenBlacklistService;
 
 	@PostMapping("/signin")
 	@Tag(name = "로그인", description = "사용자 로그인")
@@ -84,6 +86,11 @@ public class AuthController {
 				Map<String, Object> claims = JwtUtil.validateToken(accessToken);
 				String email = (String) claims.get("email");
 				log.info("토큰에서 이메일 추출: {}", email);
+				
+				// accessToken을 블랙리스트에 추가 (토큰 만료시간 추출)
+				long expirationTime = ((Number) claims.get("exp")).longValue() * 1000; // JWT exp는 초 단위
+				tokenBlacklistService.blacklistToken(accessToken, expirationTime);
+				log.info("accessToken 블랙리스트 추가 완료");
 				
 				// Member의 refreshToken 삭제
 				Member member = memberRepository.findByEmail(email)
