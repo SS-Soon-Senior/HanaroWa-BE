@@ -6,6 +6,7 @@ import com.ss.hanarowa.domain.lesson.dto.request.LessonGisuStateUpdateRequestDto
 import com.ss.hanarowa.domain.lesson.dto.response.AdminLessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonDetailResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuStateUpdateResponseDto;
+import com.ss.hanarowa.domain.lesson.dto.response.LessonMemberResponseDTO;
 import com.ss.hanarowa.domain.lesson.entity.LessonState;
 
 public interface AdminService {
@@ -15,4 +16,6 @@ public interface AdminService {
 	LessonGisuStateUpdateResponseDto updateLessonGisuState(long lessonGisuId, LessonGisuStateUpdateRequestDto request);
 
 	LessonDetailResponseDTO getLessonDetail(Long lessonId);
+
+	List<LessonMemberResponseDTO> getAllLessonMembers(long lessonId);
 }

@@ -65,4 +65,9 @@ public class AdminController {
 	public ResponseEntity<ApiResponse<LessonDetailResponseDTO>> getLessonDetail(@PathVariable Long lessonId){
 		return ResponseEntity.ok(ApiResponse.onSuccess(adminService.getLessonDetail(lessonId)));
 	}
+	//
+	// @PreAuthorize("hasRole('ADMIN')")
+	// @Operation(summary = "관리자 강좌별 신청 회원 현황")
+	// @GetMapping("/{lessonId}/member")
+
 }
