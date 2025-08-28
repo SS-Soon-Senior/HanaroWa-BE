@@ -1,6 +1,6 @@
-package com.ss.hanarowa.domain.member.entity;
+package com.ss.hanarowa.domain.lesson.entity;
 
-import com.ss.hanarowa.domain.lesson.entity.Lesson;
+import com.ss.hanarowa.domain.member.entity.Member;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
