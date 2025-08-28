@@ -3,6 +3,7 @@ package com.ss.hanarowa.global.security;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
@@ -24,12 +25,23 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+	private static final List<String> PERMIT_ALL_URLS = Arrays.asList(
+		"/member/regist",
+		"/auth/signin"
+	);
+
 
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
 		@NonNull FilterChain filterChain) throws ServletException, IOException {
 
 		String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+		String path = request.getRequestURI();
+		if (PERMIT_ALL_URLS.contains(path)) {
+			filterChain.doFilter(request, response);
+			return;
+		}
 
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
 			filterChain.doFilter(request, response);
