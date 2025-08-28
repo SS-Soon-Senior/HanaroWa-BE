@@ -25,7 +25,6 @@ import com.ss.hanarowa.domain.lesson.dto.response.OfferedLessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.service.LessonService;
 import com.ss.hanarowa.domain.lesson.service.ReviewService;
 import com.ss.hanarowa.domain.member.entity.Member;
-import com.ss.hanarowa.domain.member.repository.MemberRepository;
 import com.ss.hanarowa.global.exception.GeneralException;
 import com.ss.hanarowa.global.response.ApiResponse;
 import com.ss.hanarowa.global.response.code.status.ErrorStatus;

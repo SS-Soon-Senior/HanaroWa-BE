@@ -20,4 +20,5 @@ public class LessonInfoResponseDTO {
 	private int lessonFee; // 수강료
 	private int capacity; //LessonGisu 의 capacity
 	private int currentStudentCount; // 현재 수강중인 인원
+	private int lessonCategory; //강좌 카테고리 아이디
 }
