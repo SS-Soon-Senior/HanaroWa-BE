@@ -13,7 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ss.hanarowa.domain.member.dto.MemberAuthResponseDTO;
+import com.ss.hanarowa.domain.member.dto.response.MemberAuthResponseDTO;
 import com.ss.hanarowa.domain.member.entity.Role;
 
 import jakarta.servlet.FilterChain;

@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.ss.hanarowa.domain.member.entity.Member;
-import com.ss.hanarowa.domain.member.dto.MemberAuthResponseDTO;
+import com.ss.hanarowa.domain.member.dto.response.MemberAuthResponseDTO;
 import com.ss.hanarowa.domain.member.repository.MemberRepository;
 import com.ss.hanarowa.global.exception.GeneralException;
 import com.ss.hanarowa.global.response.code.status.ErrorStatus;

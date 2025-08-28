@@ -1,4 +1,4 @@
-package com.ss.hanarowa.domain.member.dto;
+package com.ss.hanarowa.domain.member.dto.response;
 
 
 import java.util.Collections;

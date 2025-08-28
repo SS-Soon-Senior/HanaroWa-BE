@@ -9,7 +9,7 @@ import javax.crypto.SecretKey;
 
 import org.springframework.security.core.Authentication;
 
-import com.ss.hanarowa.domain.member.dto.MemberAuthResponseDTO;
+import com.ss.hanarowa.domain.member.dto.response.MemberAuthResponseDTO;
 import com.ss.hanarowa.global.security.exception.CustomJwtException;
 
 import io.jsonwebtoken.ExpiredJwtException;
