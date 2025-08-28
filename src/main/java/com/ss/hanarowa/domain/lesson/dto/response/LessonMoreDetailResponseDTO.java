@@ -3,7 +3,6 @@ package com.ss.hanarowa.domain.lesson.dto.response;
 import java.util.List;
 
 import com.ss.hanarowa.domain.lesson.entity.Category;
-import com.ss.hanarowa.domain.lesson.entity.Review;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +22,7 @@ public class LessonMoreDetailResponseDTO {
 	private String description;
 	private Category category;
 	private String lessonImg;
-	private List<Review> reviews;
+	private List<ReviewResponseDTO> reviews;
 	private double averageRating;
 	private int totalReviews;
 

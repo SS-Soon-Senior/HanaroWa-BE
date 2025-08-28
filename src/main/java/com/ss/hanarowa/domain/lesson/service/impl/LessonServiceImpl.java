@@ -7,6 +7,7 @@ import com.ss.hanarowa.domain.lesson.service.LessonService;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonMoreDetailResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.CurriculumResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.ReviewResponseDTO;
 import com.ss.hanarowa.domain.lesson.entity.Lesson;
 import com.ss.hanarowa.domain.lesson.entity.Review;
 import com.ss.hanarowa.domain.member.repository.MyLessonRepository;
@@ -59,6 +60,17 @@ public class LessonServiceImpl implements LessonService {
 			.flatMap(lessonGisu -> reviewRepository.findByLessonGisu(lessonGisu).stream())
 			.collect(Collectors.toList());
 		
+		// Review 엔티티를 ReviewResponseDTO로 변환
+		List<ReviewResponseDTO> reviewDTOs = allReviews.stream()
+			.map(review -> ReviewResponseDTO.builder()
+				.id(review.getId())
+				.rating(review.getRating())
+				.reviewTxt(review.getReviewTxt())
+				.memberName(review.getMember().getName())
+				.lessonGisuId(review.getLessonGisu().getId())
+				.build())
+			.collect(Collectors.toList());
+		
 		double averageRating = allReviews.stream()
 			.mapToInt(Review::getRating)
 			.average()
@@ -71,7 +83,7 @@ public class LessonServiceImpl implements LessonService {
 			.description(lesson.getDescription())
 			.category(lesson.getCategory())
 			.lessonImg(lesson.getLessonImg())
-			.reviews(allReviews)
+			.reviews(reviewDTOs)
 			.averageRating(averageRating)
 			.totalReviews(allReviews.size())
 			.lessonGisus(lessonGisuDTOs)
