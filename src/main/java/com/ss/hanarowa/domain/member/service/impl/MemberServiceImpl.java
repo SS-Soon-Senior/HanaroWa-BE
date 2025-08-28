@@ -1,8 +1,5 @@
 package com.ss.hanarowa.domain.member.service.impl;
 
-import static java.time.LocalDate.*;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -13,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ss.hanarowa.domain.branch.entity.Branch;
 import com.ss.hanarowa.domain.branch.repository.BranchRepository;
 import com.ss.hanarowa.domain.member.dto.MemberRegistDTO;
-import com.ss.hanarowa.domain.member.dto.ModifyPasswdRequestDTO;
+import com.ss.hanarowa.domain.member.dto.request.ModifyPasswdRequestDTO;
 import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.repository.MemberRepository;
 import com.ss.hanarowa.domain.member.dto.MemberInfoDTO;

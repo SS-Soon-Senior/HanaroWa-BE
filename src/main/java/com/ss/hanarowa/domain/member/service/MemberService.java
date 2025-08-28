@@ -2,8 +2,7 @@ package com.ss.hanarowa.domain.member.service;
 
 import com.ss.hanarowa.domain.member.dto.MemberRegistDTO;
 import com.ss.hanarowa.domain.member.dto.MemberInfoDTO;
-import com.ss.hanarowa.domain.member.dto.ModifyPasswdRequestDTO;
-import com.ss.hanarowa.domain.member.entity.Member;
+import com.ss.hanarowa.domain.member.dto.request.ModifyPasswdRequestDTO;
 
 public interface MemberService {
 	void credentialRegist(MemberRegistDTO memberRegistDTO);
