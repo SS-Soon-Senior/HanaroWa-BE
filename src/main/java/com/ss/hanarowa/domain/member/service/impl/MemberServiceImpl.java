@@ -52,7 +52,7 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public void infoRegist(MemberInfoDTO memberInfoDTO, long id) {
-		Member member = memberRepository.findById(id).orElseThrow();
+		Member member = memberRepository.findById(id).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
 		member.setBirth(Format.getBirthAsLocalDate(memberInfoDTO.getBirth()));
 		member.setPhoneNumber(memberInfoDTO.getPhoneNumber());
@@ -119,6 +119,12 @@ public class MemberServiceImpl implements MemberService {
 
 		member.setBranch(branch);
 		memberRepository.save(member);
+	}
+
+	@Override
+	public Long getMemberIdByEmail(String email) {
+		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+		return member.getId();
 	}
 
 }

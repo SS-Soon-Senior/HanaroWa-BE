@@ -12,4 +12,5 @@ public interface MemberService {
 	void modifyInfo(MemberInfoDTO memberInfoDTO, long id);
 	void updateMemberBranch(long branchId, long memberId);
 	void modifyPassword(ModifyPasswdRequestDTO passwdRequestDTO, long id);
+	Long getMemberIdByEmail(String email);
 }
