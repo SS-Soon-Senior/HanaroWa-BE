@@ -20,5 +20,5 @@ public interface LessonService {
 
 	List<LessonListSearchResponseDTO> getLessonListSearch(String query);
 
-	void enrollForLesson(Long lessonGisuId, String email); // 강좌 신청
+	void applyForLesson(Long lessonGisuId, String email); // 강좌 신청
 }

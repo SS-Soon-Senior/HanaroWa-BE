@@ -233,7 +233,7 @@ public class LessonServiceImpl implements LessonService {
 	}
 
 	@Override
-	public void enrollForLesson(Long lessonGisuId, String email) {
+	public void applyForLesson(Long lessonGisuId, String email) {
 		Member member = memberRepository.findByEmail(email)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
@@ -241,7 +241,7 @@ public class LessonServiceImpl implements LessonService {
 			.orElseThrow(() -> new GeneralException(ErrorStatus.LESSONGISU_NOT_FOUND));
 
 		if (member.getMyLessons().stream().anyMatch(myLesson -> myLesson.getLessonGisu().equals(lessonGisu))) {
-			throw new GeneralException(ErrorStatus.LESSON_ALREADY_ENROLLED);
+			throw new GeneralException(ErrorStatus.LESSON_ALREADY_APPLIED);
 		}
 
 		int currentEnrollment = myLessonRepository.countByLessonGisuId(lessonGisuId);
