@@ -19,13 +19,13 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/admin/member")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
 @Tag(name = "[관리자] 회원", description = "관리자 관련 API")
 public class AdminMemberController {
 	private final AdminMemberService adminMemberService;
-	@GetMapping("/members")
+	@GetMapping
 	@Operation(summary ="관리자 회원 목록")
 	public ResponseEntity<ApiResponse<List<MemberListResponseDTO>>> getAdminAllMembers() {
 		List<MemberListResponseDTO> result = adminMemberService.getAllMembers();
