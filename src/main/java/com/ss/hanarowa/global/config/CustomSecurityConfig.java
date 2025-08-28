@@ -53,7 +53,7 @@ public class CustomSecurityConfig {
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(
 					"/member/regist",
-					"/auth/**",
+					"/auth/signin",
 					"/favicon.ico",
 					"/actuator/**",
 					"/swagger-ui/**",
