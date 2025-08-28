@@ -44,7 +44,6 @@ import lombok.extern.slf4j.Slf4j;
 public class LessonController {
 	private final LessonService lessonService;
 	private final ReviewService reviewService;
-	private final MemberRepository memberRepository;
 
 	@PostMapping("/{lessonGisuId}/review")
 	@Operation(summary = "강좌 기수 리뷰 작성", description = "사용자가 특정 강좌 기수에 대한 리뷰를 작성합니다.")
@@ -54,9 +53,8 @@ public class LessonController {
 		Authentication authentication) {
 
 		String email = authentication.getName();
-		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
-		reviewService.createReview(lessonGisuId, member.getId(), reviewRequestDTO);
+		reviewService.createReview(lessonGisuId, email, reviewRequestDTO);
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(null));
 	}
