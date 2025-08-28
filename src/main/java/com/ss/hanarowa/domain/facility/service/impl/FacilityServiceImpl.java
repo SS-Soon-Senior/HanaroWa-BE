@@ -4,16 +4,21 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityDetailResponseDTO;
+import com.ss.hanarowa.domain.facility.dto.reponse.FacilityImageResponseDTO;
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityResponseDTO;
-import com.ss.hanarowa.domain.facility.dto.reponse.FacilityTimeResponseDTO;
+
 import com.ss.hanarowa.domain.facility.dto.request.FacilityReservationDTO;
 import com.ss.hanarowa.domain.facility.entity.Facility;
+import com.ss.hanarowa.domain.facility.entity.FacilityImage;
 import com.ss.hanarowa.domain.facility.entity.FacilityTime;
 import com.ss.hanarowa.domain.facility.repository.FacilityRepository;
 import com.ss.hanarowa.domain.facility.repository.FacilityTimeRepository;
@@ -74,23 +79,41 @@ public class FacilityServiceImpl implements FacilityService {
 		LocalDateTime startDateTime = LocalDate.now().atStartOfDay();
 		LocalDateTime endDateTime = LocalDate.now().plusDays(3).atTime(LocalTime.MAX);
 
-		List<FacilityTime> facilityTimes = facilityTimeRepository.findFacilityTimesByFacilityAndStartedAtBetween(facility, startDateTime, endDateTime);
+		List<FacilityTime> availableBlocks = facilityTimeRepository.findFacilityTimesByFacilityAndStartedAtBetween(facility, startDateTime, endDateTime);
 
-		List<FacilityTimeResponseDTO> timeResponseDTOS = facilityTimes.stream().map(f -> FacilityTimeResponseDTO.builder()
-			.date(f.getEndedAt().format(DateTimeFormatter.ofPattern("MM-dd")))
-			.endTime(f.getEndedAt().minusHours(1).format(
-				DateTimeFormatter.ofPattern("HH:mm")))
-			.startTime(f.getStartedAt().format(
-				DateTimeFormatter.ofPattern("HH:mm")))
-			.build()
+		Map<String, List<String>> availableSlotsByDate = new TreeMap<>();
+		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+
+		for (FacilityTime timeBlock : availableBlocks) {
+			LocalDateTime start = timeBlock.getStartedAt();
+			LocalDateTime end = timeBlock.getEndedAt();
+			String dateKey = start.format(dateFormatter);
+
+			LocalDateTime currentStartTime = start;
+
+			while (currentStartTime.isBefore(end)) {
+				availableSlotsByDate.computeIfAbsent(dateKey, k -> new ArrayList<>())
+					.add(currentStartTime.format(timeFormatter));
+
+				currentStartTime = currentStartTime.plusHours(1);
+			}
+		}
+
+		List<FacilityImage> facilityImages = facility.getFacilityImages();
+		List<FacilityImageResponseDTO> imageResponseDTOS = facilityImages.stream().map(f ->
+			FacilityImageResponseDTO.builder()
+				.facilityImgId(f.getId())
+				.imgUrl(f.getFacilityImage())
+				.build()
 		).toList();
 
 		return FacilityDetailResponseDTO.builder()
 			.facilityName(facility.getName())
-			.facilityImages(facility.getFacilityImages())
+			.facilityImages(imageResponseDTOS)
 			.facilityDescription(facility.getDescription())
 			.facilityId(facility.getId())
-			.facilityTimes(timeResponseDTOS)
+			.facilityTimes(availableSlotsByDate)
 			.build();
 	}
 

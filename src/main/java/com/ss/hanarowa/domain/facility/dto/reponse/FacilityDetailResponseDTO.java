@@ -1,6 +1,7 @@
 package com.ss.hanarowa.domain.facility.dto.reponse;
 
 import java.util.List;
+import java.util.Map;
 
 import com.ss.hanarowa.domain.facility.entity.FacilityImage;
 import com.ss.hanarowa.domain.facility.entity.FacilityTime;
@@ -17,5 +18,5 @@ public class FacilityDetailResponseDTO {
 
 	private List<FacilityImageResponseDTO> facilityImages;
 
-	private List<FacilityTimeResponseDTO> facilityTimes;
+	private Map<String, List<String>> facilityTimes;
 }
