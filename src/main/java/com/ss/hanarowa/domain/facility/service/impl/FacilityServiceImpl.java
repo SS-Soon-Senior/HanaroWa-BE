@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.ss.hanarowa.domain.facility.dto.reponse.AdminFacilityResponseDTO;
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityDetailResponseDTO;
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityImageResponseDTO;
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityResponseDTO;
@@ -124,6 +125,24 @@ public class FacilityServiceImpl implements FacilityService {
 			.facilityDescription(facility.getDescription())
 			.mainImage(facility.getFacilityImages().getFirst())
 			.build();
+	}
+
+	@Override
+	public List<AdminFacilityResponseDTO> getAllFacilityReservations() {
+		List<FacilityTime> reservations = facilityTimeRepository.findAllByOrderByIdDesc();
+		
+		return reservations.stream()
+			.map(reservation -> AdminFacilityResponseDTO.builder()
+				.reservationId(reservation.getId())
+				.facilityName(reservation.getFacility().getName())
+				.memberName(reservation.getMember().getName())
+				.memberEmail(reservation.getMember().getEmail())
+				.branchName(reservation.getFacility().getBranch().getName())
+				.locationName(reservation.getFacility().getBranch().getLocation().getName())
+				.startedAt(reservation.getStartedAt())
+				.endedAt(reservation.getEndedAt())
+				.build())
+			.collect(Collectors.toList());
 	}
 
 }
