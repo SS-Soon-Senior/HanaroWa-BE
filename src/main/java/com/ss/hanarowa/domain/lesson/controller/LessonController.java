@@ -35,17 +35,17 @@ public class LessonController {
 	private final MemberRepository memberRepository;
 	private final LessonService lessonService;
 
-	@PostMapping("/lesson/{lessonId}/review")
-	@Operation(summary = "강좌 리뷰 작성", description = "사용자가 특정 강좌에 대한 리뷰를 작성합니다.")
+	@PostMapping("/{lessonGisuId}/review")
+	@Operation(summary = "강좌 기수 리뷰 작성", description = "사용자가 특정 강좌 기수에 대한 리뷰를 작성합니다.")
 	public ResponseEntity<ApiResponse<Void>> createReview(
-		@PathVariable Long lessonId,
+		@PathVariable Long lessonGisuId,
 		@Valid @RequestBody ReviewRequestDTO reviewRequestDTO,
 		Authentication authentication) {
 
 		String email = authentication.getName();
 		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
-		reviewService.createReview(lessonId, member.getId(), reviewRequestDTO);
+		reviewService.createReview(lessonGisuId, member.getId(), reviewRequestDTO);
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(null));
 	}

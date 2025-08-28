@@ -3,7 +3,7 @@ package com.ss.hanarowa.domain.lesson.dto.response;
 import java.util.List;
 
 import com.ss.hanarowa.domain.lesson.entity.Category;
-import com.ss.hanarowa.domain.member.entity.Review;
+import com.ss.hanarowa.domain.lesson.entity.Review;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

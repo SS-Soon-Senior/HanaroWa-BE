@@ -8,10 +8,9 @@ import com.ss.hanarowa.domain.lesson.dto.response.LessonMoreDetailResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.CurriculumResponseDTO;
 import com.ss.hanarowa.domain.lesson.entity.Lesson;
-import com.ss.hanarowa.domain.lesson.entity.LessonGisu;
+import com.ss.hanarowa.domain.lesson.entity.Review;
 import com.ss.hanarowa.domain.member.repository.MyLessonRepository;
-import com.ss.hanarowa.domain.member.repository.ReviewRepository;
-import com.ss.hanarowa.domain.member.entity.Review;
+import com.ss.hanarowa.domain.lesson.repository.ReviewRepository;
 import com.ss.hanarowa.domain.member.entity.MyLesson;
 
 import lombok.RequiredArgsConstructor;
