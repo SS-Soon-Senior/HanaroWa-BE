@@ -29,6 +29,8 @@ public enum ErrorStatus implements BaseErrorCode {
 	//토큰 관련 에러
 	TOKEN_BLACKLISTED(HttpStatus.UNAUTHORIZED, "TOKEN401", "로그아웃된 토큰입니다."),
 	TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "TOKEN401", "유효하지 않은 토큰입니다."),
+	TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "TOKEN404", "토큰이 없습니다."),
+
 
 	//지점 관련 에러
 	BRANCH_NOT_FOUND(HttpStatus.NOT_FOUND, "BRANCH404", "해당 지점이 없습니다."),
