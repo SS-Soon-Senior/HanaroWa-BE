@@ -33,8 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private static final List<String> PERMIT_ALL_URLS = Arrays.asList(
 		"/member/regist",
 		"/auth/signin",
-		"/member/refresh",
-		"/auth/logout"
+		"/member/refresh"
 	);
 
 

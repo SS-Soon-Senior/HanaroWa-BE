@@ -41,7 +41,7 @@ public class AuthController {
 	@PostMapping("/signin")
 	@Tag(name = "로그인", description = "사용자 로그인")
 	@Transactional
-	public ResponseEntity<?> signin(@RequestBody LoginRequestDTO loginRequest) {
+	public ResponseEntity<ApiResponse<Map<String, Object>>> signin(@RequestBody LoginRequestDTO loginRequest) {
 		try {
 			Authentication authenticate = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(
@@ -58,8 +58,8 @@ public class AuthController {
 				.orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 			member.updateRefreshToken(refreshToken);
 			memberRepository.save(member);
-			
-			return ResponseEntity.ok(result);
+
+			return ResponseEntity.ok(ApiResponse.onSuccess(result));
 		} catch (AuthenticationException e) {
 			throw new GeneralException(ErrorStatus.MEMBER_AUTHENTICATION_FAILED);
 		}
