@@ -8,6 +8,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,7 +25,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,12 +41,7 @@ public class AuthController {
 	@PostMapping("/signin")
 	@Tag(name = "로그인", description = "사용자 로그인")
 	@Transactional
-	public ResponseEntity<?> signin(@Parameter(example = """
-		{
-		  "email": "youngkyun@hana.com",
-		  "pwd": "1234"
-		}
-		""")LoginRequestDTO loginRequest) {
+	public ResponseEntity<ApiResponse<Map<String, Object>>> signin(@RequestBody LoginRequestDTO loginRequest) {
 		try {
 			Authentication authenticate = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(
@@ -63,8 +58,8 @@ public class AuthController {
 				.orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 			member.updateRefreshToken(refreshToken);
 			memberRepository.save(member);
-			
-			return ResponseEntity.ok(result);
+
+			return ResponseEntity.ok(ApiResponse.onSuccess(result));
 		} catch (AuthenticationException e) {
 			throw new GeneralException(ErrorStatus.MEMBER_AUTHENTICATION_FAILED);
 		}

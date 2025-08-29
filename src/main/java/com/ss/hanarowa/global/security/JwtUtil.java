@@ -64,7 +64,7 @@ public class JwtUtil {
 		MemberAuthResponseDTO d = (MemberAuthResponseDTO)authentication.getPrincipal();
 		MemberAuthResponseDTO dto = new MemberAuthResponseDTO(d.getEmail(), "" ,d.getRole());
 		Map<String, Object> claims = dto.getClaims();
-		String accessToken = JwtUtil.generateToken(claims, 10);
+		String accessToken = JwtUtil.generateToken(claims, 1);
 		String refreshToken = JwtUtil.generateToken(claims, 60 * 24);
 		claims.put("accessToken", accessToken);
 		claims.put("refreshToken", refreshToken);
