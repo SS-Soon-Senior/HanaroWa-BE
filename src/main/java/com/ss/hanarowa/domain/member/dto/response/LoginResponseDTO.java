@@ -8,6 +8,6 @@ import lombok.Getter;
 @Getter
 @Builder
 public class LoginResponseDTO {
-	Map<String, Object> result;
-	String url;
+	private String url;
+	private TokenResponseDTO tokens;
 }
