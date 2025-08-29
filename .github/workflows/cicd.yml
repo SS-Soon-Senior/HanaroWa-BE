@@ -1,0 +1,26 @@
+name: SpringDemo CI/CD
+on:
+  push:
+    branches: [ develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: test pwd
+        run: pwd
+
+      - name: test ls
+        run: ls -al
+
+      - uses: actions/setup-java@v5.0.0
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: set props
+        working-directory: HanaroWa-BE
+        run: echo "${{ secrets.APPLICATION }}"
