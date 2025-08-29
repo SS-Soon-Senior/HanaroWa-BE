@@ -1,4 +1,5 @@
 package com.ss.hanarowa.domain.lesson.repository;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ss.hanarowa.domain.branch.entity.Branch;
@@ -152,4 +153,5 @@ class LessonRepositoryTest extends RepositoryTest {
 		Lesson afterDelete = tem.find(Lesson.class, savedLesson.getId());
 		assertThat(afterDelete).isNull();
 	}
+
 }
