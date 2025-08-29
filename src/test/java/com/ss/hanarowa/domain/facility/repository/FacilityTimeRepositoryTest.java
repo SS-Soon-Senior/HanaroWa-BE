@@ -19,6 +19,7 @@ import com.ss.hanarowa.domain.branch.repository.LocationRepository;
 import com.ss.hanarowa.domain.facility.entity.Facility;
 import com.ss.hanarowa.domain.facility.entity.FacilityTime;
 import com.ss.hanarowa.domain.member.entity.Member;
+import com.ss.hanarowa.domain.member.entity.Role;
 import com.ss.hanarowa.domain.member.repository.MemberRepository;
 import com.ss.hanarowa.repository.RepositoryTest;
 
@@ -68,6 +69,7 @@ class FacilityTimeRepositoryTest extends RepositoryTest {
 			.name("테스트 회원")
 			.email("test@example.com")
 			.birth(LocalDate.of(1990, 1, 1))
+			.role(Role.USERS)
 			.branch(testBranch)
 			.build();
 		testMember = memberRepository.save(testMember);
