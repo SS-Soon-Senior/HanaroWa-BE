@@ -10,6 +10,7 @@ import javax.crypto.SecretKey;
 import org.springframework.security.core.Authentication;
 
 import com.ss.hanarowa.domain.member.dto.response.MemberAuthResponseDTO;
+import com.ss.hanarowa.domain.member.dto.response.TokenResponseDTO;
 import com.ss.hanarowa.global.security.exception.CustomJwtException;
 
 import io.jsonwebtoken.ExpiredJwtException;
@@ -32,6 +33,24 @@ public class JwtUtil {
 			.signWith(K).compact();
 		System.out.println("jwtStr = " + jwtStr);
 		return jwtStr;
+	}
+
+	public static TokenResponseDTO createTokens(Authentication authentication) {
+		MemberAuthResponseDTO principal = (MemberAuthResponseDTO) authentication.getPrincipal();
+
+		Map<String, Object> claims = Map.of(
+			"email", principal.getEmail(),
+			"role", principal.getRole().name()
+		);
+
+		String accessToken = generateToken(claims, 1000000);
+		String refreshToken = generateToken(Map.of("email", principal.getEmail()), 60 * 24);
+
+		return TokenResponseDTO.builder()
+			.email(principal.getEmail())
+			.accessToken(accessToken)
+			.refreshToken(refreshToken)
+			.build();
 	}
 
 	public static Map<String, Object> validateToken(String token) {
