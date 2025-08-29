@@ -43,7 +43,7 @@ public class JwtUtil {
 			"role", principal.getRole().name()
 		);
 
-		String accessToken = generateToken(claims, 10);
+		String accessToken = generateToken(claims, 1000000);
 		String refreshToken = generateToken(Map.of("email", principal.getEmail()), 60 * 24);
 
 		return TokenResponseDTO.builder()
