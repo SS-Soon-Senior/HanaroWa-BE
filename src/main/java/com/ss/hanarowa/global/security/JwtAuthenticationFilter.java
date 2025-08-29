@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ss.hanarowa.domain.member.dto.response.MemberAuthResponseDTO;
 import com.ss.hanarowa.domain.member.entity.Role;
 import com.ss.hanarowa.global.response.ApiResponse;
+import com.ss.hanarowa.global.response.code.ReasonDTO;
 import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 
 import jakarta.servlet.FilterChain;
@@ -61,18 +62,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			if (tokenBlacklistService.isBlacklisted(token)) {
 				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 				response.setContentType("application/json;charset=UTF-8");
-				ObjectMapper objectMapper = new ObjectMapper();
-				PrintWriter out = response.getWriter();
-				
-				ApiResponse<Object> errorResponse = ApiResponse.onFailure(
-					ErrorStatus.TOKEN_BLACKLISTED.getCode(), 
-					ErrorStatus.TOKEN_BLACKLISTED.getMessage(), 
-					null
-				);
-				out.println(objectMapper.writeValueAsString(errorResponse));
-				out.flush();
-				out.close();
-				return;
+
+				ReasonDTO reason = ErrorStatus.MEMBER_NOT_AUTHORITY.getReason();
+				ObjectMapper mapper = new ObjectMapper();
+				String json = mapper.writeValueAsString(reason);
+
+				response.getWriter().write(json);
 			}
 			
 			Map<String, Object> claims = JwtUtil.validateToken(token);

@@ -18,8 +18,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 public class JwtRefreshController {
-	@PostMapping("/member/refresh")
-	@Tag(name = "RefreshToken", description = "리프레시 토큰 확인")
+	@PostMapping("/auth/reissue")
+	@Tag(name = "RefreshToken", description = "리프레시 토큰 재발급")
 	public ResponseEntity<ApiResponse<Map<String, Object>>> refresh(
 		@RequestHeader("Authorization") String authHeader,
 		@RequestParam String refreshToken) {
