@@ -2,7 +2,11 @@ package com.ss.hanarowa.domain.facility.service;
 
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
+
+import com.ss.hanarowa.domain.facility.dto.reponse.AdminFacilityResponseDTO;
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityDetailResponseDTO;
+import com.ss.hanarowa.domain.facility.dto.reponse.FacilityReservationResponseDTO;
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityResponseDTO;
 import com.ss.hanarowa.domain.facility.dto.request.FacilityReservationDTO;
 
@@ -14,4 +18,8 @@ public interface FacilityService {
 	void deleteFacilityReservation(Long reservationId);
 
 	void reservateFacility(FacilityReservationDTO facilityReservationDTO, Long memberId);
+	
+	List<AdminFacilityResponseDTO> getAllFacilityReservations();
+
+	List<FacilityReservationResponseDTO> getAllMyFacilityReservations(Long memberId, Authentication authentication);
 }

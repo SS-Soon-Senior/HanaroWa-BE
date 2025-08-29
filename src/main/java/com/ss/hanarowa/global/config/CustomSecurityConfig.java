@@ -19,10 +19,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.ss.hanarowa.global.security.CustomAuthenticationEntryPoint;
 import com.ss.hanarowa.global.security.CustomOAuth2UserService;
 import com.ss.hanarowa.global.security.JwtAuthenticationFilter;
 import com.ss.hanarowa.global.security.handler.CustomAccessDeiniedHandler;
-import com.ss.hanarowa.global.security.handler.LoginFailureHandler;
 import com.ss.hanarowa.global.security.handler.LoginSuccessHandler;
 import com.ss.hanarowa.global.security.handler.OAuth2SuccessHandler;
 
@@ -39,7 +39,8 @@ public class CustomSecurityConfig {
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 	private final CustomAccessDeiniedHandler customAccessDeiniedHandler;
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	public SecurityFilterChain filterChain(HttpSecurity http,
+		CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
 		log.info("--- securityConfig");
 		System.out.println("** SecurityConfig.filgerChain");
 
@@ -53,7 +54,7 @@ public class CustomSecurityConfig {
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(
 					"/member/regist",
-					"/auth/**",
+					"/auth/signin",
 					"/favicon.ico",
 					"/actuator/**",
 					"/swagger-ui/**",
@@ -61,11 +62,17 @@ public class CustomSecurityConfig {
 					"/hanarowa/api-docs/**",
 					"/v3/api-docs/**",
 					"/broadcast/**",
-					"/swagger.html"
+					"/swagger.html",
+					"/member/refresh",
+					"/auth/logout"
 				).permitAll()
 				.anyRequest().authenticated()
 			)
-			.exceptionHandling(config -> config.accessDeniedHandler(customAccessDeiniedHandler))
+			.exceptionHandling(config -> {
+				config.accessDeniedHandler(customAccessDeiniedHandler);
+				config.authenticationEntryPoint(customAuthenticationEntryPoint);
+			})
+
 			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 			http.oauth2Login(oauth2 -> oauth2
 				.userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
