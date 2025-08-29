@@ -22,5 +22,4 @@ jobs:
           java-version: '21'
 
       - name: set props
-        working-directory: HanaroWa-BE
         run: echo "${{ secrets.APPLICATION }}"
