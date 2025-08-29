@@ -1,5 +1,6 @@
 HELP.md
 application-secret.properties
+application-prod.propertiesgit
 .gradle
 build/
 logs/
