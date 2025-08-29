@@ -1,5 +1,4 @@
 HELP.md
-application.properties
 .gradle
 build/
 logs/
@@ -12,6 +11,9 @@ scr/main/generated
 src/main/resources/static/origin
 src/main/resources/static/upload
 data.sql
+
+application.properties
+application-secret.properties
 
 ### STS ###
 .apt_generated
