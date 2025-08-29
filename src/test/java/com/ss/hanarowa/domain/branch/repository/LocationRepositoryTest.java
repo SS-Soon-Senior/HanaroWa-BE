@@ -28,7 +28,7 @@ class LocationRepositoryTest extends RepositoryTest {
         assertNotNull(savedLocation.getId());
         assertEquals("서울", savedLocation.getName());
         
-        print(savedLocation);
+        print("Created Location: " + savedLocation.getName() + ", ID: " + savedLocation.getId());
     }
     
     @Test
@@ -47,7 +47,7 @@ class LocationRepositoryTest extends RepositoryTest {
         assertEquals(savedLocation.getId(), foundLocation.getId());
         assertEquals("부산", foundLocation.getName());
         
-        print(foundLocation);
+        print("Found Location: " + foundLocation.getName() + ", ID: " + foundLocation.getId());
     }
     
     @Test
@@ -66,7 +66,7 @@ class LocationRepositoryTest extends RepositoryTest {
         assertEquals("대전", updatedLocation.getName());
         assertEquals(savedLocation.getId(), updatedLocation.getId());
         
-        print(updatedLocation);
+        print("Updated Location: " + updatedLocation.getName() + ", ID: " + updatedLocation.getId());
     }
     
     @Test
@@ -91,7 +91,7 @@ class LocationRepositoryTest extends RepositoryTest {
     @Order(5)
     @DisplayName("모든 지역 조회 테스트")
     void findAllLocationsTest() {
-        locationRepository.deleteAll();
+        long initialCount = locationRepository.count();
         
         Location location1 = Location.builder()
                 .name("광주")
@@ -109,8 +109,9 @@ class LocationRepositoryTest extends RepositoryTest {
         locationRepository.save(location2);
         locationRepository.save(location3);
         
-        assertEquals(3, locationRepository.findAll().size());
+        assertEquals(initialCount + 3, locationRepository.count());
         
-        locationRepository.findAll().forEach(this::print);
+        locationRepository.findAll().forEach(location -> 
+                print("Location: " + location.getName() + ", ID: " + location.getId()));
     }
 }
