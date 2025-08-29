@@ -21,6 +21,6 @@ public class LoginRequestDTO {
 	private String email;
 
 	@NotBlank(message = "비밀번호는 필수입력 값입니다.")
-	private String pwd;
+	private String password;
 
 }
