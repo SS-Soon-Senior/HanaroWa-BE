@@ -69,7 +69,7 @@ jobs:
 #            cd /home/ec2-user/workspace
 #            rm -rf my-app/.next
 #            unzip -q next.zip -d my-app
-          '
+#          '
 
       - name: scp jar to was
         run: |
