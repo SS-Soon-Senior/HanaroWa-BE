@@ -1,4 +1,4 @@
-package com.ss.hanarowa.repository;
+package com.ss.hanarowa.domain.member.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -8,6 +8,7 @@ import com.ss.hanarowa.domain.branch.entity.Branch;
 import com.ss.hanarowa.domain.branch.entity.Location;
 import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.entity.Role;
+import com.ss.hanarowa.repository.RepositoryTest;
 
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;

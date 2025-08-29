@@ -1,4 +1,4 @@
-package com.ss.hanarowa.repository;
+package com.ss.hanarowa.domain.lesson.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -12,9 +12,10 @@ import com.ss.hanarowa.domain.lesson.entity.Lesson;
 import com.ss.hanarowa.domain.lesson.entity.LessonGisu;
 import com.ss.hanarowa.domain.lesson.entity.LessonRoom;
 import com.ss.hanarowa.domain.lesson.entity.LessonState;
+import com.ss.hanarowa.domain.lesson.entity.Review;
 import com.ss.hanarowa.domain.member.entity.Member;
-import com.ss.hanarowa.domain.member.entity.MyLesson;
 import com.ss.hanarowa.domain.member.entity.Role;
+import com.ss.hanarowa.repository.RepositoryTest;
 
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
-class MyLessonRepositoryTest extends RepositoryTest {
+class ReviewRepositoryTest extends RepositoryTest {
 
 	@Autowired
 	private TestEntityManager tem;
@@ -36,10 +37,9 @@ class MyLessonRepositoryTest extends RepositoryTest {
 	private Lesson lesson;
 	private LessonRoom lessonRoom;
 	private LessonGisu gisu1;
-	private LessonGisu gisu2;
 	private Member member1;
 	private Member member2;
-	private MyLesson savedMyLesson;
+	private Review savedReview;
 
 	@BeforeEach
 	void setUp() {
@@ -50,7 +50,7 @@ class MyLessonRepositoryTest extends RepositoryTest {
 
 		branch = Branch.builder()
 			.name("대전 컬처뱅크")
-			.address("대전광역시 서구 둔산동 123")
+			.address("대전 서구 둔산동 123")
 			.telNumber("042-123-4567")
 			.location(location)
 			.build();
@@ -62,9 +62,7 @@ class MyLessonRepositoryTest extends RepositoryTest {
 			.instruction("매주 월/수/금 10:00")
 			.description("기초 요가 수업입니다.")
 			.category(Category.HEALTH)
-			.lessonImg(null)
 			.branch(branch)
-			.member(null)
 			.build();
 		tem.persist(lesson);
 
@@ -75,28 +73,16 @@ class MyLessonRepositoryTest extends RepositoryTest {
 		tem.persist(lessonRoom);
 
 		gisu1 = LessonGisu.builder()
-			.capacity(10)
+			.capacity(12)
 			.lessonFee(10000)
 			.duration("8주")
 			.lessonState(LessonState.PENDING)
 			.lesson(lesson)
 			.lessonRoom(lessonRoom)
-			.startedAt(LocalDateTime.now().minusDays(30))
-			.endedAt(LocalDateTime.now().plusDays(30))
+			.startedAt(LocalDateTime.now().minusDays(7))
+			.endedAt(LocalDateTime.now().plusDays(21))
 			.build();
 		tem.persist(gisu1);
-
-		gisu2 = LessonGisu.builder()
-			.capacity(15)
-			.lessonFee(15000)
-			.duration("6주")
-			.lessonState(LessonState.PENDING)
-			.lesson(lesson)
-			.lessonRoom(lessonRoom)
-			.startedAt(LocalDateTime.now().minusDays(10))
-			.endedAt(LocalDateTime.now().plusDays(50))
-			.build();
-		tem.persist(gisu2);
 
 		member1 = Member.builder()
 			.name("김시영")
@@ -118,11 +104,13 @@ class MyLessonRepositoryTest extends RepositoryTest {
 			.build();
 		tem.persist(member2);
 
-		savedMyLesson = MyLesson.builder()
+		savedReview = Review.builder()
+			.rating(4)
+			.reviewTxt("수업이 알찼어요.")
 			.member(member1)
 			.lessonGisu(gisu1)
 			.build();
-		tem.persist(savedMyLesson);
+		tem.persist(savedReview);
 
 		tem.flush();
 		tem.clear();
@@ -130,60 +118,68 @@ class MyLessonRepositoryTest extends RepositoryTest {
 
 	@Test
 	@Order(1)
-	@DisplayName("CREATE: MyLesson 신규 저장")
-	void createMyLesson() {
-		MyLesson newMyLesson = MyLesson.builder()
+	@DisplayName("CREATE: Review 신규 저장")
+	void createReview() {
+		Review newReview = Review.builder()
+			.rating(5)
+			.reviewTxt("최고의 강의!")
 			.member(member2)
-			.lessonGisu(gisu2)
+			.lessonGisu(gisu1)
 			.build();
 
-		MyLesson persisted = tem.persistFlushFind(newMyLesson);
+		Review persisted = tem.persistFlushFind(newReview);
 
 		assertThat(persisted.getId()).isNotNull();
+		assertThat(persisted.getRating()).isEqualTo(5);
+		assertThat(persisted.getReviewTxt()).isEqualTo("최고의 강의!");
 		assertThat(persisted.getMember().getId()).isEqualTo(member2.getId());
-		assertThat(persisted.getLessonGisu().getId()).isEqualTo(gisu2.getId());
+		assertThat(persisted.getLessonGisu().getId()).isEqualTo(gisu1.getId());
 	}
 
 	@Test
 	@Order(2)
-	@DisplayName("READ: MyLesson 조회)")
-	void readMyLesson() {
-		MyLesson found = tem.find(MyLesson.class, savedMyLesson.getId());
+	@DisplayName("READ: Review 조회")
+	void readReview() {
+		Review found = tem.find(Review.class, savedReview.getId());
 
 		assertThat(found).isNotNull();
-		assertThat(found.getId()).isEqualTo(savedMyLesson.getId());
+		assertThat(found.getId()).isEqualTo(savedReview.getId());
+		assertThat(found.getRating()).isEqualTo(4);
+		assertThat(found.getReviewTxt()).isEqualTo("수업이 알찼어요.");
 		assertThat(found.getMember().getId()).isEqualTo(member1.getId());
 		assertThat(found.getLessonGisu().getId()).isEqualTo(gisu1.getId());
 	}
 
 	@Test
 	@Order(3)
-	@DisplayName("UPDATE: MyLesson의 수강 기수 변경")
-	void updateMyLesson_changeGisu() {
-		MyLesson toUpdate = tem.find(MyLesson.class, savedMyLesson.getId());
+	@DisplayName("UPDATE: 점수/리뷰 텍스트 변경")
+	void updateReview() {
+		Review toUpdate = tem.find(Review.class, savedReview.getId());
 		assertThat(toUpdate).isNotNull();
 
-		toUpdate.setLessonGisu(gisu2);
+		toUpdate.setRating(2);
+		toUpdate.setReviewTxt("아쉬운 점이 있었어요.");
 
 		tem.flush();
 		tem.clear();
 
-		MyLesson found = tem.find(MyLesson.class, savedMyLesson.getId());
-		assertThat(found.getLessonGisu().getId()).isEqualTo(gisu2.getId());
+		Review reloaded = tem.find(Review.class, savedReview.getId());
+		assertThat(reloaded.getRating()).isEqualTo(2);
+		assertThat(reloaded.getReviewTxt()).isEqualTo("아쉬운 점이 있었어요.");
 	}
 
 	@Test
 	@Order(4)
-	@DisplayName("DELETE: MyLesson 삭제")
-	void deleteMyLesson() {
-		MyLesson target = tem.find(MyLesson.class, savedMyLesson.getId());
+	@DisplayName("DELETE: Review 삭제")
+	void deleteReview() {
+		Review target = tem.find(Review.class, savedReview.getId());
 		assertThat(target).isNotNull();
 
 		em.remove(target);
 		tem.flush();
 		tem.clear();
 
-		MyLesson afterDelete = tem.find(MyLesson.class, savedMyLesson.getId());
+		Review afterDelete = tem.find(Review.class, savedReview.getId());
 		assertThat(afterDelete).isNull();
 	}
 }
