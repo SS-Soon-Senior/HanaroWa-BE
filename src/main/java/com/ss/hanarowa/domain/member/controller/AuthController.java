@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ss.hanarowa.domain.member.dto.response.LoginResponseDTO;
 import com.ss.hanarowa.domain.member.dto.request.LoginRequestDTO;
 import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.repository.MemberRepository;
@@ -41,7 +42,7 @@ public class AuthController {
 	@PostMapping("/signin")
 	@Tag(name = "로그인", description = "사용자 로그인")
 	@Transactional
-	public ResponseEntity<ApiResponse<Map<String, Object>>> signin(@RequestBody LoginRequestDTO loginRequest) {
+	public ResponseEntity<ApiResponse<LoginResponseDTO>> signin(@RequestBody LoginRequestDTO loginRequest) {
 		try {
 			Authentication authenticate = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(
@@ -59,7 +60,15 @@ public class AuthController {
 			member.updateRefreshToken(refreshToken);
 			memberRepository.save(member);
 
-			return ResponseEntity.ok(ApiResponse.onSuccess(result));
+			String redirectUrl;
+			if (member.getPhoneNumber() == null || member.getBirth() == null) {
+				redirectUrl = "http://localhost:3000/auth/signup/info";
+			} else {
+				redirectUrl = "http://localhost:3000";
+			}
+			LoginResponseDTO response = LoginResponseDTO.builder().url(redirectUrl).result(result).build();
+
+			return ResponseEntity.ok(ApiResponse.onSuccess(response));
 		} catch (AuthenticationException e) {
 			throw new GeneralException(ErrorStatus.MEMBER_AUTHENTICATION_FAILED);
 		}

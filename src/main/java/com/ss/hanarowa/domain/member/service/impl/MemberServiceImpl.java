@@ -112,4 +112,9 @@ public class MemberServiceImpl implements MemberService {
 		return member.getId();
 	}
 
+	@Override
+	public Member getMemberByEmail(String email) {
+		return memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+	}
+
 }

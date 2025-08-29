@@ -23,6 +23,7 @@ import com.ss.hanarowa.global.security.CustomAuthenticationEntryPoint;
 import com.ss.hanarowa.global.security.CustomOAuth2UserService;
 import com.ss.hanarowa.global.security.JwtAuthenticationFilter;
 import com.ss.hanarowa.global.security.handler.CustomAccessDeiniedHandler;
+import com.ss.hanarowa.global.security.handler.LoginSuccessHandler;
 import com.ss.hanarowa.global.security.handler.OAuth2SuccessHandler;
 
 import lombok.RequiredArgsConstructor;
@@ -71,6 +72,7 @@ public class CustomSecurityConfig {
 				config.accessDeniedHandler(customAccessDeiniedHandler);
 				config.authenticationEntryPoint(customAuthenticationEntryPoint);
 			})
+
 			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 			http.oauth2Login(oauth2 -> oauth2
 				.userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
