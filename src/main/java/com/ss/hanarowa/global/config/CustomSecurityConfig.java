@@ -53,7 +53,7 @@ public class CustomSecurityConfig {
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(
 					"/member/regist",
-					"/auth/**",
+					"/auth/signin",
 					"/favicon.ico",
 					"/actuator/**",
 					"/swagger-ui/**",
@@ -61,7 +61,9 @@ public class CustomSecurityConfig {
 					"/hanarowa/api-docs/**",
 					"/v3/api-docs/**",
 					"/broadcast/**",
-					"/swagger.html"
+					"/swagger.html",
+					"/member/refresh",
+					"/auth/logout"
 				).permitAll()
 				.anyRequest().authenticated()
 			)

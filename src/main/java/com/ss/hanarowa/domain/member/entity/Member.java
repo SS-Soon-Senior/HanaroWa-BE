@@ -66,6 +66,8 @@ public class Member {
 	@Column(nullable = false)
 	private Role role;
 
+	private String refreshToken;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "branchId",
 		foreignKey = @ForeignKey(name = "fk_Member_Branch"))
@@ -90,4 +92,12 @@ public class Member {
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
 	private List<Lesson> lessons = new ArrayList<>();
+	
+	public void updateRefreshToken(String refreshToken) {
+		this.refreshToken = refreshToken;
+	}
+	
+	public void clearRefreshToken() {
+		this.refreshToken = null;
+	}
 }
