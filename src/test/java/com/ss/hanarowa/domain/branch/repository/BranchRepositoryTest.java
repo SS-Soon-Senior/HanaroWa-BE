@@ -49,7 +49,7 @@ class BranchRepositoryTest extends RepositoryTest {
         assertEquals("02-1234-5678", savedBranch.getTelNumber());
         assertEquals(testLocation.getId(), savedBranch.getLocation().getId());
         
-        print(savedBranch);
+        print("Created Branch: " + savedBranch.getName() + ", ID: " + savedBranch.getId());
     }
     
     @Test
@@ -71,7 +71,7 @@ class BranchRepositoryTest extends RepositoryTest {
         assertEquals(savedBranch.getId(), foundBranch.getId());
         assertEquals("조회 테스트 지점", foundBranch.getName());
         
-        print(foundBranch);
+        print("Found Branch: " + foundBranch.getName() + ", ID: " + foundBranch.getId());
     }
     
     @Test
@@ -95,7 +95,7 @@ class BranchRepositoryTest extends RepositoryTest {
         assertEquals("수정 후 지점", updatedBranch.getName());
         assertEquals("서울시 마포구 홍대로 321", updatedBranch.getAddress());
         
-        print(updatedBranch);
+        print("Updated Branch: " + updatedBranch.getName() + ", Address: " + updatedBranch.getAddress());
     }
     
     @Test
@@ -144,6 +144,7 @@ class BranchRepositoryTest extends RepositoryTest {
         
         assertEquals(initialCount + 2, branchRepository.count());
         
-        branchRepository.findAll().forEach(this::print);
+        branchRepository.findAll().forEach(branch -> 
+                print("Branch: " + branch.getName() + ", ID: " + branch.getId()));
     }
 }
