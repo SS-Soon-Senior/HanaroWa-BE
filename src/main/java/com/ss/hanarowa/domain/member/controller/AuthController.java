@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.hanarowa.domain.member.dto.response.LoginResponseDTO;
 import com.ss.hanarowa.domain.member.dto.request.LoginRequestDTO;
+import com.ss.hanarowa.domain.member.dto.response.TokenResponseDTO;
 import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.repository.MemberRepository;
 import com.ss.hanarowa.global.exception.GeneralException;
@@ -49,24 +50,26 @@ public class AuthController {
 					loginRequest.getEmail(), loginRequest.getPassword()
 				)
 			);
-			
-			// JWT 토큰 생성
-			Map<String, Object> result = JwtUtil.authenticationToClaims(authenticate);
-			String refreshToken = (String) result.get("refreshToken");
-			
-			// Member에 refreshToken 저장
+
+			// 1. 타입이 명확한 TokenResponseDTO를 받음
+			TokenResponseDTO tokenDto = JwtUtil.createTokens(authenticate);
+
 			Member member = memberRepository.findByEmail(loginRequest.getEmail())
 				.orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
-			member.updateRefreshToken(refreshToken);
-			memberRepository.save(member);
 
-			String redirectUrl;
-			if (member.getPhoneNumber() == null || member.getBirth() == null) {
-				redirectUrl = "http://localhost:3000/auth/signup/info";
-			} else {
-				redirectUrl = "http://localhost:3000";
-			}
-			LoginResponseDTO response = LoginResponseDTO.builder().url(redirectUrl).result(result).build();
+			// 2. DB에 refreshToken 저장
+			member.updateRefreshToken(tokenDto.getRefreshToken());
+			// memberRepository.save(member); // @Transactional이므로 생략 가능
+
+			String redirectUrl = (member.getPhoneNumber() == null || member.getBirth() == null)
+				? "http://localhost:3000/auth/signup/info"
+				: "http://localhost:3000";
+
+			// 3. LoginResponseDTO를 새로운 구조로 생성
+			LoginResponseDTO response = LoginResponseDTO.builder()
+				.url(redirectUrl)
+				.tokens(tokenDto)
+				.build();
 
 			return ResponseEntity.ok(ApiResponse.onSuccess(response));
 		} catch (AuthenticationException e) {
