@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import com.ss.hanarowa.domain.branch.entity.Branch;
 import com.ss.hanarowa.domain.branch.entity.Location;
@@ -16,30 +15,32 @@ import com.ss.hanarowa.domain.lesson.entity.LessonState;
 import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.entity.MyLesson;
 import com.ss.hanarowa.domain.member.entity.Role;
-import com.ss.hanarowa.domain.member.repository.MyLessonRepository;
 
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+
 class MyLessonRepositoryTest extends RepositoryTest {
 
 	@Autowired
 	private TestEntityManager tem;
 
 	@Autowired
-	private MyLessonRepository myLessonRepository;
+	private EntityManager em;
 
+	private Branch branch;
 	private Lesson lesson;
 	private LessonRoom lessonRoom;
 	private LessonGisu gisu1;
 	private LessonGisu gisu2;
 	private Member member1;
 	private Member member2;
+	private MyLesson savedMyLesson;
 
-	// 테스트 전 세팅
 	@BeforeEach
 	void setUp() {
 		Location location = Location.builder()
@@ -47,7 +48,7 @@ class MyLessonRepositoryTest extends RepositoryTest {
 			.build();
 		tem.persist(location);
 
-		Branch branch = Branch.builder()
+		branch = Branch.builder()
 			.name("대전 컬처뱅크")
 			.address("대전광역시 서구 둔산동 123")
 			.telNumber("042-123-4567")
@@ -80,9 +81,9 @@ class MyLessonRepositoryTest extends RepositoryTest {
 			.lessonState(LessonState.PENDING)
 			.lesson(lesson)
 			.lessonRoom(lessonRoom)
+			.startedAt(LocalDateTime.now().minusDays(30))
+			.endedAt(LocalDateTime.now().plusDays(30))
 			.build();
-		gisu1.setStartedAt(LocalDateTime.now().minusDays(30));
-		gisu1.setEndedAt(LocalDateTime.now().plusDays(30));
 		tem.persist(gisu1);
 
 		gisu2 = LessonGisu.builder()
@@ -92,9 +93,9 @@ class MyLessonRepositoryTest extends RepositoryTest {
 			.lessonState(LessonState.PENDING)
 			.lesson(lesson)
 			.lessonRoom(lessonRoom)
+			.startedAt(LocalDateTime.now().minusDays(10))
+			.endedAt(LocalDateTime.now().plusDays(50))
 			.build();
-		gisu2.setStartedAt(LocalDateTime.now().minusDays(10));
-		gisu2.setEndedAt(LocalDateTime.now().plusDays(50));
 		tem.persist(gisu2);
 
 		member1 = Member.builder()
@@ -117,10 +118,11 @@ class MyLessonRepositoryTest extends RepositoryTest {
 			.build();
 		tem.persist(member2);
 
-		tem.persist(MyLesson.builder().member(member1).lessonGisu(gisu1).build());
-		tem.persist(MyLesson.builder().member(member1).lessonGisu(gisu1).build());
-		tem.persist(MyLesson.builder().member(member2).lessonGisu(gisu1).build());
-		tem.persist(MyLesson.builder().member(member2).lessonGisu(gisu2).build());
+		savedMyLesson = MyLesson.builder()
+			.member(member1)
+			.lessonGisu(gisu1)
+			.build();
+		tem.persist(savedMyLesson);
 
 		tem.flush();
 		tem.clear();
@@ -128,52 +130,60 @@ class MyLessonRepositoryTest extends RepositoryTest {
 
 	@Test
 	@Order(1)
-	@DisplayName("countByLessonGisu: 특정 기수 수강신청 수")
-	void countByLessonGisu() {
-		int countGisu1 = myLessonRepository.countByLessonGisu(gisu1);
-		int countGisu2 = myLessonRepository.countByLessonGisu(gisu2);
+	@DisplayName("CREATE: MyLesson 신규 저장")
+	void createMyLesson() {
+		MyLesson newMyLesson = MyLesson.builder()
+			.member(member2)
+			.lessonGisu(gisu2)
+			.build();
 
-		assertThat(countGisu1).isEqualTo(3);
-		assertThat(countGisu2).isEqualTo(1);
+		MyLesson persisted = tem.persistFlushFind(newMyLesson);
+
+		assertThat(persisted.getId()).isNotNull();
+		assertThat(persisted.getMember().getId()).isEqualTo(member2.getId());
+		assertThat(persisted.getLessonGisu().getId()).isEqualTo(gisu2.getId());
 	}
 
 	@Test
 	@Order(2)
-	@DisplayName("countByLessonGisuId: 특정 기수 ID 수강신청 수")
-	void countByLessonGisuId() {
-		int countGisu1 = myLessonRepository.countByLessonGisuId(gisu1.getId());
-		int countGisu2 = myLessonRepository.countByLessonGisuId(gisu2.getId());
+	@DisplayName("READ: MyLesson 조회)")
+	void readMyLesson() {
+		MyLesson found = tem.find(MyLesson.class, savedMyLesson.getId());
 
-		assertThat(countGisu1).isEqualTo(3);
-		assertThat(countGisu2).isEqualTo(1);
+		assertThat(found).isNotNull();
+		assertThat(found.getId()).isEqualTo(savedMyLesson.getId());
+		assertThat(found.getMember().getId()).isEqualTo(member1.getId());
+		assertThat(found.getLessonGisu().getId()).isEqualTo(gisu1.getId());
 	}
 
 	@Test
 	@Order(3)
-	@DisplayName("findAllByLessonGisuId: 특정 기수 ID로 조회")
-	void findAllByLessonGisuId() {
-		List<MyLesson> list = myLessonRepository.findAllByLessonGisuId(gisu1.getId());
+	@DisplayName("UPDATE: MyLesson의 수강 기수 변경")
+	void updateMyLesson_changeGisu() {
+		MyLesson toUpdate = tem.find(MyLesson.class, savedMyLesson.getId());
+		assertThat(toUpdate).isNotNull();
 
-		assertThat(list).hasSize(3);
-		assertThat(list).allSatisfy(ml -> {
-			assertThat(ml.getLessonGisu().getId()).isEqualTo(gisu1.getId());
-			assertThat(ml.getMember()).isNotNull();
-		});
+		toUpdate.setLessonGisu(gisu2);
+
+		tem.flush();
+		tem.clear();
+
+		MyLesson found = tem.find(MyLesson.class, savedMyLesson.getId());
+		assertThat(found.getLessonGisu().getId()).isEqualTo(gisu2.getId());
 	}
 
 	@Test
 	@Order(4)
-	@DisplayName("findAllByMemberId: 특정 회원 ID로 조회")
-	void findAllByMemberId() {
-		List<MyLesson> list1 = myLessonRepository.findAllByMemberId(member1.getId());
-		List<MyLesson> list2 = myLessonRepository.findAllByMemberId(member2.getId());
+	@DisplayName("DELETE: MyLesson 삭제")
+	void deleteMyLesson() {
+		MyLesson target = tem.find(MyLesson.class, savedMyLesson.getId());
+		assertThat(target).isNotNull();
 
-		// member1: gisu1에서 2건
-		assertThat(list1).hasSize(2);
-		assertThat(list1).allSatisfy(ml -> assertThat(ml.getMember().getId()).isEqualTo(member1.getId()));
+		em.remove(target);
+		tem.flush();
+		tem.clear();
 
-		// member2: gisu1 1건 + gisu2 1건 = 총 2건
-		assertThat(list2).hasSize(2);
-		assertThat(list2).allSatisfy(ml -> assertThat(ml.getMember().getId()).isEqualTo(member2.getId()));
+		MyLesson afterDelete = tem.find(MyLesson.class, savedMyLesson.getId());
+		assertThat(afterDelete).isNull();
 	}
 }
