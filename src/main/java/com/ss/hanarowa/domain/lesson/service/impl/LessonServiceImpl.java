@@ -1,13 +1,18 @@
 package com.ss.hanarowa.domain.lesson.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.ss.hanarowa.domain.lesson.dto.request.CreateLessonRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.entity.Lesson;
 import com.ss.hanarowa.domain.lesson.entity.LessonGisu;
 import com.ss.hanarowa.domain.lesson.entity.LessonRoom;
+import com.ss.hanarowa.domain.lesson.entity.LessonState;
+import com.ss.hanarowa.domain.lesson.entity.Curriculum;
 import com.ss.hanarowa.domain.branch.entity.Branch;
 import com.ss.hanarowa.domain.branch.repository.BranchRepository;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonInfoResponseDTO;
@@ -15,6 +20,8 @@ import com.ss.hanarowa.domain.lesson.dto.response.LessonListByBranchIdResponseDT
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListSearchResponseDTO;
 import com.ss.hanarowa.domain.lesson.repository.LessonGisuRepository;
 import com.ss.hanarowa.domain.lesson.repository.LessonRepository;
+import com.ss.hanarowa.domain.lesson.repository.LessonRoomRepository;
+import com.ss.hanarowa.domain.lesson.repository.CurriculumRepository;
 import com.ss.hanarowa.domain.lesson.service.LessonService;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonMoreDetailResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuResponseDTO;
@@ -42,6 +49,8 @@ public class LessonServiceImpl implements LessonService {
 	private final BranchRepository branchRepository;
 	private final MemberRepository memberRepository;
 	private final LessonGisuRepository lessonGisuRepository;
+	private final LessonRoomRepository lessonRoomRepository;
+	private final CurriculumRepository curriculumRepository;
 
 	@Override
 	public LessonMoreDetailResponseDTO getLessonMoreDetail(Long lessonId) {
@@ -258,5 +267,55 @@ public class LessonServiceImpl implements LessonService {
 			.build();
 
 		myLessonRepository.save(newMyLesson);
+	}
+
+	@Override
+	@Transactional
+	public void createLesson(CreateLessonRequestDTO createLessonRequestDTO, String email) {
+		Member member = memberRepository.findByEmail(email)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+
+		Branch branch = branchRepository.findById(createLessonRequestDTO.getBranchId())
+			.orElseThrow(() -> new GeneralException(ErrorStatus.BRANCH_NOT_FOUND));
+
+		Lesson lesson = Lesson.builder()
+			.lessonName(createLessonRequestDTO.getLessonName())
+			.instructor(createLessonRequestDTO.getInstructor())
+			.instruction(createLessonRequestDTO.getInstruction())
+			.description(createLessonRequestDTO.getDescription())
+			.category(createLessonRequestDTO.getCategory())
+			.lessonImg(createLessonRequestDTO.getLessonImg())
+			.branch(branch)
+			.member(member)
+			.build();
+
+		Lesson savedLesson = lessonRepository.save(lesson);
+
+		for (CreateLessonRequestDTO.CreateLessonGisuRequestDTO gisuDto : createLessonRequestDTO.getLessonGisus()) {
+			LessonRoom lessonRoom = lessonRoomRepository.findById(gisuDto.getLessonRoomId())
+				.orElseThrow(() -> new GeneralException(ErrorStatus.LESSON_ROOM_NOT_FOUND));
+
+			LessonGisu lessonGisu = LessonGisu.builder()
+				.capacity(gisuDto.getCapacity())
+				.lessonFee(gisuDto.getLessonFee())
+				.duration(gisuDto.getDuration())
+				.lessonState(LessonState.PENDING)
+				.lesson(savedLesson)
+				.lessonRoom(lessonRoom)
+				.startedAt(LocalDateTime.now())
+				.build();
+
+			LessonGisu savedLessonGisu = lessonGisuRepository.save(lessonGisu);
+
+			for (CreateLessonRequestDTO.CreateCurriculumRequestDTO curriculumDto : gisuDto.getCurriculums()) {
+				Curriculum curriculum = Curriculum.builder()
+					.content(curriculumDto.getContent())
+					.lessonGisu(savedLessonGisu)
+					.startedAt(LocalDateTime.now())
+					.build();
+
+				curriculumRepository.save(curriculum);
+			}
+		}
 	}
 }
