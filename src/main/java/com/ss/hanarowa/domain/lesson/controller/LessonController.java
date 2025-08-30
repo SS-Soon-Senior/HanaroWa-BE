@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.hanarowa.domain.lesson.dto.request.ReviewRequestDTO;
+import com.ss.hanarowa.domain.lesson.dto.request.CreateLessonRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListByBranchIdResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListSearchResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.AppliedLessonListResponseDTO;
@@ -121,6 +122,17 @@ public class LessonController {
 		List<LessonListResponseDTO> offeredLessons = lessonService.getAllOfferedLessons(memberId);
 		return ResponseEntity.ok(new OfferedLessonListResponseDTO(offeredLessons));
 	}
+	@PostMapping("/create")
+	@Operation(summary = "강좌 개설", description = "사용자가 새로운 강좌를 개설합니다.")
+	public ResponseEntity<ApiResponse<Void>> createLesson(
+		@Valid @RequestBody CreateLessonRequestDTO createLessonRequestDTO,
+		Authentication authentication) {
+
+		String email = authentication.getName();
+		lessonService.createLesson(createLessonRequestDTO, email);
+		return ResponseEntity.ok(ApiResponse.onSuccess(null));
+	}
+
 	@PostMapping("/{lessonGisuId}")
 	@Operation(summary = "강좌 수강 신청", description = "사용자가 특정 강좌 기수에 대한 수강을 신청합니다.")
 	public ResponseEntity<ApiResponse<String>> applyForLesson( // 메서드 이름 변경

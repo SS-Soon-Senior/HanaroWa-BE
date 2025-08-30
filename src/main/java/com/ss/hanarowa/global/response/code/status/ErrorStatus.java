@@ -42,6 +42,7 @@ public enum ErrorStatus implements BaseErrorCode {
 	LESSONLIST_NOT_AUTHORITY(HttpStatus.FORBIDDEN, "LESSON403", "강좌 목록을 조회할 권한이 없습니다."),
 	LESSON_ALREADY_APPLIED(HttpStatus.BAD_REQUEST, "LESSON400", "이미 신청한 강좌입니다."),
 	LESSON_CAPACITY_EXCEEDED(HttpStatus.BAD_REQUEST, "LESSON400", "강좌 정원이 초과되었습니다."),
+	LESSON_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "LESSONROOM404", "해당 강의실을 찾을 수 없습니다."),
 	CURRICULUM_NOT_FOUND(HttpStatus.NOT_FOUND,"CURRICULUM404","해당 커리큘럼을 찾을 수 없습니다."),
 
 	//Gemini API 관련 에러
