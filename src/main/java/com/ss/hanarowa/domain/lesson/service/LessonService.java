@@ -2,6 +2,7 @@ package com.ss.hanarowa.domain.lesson.service;
 
 import java.util.List;
 
+import com.ss.hanarowa.domain.lesson.dto.request.CreateLessonRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListByBranchIdResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListSearchResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListResponseDTO;
@@ -19,4 +20,6 @@ public interface LessonService {
 	List<LessonListSearchResponseDTO> getLessonListSearch(String query);
 
 	void applyForLesson(Long lessonGisuId, String email); // 강좌 신청
+	
+	void createLesson(CreateLessonRequestDTO createLessonRequestDTO, String email); // 강좌 개설
 }

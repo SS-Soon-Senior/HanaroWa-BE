@@ -90,18 +90,6 @@ public class MemberServiceImpl implements MemberService {
 			throw new GeneralException(ErrorStatus.MEMBER_PASSWORD_WRONG);
 		}
 
-		// 새 비밀번호의 유효성 확인
-		String regex = "^(?=.*[가-힣a-zA-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{6,20}$";
-		if (!passwdRequestDTO.getNewPassword().matches(regex)) {
-			throw new GeneralException(ErrorStatus.MEMBER_PASSWORD_INVALID);
-		}
-
-
-		// 새 비밀번호, 새 비밀번호 확인이 같은지
-		if(!Objects.equals(passwdRequestDTO.getNewPassword(), passwdRequestDTO.getCheckNewPassword())) {
-			throw new GeneralException(ErrorStatus.MEMBER_PASSWORD_UNMATCHED);
-		}
-
 		member.setPassword(passwordEncoder.encode(passwdRequestDTO.getNewPassword()));
 		memberRepository.save(member);
 	}
@@ -122,6 +110,11 @@ public class MemberServiceImpl implements MemberService {
 	public Long getMemberIdByEmail(String email) {
 		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 		return member.getId();
+	}
+
+	@Override
+	public Member getMemberByEmail(String email) {
+		return memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 	}
 
 }

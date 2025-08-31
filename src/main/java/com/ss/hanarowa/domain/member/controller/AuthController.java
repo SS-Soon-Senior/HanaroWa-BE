@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ss.hanarowa.domain.member.dto.response.LoginResponseDTO;
 import com.ss.hanarowa.domain.member.dto.request.LoginRequestDTO;
+import com.ss.hanarowa.domain.member.dto.response.TokenResponseDTO;
 import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.repository.MemberRepository;
 import com.ss.hanarowa.global.exception.GeneralException;
@@ -24,7 +26,6 @@ import com.ss.hanarowa.global.security.JwtUtil;
 import com.ss.hanarowa.global.security.TokenBlacklistService;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,25 +45,35 @@ public class AuthController {
 	@PostMapping("/signin")
 	@Tag(name = "로그인", description = "사용자 로그인")
 	@Transactional
-	public ResponseEntity<ApiResponse<Map<String, Object>>> signin(@RequestBody LoginRequestDTO loginRequest) {
+	public ResponseEntity<ApiResponse<LoginResponseDTO>> signin(@RequestBody LoginRequestDTO loginRequest) {
 		try {
 			Authentication authenticate = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(
-					loginRequest.getEmail(), loginRequest.getPwd()
+					loginRequest.getEmail(), loginRequest.getPassword()
 				)
 			);
-			
-			// JWT 토큰 생성
-			Map<String, Object> result = JwtUtil.authenticationToClaims(authenticate);
-			String refreshToken = (String) result.get("refreshToken");
-			
-			// Member에 refreshToken 저장
+
+			// 1. 타입이 명확한 TokenResponseDTO를 받음
+			TokenResponseDTO tokenDto = JwtUtil.createTokens(authenticate);
+
 			Member member = memberRepository.findByEmail(loginRequest.getEmail())
 				.orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
-			member.updateRefreshToken(refreshToken);
-			memberRepository.save(member);
 
-			return ResponseEntity.ok(ApiResponse.onSuccess(result));
+			// 2. DB에 refreshToken 저장
+			member.updateRefreshToken(tokenDto.getRefreshToken());
+			// memberRepository.save(member); // @Transactional이므로 생략 가능
+
+			String redirectUrl = (member.getPhoneNumber() == null || member.getBirth() == null)
+				? "http://localhost:3000/auth/signup/info"
+				: "http://localhost:3000";
+
+			// 3. LoginResponseDTO를 새로운 구조로 생성
+			LoginResponseDTO response = LoginResponseDTO.builder()
+				.url(redirectUrl)
+				.tokens(tokenDto)
+				.build();
+
+			return ResponseEntity.ok(ApiResponse.onSuccess(response));
 		} catch (AuthenticationException e) {
 			throw new GeneralException(ErrorStatus.MEMBER_AUTHENTICATION_FAILED);
 		}
