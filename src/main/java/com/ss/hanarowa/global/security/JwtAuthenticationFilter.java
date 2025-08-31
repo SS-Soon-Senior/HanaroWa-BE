@@ -33,7 +33,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private static final List<String> PERMIT_ALL_URLS = Arrays.asList(
 		"/member/regist",
 		"/auth/signin",
-		"/member/refresh"
+		"/member/refresh",
+		"/oauth2/authorization/kakao",
+		"/oauth2/authorization/google",
+		"/oauth2/authorization/naver",
+		"/login/oauth2/code/kakao",
+		"/login/oauth2/code/google",
+		"/login/oauth2/code/naver"
 	);
 
 
@@ -108,5 +114,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			out.flush();
 			out.close();
 		}
+		System.out.println(">>> JwtFilter path=" + request.getRequestURI()
+			+ " authHeader=" + request.getHeader(HttpHeaders.AUTHORIZATION));
 	}
 }

@@ -1,5 +1,6 @@
 package com.ss.hanarowa.domain.member.controller;
 
+import java.io.IOException;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -7,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +24,7 @@ import com.ss.hanarowa.global.security.JwtUtil;
 import com.ss.hanarowa.global.security.TokenBlacklistService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -106,4 +109,24 @@ public class AuthController {
 		return ResponseEntity.ok(ApiResponse.onSuccess("로그아웃이 완료되었습니다."));
 	}
 
+	@GetMapping("/signin/google")
+	@Operation(summary = "Google 소셜 로그인", description = "Google 계정으로 로그인")
+	@Tag(name = "로그인", description = "구글")
+	public void googleLogin(HttpServletResponse response) throws IOException {
+		response.sendRedirect("/oauth2/authorization/google");
+	}
+
+	@GetMapping("/signin/naver")
+	@Operation(summary = "Naver 소셜 로그인", description = "Naver 계정으로 로그인")
+	@Tag(name = "로그인", description = "네이버")
+	public void naverLogin(HttpServletResponse response) throws IOException {
+		response.sendRedirect("/oauth2/authorization/naver");
+	}
+
+	@GetMapping("/signin/kakao")
+	@Operation(summary = "Kakao 소셜 로그인", description = "Kakao 계정으로 로그인")
+	@Tag(name = "로그인", description = "카카오")
+	public void kakaoLogin(HttpServletResponse response) throws IOException {
+		response.sendRedirect("/oauth2/authorization/kakao");
+	}
 }

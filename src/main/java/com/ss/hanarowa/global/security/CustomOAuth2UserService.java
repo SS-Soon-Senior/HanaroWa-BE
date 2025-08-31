@@ -13,9 +13,11 @@ import com.ss.hanarowa.domain.member.entity.Role;
 import com.ss.hanarowa.domain.member.repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
 	private final MemberRepository memberRepository;
@@ -25,32 +27,64 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 		OAuth2User oAuth2User = super.loadUser(userRequest);
 
 		String provider = userRequest.getClientRegistration().getRegistrationId();
-		String providerId;
 
-		if (provider.equals("google")) {
+		String providerId = null;
+		String email = null;
+		String name = null;
+
+		if ("google".equals(provider)) {
+			// Google
 			providerId = oAuth2User.getAttribute("sub");
-		} else if (provider.equals("naver")) {
+			email = oAuth2User.getAttribute("email");
+			name = oAuth2User.getAttribute("name");
+
+		} else if ("naver".equals(provider)) {
+			// Naver
 			Map<String, Object> response = (Map<String, Object>) oAuth2User.getAttribute("response");
-			providerId = (String) response.get("id");
-		} else if (provider.equals("kakao")) {
-			providerId = String.valueOf(oAuth2User.getAttribute("id"));
+			if (response != null) {
+				providerId = (String) response.get("id");
+				email = (String) response.get("email");
+				name = (String) response.get("name");
+			}
+
+		} else if ("kakao".equals(provider)) {
+			// Kakao
+			Object kakaoId = oAuth2User.getAttribute("id");
+			providerId = kakaoId != null ? String.valueOf(kakaoId) : null;
+
+			Map<String, Object> kakaoAccount = (Map<String, Object>) oAuth2User.getAttribute("kakao_account");
+			if (kakaoAccount != null) {
+				email = (String) kakaoAccount.get("email");
+
+				Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
+				if (profile != null) {
+					name = (String) profile.get("nickname");
+				} else {
+					name = (String) kakaoAccount.get("name");
+				}
+			}
 		} else {
 			throw new OAuth2AuthenticationException("지원하지 않는 provider: " + provider);
 		}
 
-		String email = oAuth2User.getAttribute("email");
-		String name = oAuth2User.getAttribute("name");
+		// DB 조회 및 신규 회원 저장
+		final String finalProviderId = providerId;
+		final String finalEmail = email;
+		final String finalName = name;
 
 		Member member = memberRepository.findByProviderAndProviderId(provider, providerId)
 										.orElseGet(() -> {
+											// log.info(">>> 신규 회원 가입: provider={}, providerId={}, email={}, name={}", provider, finalProviderId, finalEmail, finalName);
 											return memberRepository.save(Member.builder()
-																			   .email(email)
-																			   .name(name)
+																			   .email(finalEmail)
+																			   .name(finalName)
 																			   .provider(provider)
-																			   .providerId(providerId)
+																			   .providerId(finalProviderId)
 																			   .role(Role.USERS)
 																			   .build());
 										});
+
+		// log.info(">>> 로그인 완료: memberId={}, email={}, provider={}", member.getId(), member.getEmail(), member.getProvider());
 
 		return new CustomOAuth2User(member, oAuth2User.getAttributes());
 	}
