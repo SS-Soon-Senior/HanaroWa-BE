@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ss.hanarowa.domain.lesson.dto.request.ReviewRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.request.CreateLessonRequestDTO;
@@ -24,6 +25,7 @@ import com.ss.hanarowa.domain.lesson.service.LessonService;
 import com.ss.hanarowa.domain.lesson.service.ReviewService;
 import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.repository.MemberRepository;
+import com.ss.hanarowa.global.S3Service;
 import com.ss.hanarowa.global.exception.GeneralException;
 import com.ss.hanarowa.global.response.ApiResponse;
 import com.ss.hanarowa.global.response.code.status.ErrorStatus;
@@ -43,6 +45,7 @@ public class LessonController {
 	private final LessonService lessonService;
 	private final ReviewService reviewService;
 	private final MemberRepository memberRepository;
+	private final S3Service s3Service;
 
 	@PostMapping("/{lessonGisuId}/review")
 	@Operation(summary = "강좌 기수 리뷰 작성", description = "사용자가 특정 강좌 기수에 대한 리뷰를 작성합니다.")
@@ -125,12 +128,23 @@ public class LessonController {
 	@PostMapping("/create")
 	@Operation(summary = "강좌 개설", description = "사용자가 새로운 강좌를 개설합니다.")
 	public ResponseEntity<ApiResponse<Void>> createLesson(
-		@Valid @RequestBody CreateLessonRequestDTO createLessonRequestDTO,
-		Authentication authentication) {
+		@Valid @RequestBody CreateLessonRequestDTO createLessonRequestDTO, Authentication authentication) {
 
-		String email = authentication.getName();
-		lessonService.createLesson(createLessonRequestDTO, email);
-		return ResponseEntity.ok(ApiResponse.onSuccess(null));
+		try {
+			String email = authentication.getName();
+			MultipartFile lessonImg = createLessonRequestDTO.getLessonImg();
+			// 이미지 파일이 있는 경우 S3에 업로드
+			String imageUrl = null;
+			if (lessonImg != null && !lessonImg.isEmpty()) {
+				imageUrl = s3Service.uploadFile(lessonImg);
+			}
+			
+			lessonService.createLesson(createLessonRequestDTO, email,imageUrl);
+			return ResponseEntity.ok(ApiResponse.onSuccess(null));
+		} catch (Exception e) {
+			log.error("강좌 생성 중 오류 발생: {}", e.getMessage(), e);
+			throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@PostMapping("/{lessonGisuId}")
