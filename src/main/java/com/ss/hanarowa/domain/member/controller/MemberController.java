@@ -2,6 +2,7 @@ package com.ss.hanarowa.domain.member.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ss.hanarowa.domain.member.dto.request.MemberRegistRequestDTO;
 import com.ss.hanarowa.domain.member.dto.request.ModifyPasswdRequestDTO;
 import com.ss.hanarowa.domain.member.dto.request.MemberInfoRequestDTO;
+import com.ss.hanarowa.domain.member.dto.response.MemberInfoResponseDTO;
+import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.service.MemberService;
 import com.ss.hanarowa.global.response.ApiResponse;
 
@@ -29,12 +32,23 @@ import lombok.extern.slf4j.Slf4j;
 public class MemberController {
 	private final MemberService memberService;
 
+	@GetMapping
+	@Operation(summary = "멤버 정보 반환")
+	public ResponseEntity<ApiResponse<MemberInfoResponseDTO>> getInfo (Authentication authentication) {
+		String email =  authentication.getName();
+		Member m = memberService.getMemberByEmail(email);
+		MemberInfoResponseDTO dto = MemberInfoResponseDTO.builder().
+			name(m.getName()).birth(m.getBirth()).phone(m.getPhoneNumber()).build();
+		return ResponseEntity.ok(ApiResponse.onSuccess(dto));
+	}
+
 	@PostMapping("/regist")
 	@Operation(summary = "일반 회원가입")
 	public ResponseEntity<ApiResponse<String>> regist(@Valid @RequestBody MemberRegistRequestDTO memberRegistRequestDTO) {
 		memberService.credentialRegist(memberRegistRequestDTO);
 		return ResponseEntity.ok(ApiResponse.onSuccess("회원가입 완료"));
 	}
+
 
 	@PostMapping("/info")
 	@Operation(summary = "전화번호, 생일등록")
