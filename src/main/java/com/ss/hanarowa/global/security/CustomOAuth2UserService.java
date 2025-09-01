@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.entity.Role;
 import com.ss.hanarowa.domain.member.repository.MemberRepository;
+import com.ss.hanarowa.global.exception.GeneralException;
+import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -64,7 +66,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 				}
 			}
 		} else {
-			throw new OAuth2AuthenticationException("지원하지 않는 provider: " + provider);
+			throw new GeneralException(ErrorStatus.PROVIDER_NOT_USED);
 		}
 
 		// DB 조회 및 신규 회원 저장
