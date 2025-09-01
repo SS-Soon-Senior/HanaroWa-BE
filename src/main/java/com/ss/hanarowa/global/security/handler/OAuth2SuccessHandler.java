@@ -39,33 +39,34 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 		// JWT 토큰 발급
 		TokenResponseDTO tokenDto = JwtUtil.createTokens(authentication);
 
-		// RefreshToken DB 저장
+		// RefreshToken 저장
 		member.updateRefreshToken(tokenDto.getRefreshToken());
 		memberRepository.save(member);
 
-		ResponseCookie cookie = ResponseCookie.from("refreshToken", tokenDto.getRefreshToken())
-											  .httpOnly(true)
-											  .secure(false) // 로컬은 false, 배포는 true
-											  .path("/")
-											  .maxAge(Duration.ofDays(7))
-											  .sameSite("Strict")
-											  .build();
-		response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+		ResponseCookie accessCookie = ResponseCookie.from("accessToken", tokenDto.getAccessToken())
+													.httpOnly(false)
+													.secure(false)
+													.path("/")
+													.maxAge(Duration.ofHours(1))
+													.sameSite("Lax")
+													.build();
+		response.setHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 
-		// 추가 정보 입력 필요 여부 확인
+		ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokenDto.getRefreshToken())
+													 .httpOnly(true)
+													 .secure(false)
+													 .path("/")
+													 .maxAge(Duration.ofDays(7))
+													 .sameSite("Strict")
+													 .build();
+		response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
 		String baseRedirectUrl = "http://localhost:3000";
 		String path = (member.getPhoneNumber() == null || member.getBirth() == null)
 			? "/auth/signup/info"
 			: "/";
+		getRedirectStrategy().sendRedirect(request, response, baseRedirectUrl + path);
 
-		// accessToken만 쿼리파라미터로 프론트에 전달
-		String redirectUrl = String.format(
-			"%s%s?accessToken=%s",
-			baseRedirectUrl, path,
-			tokenDto.getAccessToken()
-		);
-
-		getRedirectStrategy().sendRedirect(request, response, redirectUrl);
 	}
 }
 
