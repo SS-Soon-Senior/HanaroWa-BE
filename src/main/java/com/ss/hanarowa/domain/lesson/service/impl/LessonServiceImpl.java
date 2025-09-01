@@ -279,7 +279,7 @@ public class LessonServiceImpl implements LessonService {
 
 	@Override
 	@Transactional
-	public void createLesson(CreateLessonRequestDTO createLessonRequestDTO, String email) {
+	public void createLesson(CreateLessonRequestDTO createLessonRequestDTO, String email,String imageUrl) {
 		Member member = memberRepository.findByEmail(email)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
@@ -292,7 +292,7 @@ public class LessonServiceImpl implements LessonService {
 			.instruction(createLessonRequestDTO.getInstruction())
 			.description(createLessonRequestDTO.getDescription())
 			.category(createLessonRequestDTO.getCategory())
-			.lessonImg(createLessonRequestDTO.getLessonImg())
+			.lessonImg(imageUrl)
 			.branch(branch)
 			.member(member)
 			.build();

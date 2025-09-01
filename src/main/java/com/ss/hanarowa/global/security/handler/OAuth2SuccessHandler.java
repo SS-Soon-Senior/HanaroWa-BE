@@ -1,7 +1,10 @@
 package com.ss.hanarowa.global.security.handler;
 
 import java.io.IOException;
+import java.time.Duration;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -40,20 +43,29 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 		member.updateRefreshToken(tokenDto.getRefreshToken());
 		memberRepository.save(member);
 
+		ResponseCookie cookie = ResponseCookie.from("refreshToken", tokenDto.getRefreshToken())
+											  .httpOnly(true)
+											  .secure(false) // 로컬은 false, 배포는 true
+											  .path("/")
+											  .maxAge(Duration.ofDays(7))
+											  .sameSite("Strict")
+											  .build();
+		response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
 		// 추가 정보 입력 필요 여부 확인
 		String baseRedirectUrl = "http://localhost:3000";
 		String path = (member.getPhoneNumber() == null || member.getBirth() == null)
 			? "/auth/signup/info"
 			: "/";
 
-		// 토큰을 쿼리파라미터에 포함시켜 리다이렉트
+		// accessToken만 쿼리파라미터로 프론트에 전달
 		String redirectUrl = String.format(
-			"%s%s?accessToken=%s&refreshToken=%s",
+			"%s%s?accessToken=%s",
 			baseRedirectUrl, path,
-			tokenDto.getAccessToken(),
-			tokenDto.getRefreshToken()
+			tokenDto.getAccessToken()
 		);
 
 		getRedirectStrategy().sendRedirect(request, response, redirectUrl);
 	}
 }
+

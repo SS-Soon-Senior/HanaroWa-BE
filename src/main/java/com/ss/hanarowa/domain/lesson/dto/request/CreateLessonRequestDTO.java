@@ -2,6 +2,8 @@ package com.ss.hanarowa.domain.lesson.dto.request;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.ss.hanarowa.domain.lesson.entity.Category;
 
 import jakarta.validation.Valid;
@@ -32,7 +34,7 @@ public class CreateLessonRequestDTO {
     @NotNull(message = "카테고리는 필수입니다")
     private Category category;
     
-    private String lessonImg;
+    private MultipartFile lessonImg;
     
     @NotNull(message = "지점 ID는 필수입니다")
     private Long branchId;
