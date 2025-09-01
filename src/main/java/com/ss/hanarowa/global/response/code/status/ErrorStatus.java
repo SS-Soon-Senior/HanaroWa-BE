@@ -23,6 +23,7 @@ public enum ErrorStatus implements BaseErrorCode {
 	MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER404", "해당 유저가 없습니다"),
 	MEMBER_AUTHENTICATION_FAILED(HttpStatus.BAD_REQUEST,"MEMBER400","아이디 또는 비밀번호를 확인해주세요."),
 	MEMBER_EMAIL_EXIST(HttpStatus.CONFLICT, "MEMBER409", "이미 존재하는 이메일입니다"),
+	PROVIDER_NOT_USED(HttpStatus.BAD_REQUEST, "MEMBER400", "지원하지 않는 provider입니다."),
 	
 	//토큰 관련 에러
 	TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "TOKEN401", "유효하지 않은 토큰입니다."),
