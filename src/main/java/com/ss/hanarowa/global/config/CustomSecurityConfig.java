@@ -55,6 +55,9 @@ public class CustomSecurityConfig {
 				.requestMatchers(
 					"/member/regist",
 					"/auth/signin",
+					"/auth/signin/**",
+					"/oauth2/**",
+					"/login/**",
 					"/favicon.ico",
 					"/actuator/**",
 					"/swagger-ui/**",
