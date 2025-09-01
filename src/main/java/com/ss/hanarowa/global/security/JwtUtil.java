@@ -36,18 +36,31 @@ public class JwtUtil {
 	}
 
 	public static TokenResponseDTO createTokens(Authentication authentication) {
-		MemberAuthResponseDTO principal = (MemberAuthResponseDTO) authentication.getPrincipal();
+		Object principal = authentication.getPrincipal();
+
+		String email;
+		String role;
+
+		if (principal instanceof MemberAuthResponseDTO user) {
+			email = user.getEmail();
+			role = user.getRole().name();
+		} else if (principal instanceof CustomOAuth2User oAuth2User) {
+			email = oAuth2User.getMember().getEmail();
+			role = oAuth2User.getMember().getRole().name();
+		} else {
+			throw new IllegalArgumentException("지원하지 않는 principal 타입: " + principal.getClass());
+		}
 
 		Map<String, Object> claims = Map.of(
-			"email", principal.getEmail(),
-			"role", principal.getRole().name()
+			"email", email,
+			"role", role
 		);
 
 		String accessToken = generateToken(claims, 1000000);
-		String refreshToken = generateToken(Map.of("email", principal.getEmail()), 60 * 24);
+		String refreshToken = generateToken(Map.of("email", email), 60 * 24);
 
 		return TokenResponseDTO.builder()
-			.email(principal.getEmail())
+			.email(email)
 			.accessToken(accessToken)
 			.refreshToken(refreshToken)
 			.build();
