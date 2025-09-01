@@ -76,7 +76,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
 		Member member = memberRepository.findByProviderAndProviderId(provider, providerId)
 										.orElseGet(() -> {
-											// log.info(">>> 신규 회원 가입: provider={}, providerId={}, email={}, name={}", provider, finalProviderId, finalEmail, finalName);
 											return memberRepository.save(Member.builder()
 																			   .email(finalEmail)
 																			   .name(finalName)
@@ -85,8 +84,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 																			   .role(Role.USERS)
 																			   .build());
 										});
-
-		// log.info(">>> 로그인 완료: memberId={}, email={}, provider={}", member.getId(), member.getEmail(), member.getProvider());
 
 		return new CustomOAuth2User(member, oAuth2User.getAttributes());
 	}
