@@ -9,12 +9,15 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Schema(description = "AI 추천 강좌 상세 정보")
-public class CourseRecommendation {
+@Schema(description = "AI 추천 상세 정보")
+public class Recommendation {
 
-	@Schema(description = "추천된 강좌명")
-	private String courseName;
+	@Schema(description = "추천 타이틀")
+	private String name;
 
-	@Schema(description = "해당 강좌를 추천하는 이유")
+	@Schema(description = "해당되는 설명")
+	private String description;
+
+	@Schema(description = "추천하는 이유")
 	private String reason;
 }
