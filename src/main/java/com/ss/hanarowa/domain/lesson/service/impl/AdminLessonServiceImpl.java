@@ -49,12 +49,20 @@ public class AdminLessonServiceImpl implements AdminLessonService {
 		}
 
 		return lessons.stream()
-			.map(l -> AdminLessonListResponseDTO.builder()
-				.lessonName(l.getLessonName())
-				.instructor(l.getInstructor())
-				.instruction(l.getInstruction())
-				.lessonImg(l.getLessonImg())
-				.build())
+			.flatMap(lesson -> lesson.getLessonGisus().stream()
+				.map(gisu -> {
+					int participantCount = myLessonRepository.countByLessonGisuId(gisu.getId());
+					return AdminLessonListResponseDTO.builder()
+						.id(lesson.getId())
+						.lessonName(lesson.getLessonName())
+						.instructor(lesson.getInstructor())
+						.lessonImg(lesson.getLessonImg())
+						.duration(gisu.getDuration())
+						.participants(participantCount)
+						.capacity(gisu.getCapacity())
+						.lessonFee(gisu.getLessonFee())
+						.build();
+				}))
 			.toList();
 	}
 

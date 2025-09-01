@@ -38,7 +38,8 @@ public class AdminLessonController {
 	@Operation(summary ="강좌 개설 신청 내역")
 	@GetMapping
 	public ResponseEntity<ApiResponse<List<AdminLessonListResponseDTO>>> getAdminAllLessons(){
-		log.info("[관리자] Controller : 강좌 목록 전체 가져오기");
+		log.debug("[관리자] Controller : 강좌 목록 전체 가져오기");
+		System.out.println("이쪽으로와야함");
 		List<AdminLessonListResponseDTO> list = adminLessonService.getAllLessons();
 		return ResponseEntity.ok(ApiResponse.onSuccess(list));
 	}

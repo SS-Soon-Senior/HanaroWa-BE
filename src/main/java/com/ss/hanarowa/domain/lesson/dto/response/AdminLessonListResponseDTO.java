@@ -1,5 +1,7 @@
 package com.ss.hanarowa.domain.lesson.dto.response;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,8 +14,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 public class AdminLessonListResponseDTO {
+	Long id;
 	String lessonName;
 	String instructor;
-	String instruction;
 	String lessonImg;
+	String duration;
+	int participants;
+	int capacity;
+	int lessonFee;
 }
