@@ -117,4 +117,5 @@ public class MemberServiceImpl implements MemberService {
 		return memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 	}
 
+
 }
