@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ss.hanarowa.domain.branch.dto.response.BranchResponseDTO;
 import com.ss.hanarowa.domain.member.dto.response.LoginResponseDTO;
 import com.ss.hanarowa.domain.member.dto.request.LoginRequestDTO;
 import com.ss.hanarowa.domain.member.dto.response.TokenResponseDTO;
@@ -54,24 +55,33 @@ public class AuthController {
 				)
 			);
 
-			// 1. 타입이 명확한 TokenResponseDTO를 받음
 			TokenResponseDTO tokenDto = JwtUtil.createTokens(authenticate);
 
 			Member member = memberRepository.findByEmail(loginRequest.getEmail())
 				.orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
-			// 2. DB에 refreshToken 저장
 			member.updateRefreshToken(tokenDto.getRefreshToken());
-			// memberRepository.save(member); // @Transactional이므로 생략 가능
 
 			String redirectUrl = (member.getPhoneNumber() == null || member.getBirth() == null)
 				? "http://localhost:3000/auth/signup/info"
 				: "http://localhost:3000";
 
-			// 3. LoginResponseDTO를 새로운 구조로 생성
+			BranchResponseDTO branchDto = null;
+			if (member.getBranch() != null) {
+				branchDto = BranchResponseDTO.builder()
+					.branchId(member.getBranch().getId())
+					.locationName(member.getBranch().getLocation().getName())
+					.branchName(member.getBranch().getName())
+					.build();
+			}
+
 			LoginResponseDTO response = LoginResponseDTO.builder()
 				.url(redirectUrl)
 				.tokens(tokenDto)
+				.branch(branchDto)
+				.name(member.getName())
+				.birth(member.getBirth())
+				.phoneNumber(member.getPhoneNumber())
 				.build();
 
 			return ResponseEntity.ok(ApiResponse.onSuccess(response));
