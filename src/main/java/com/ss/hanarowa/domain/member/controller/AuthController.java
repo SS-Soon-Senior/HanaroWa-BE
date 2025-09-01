@@ -68,14 +68,26 @@ public class AuthController {
 
 			member.updateRefreshToken(tokenDto.getRefreshToken());
 
-			ResponseCookie cookie = ResponseCookie.from("refreshToken", tokenDto.getRefreshToken())
-												  .httpOnly(true)
-												  .secure(false)
-												  .path("/")
-												  .maxAge(Duration.ofDays(7))
-												  .sameSite("Strict")
-												  .build();
-			response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+			// AccessToken 쿠키
+			ResponseCookie accessCookie = ResponseCookie.from("accessToken", tokenDto.getAccessToken())
+														.httpOnly(false)
+														.secure(false)
+														.path("/")
+														.maxAge(Duration.ofHours(1))
+														.sameSite("Lax")
+														.build();
+			response.setHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+
+			// RefreshToken 쿠키
+			ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokenDto.getRefreshToken())
+														 .httpOnly(true)
+														 .secure(false)
+														 .path("/")
+														 .maxAge(Duration.ofDays(7))
+														 .sameSite("Strict")
+														 .build();
+			response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
 
 			String redirectUrl = (member.getPhoneNumber() == null || member.getBirth() == null)
 				? "http://localhost:3000/auth/signup/info"
