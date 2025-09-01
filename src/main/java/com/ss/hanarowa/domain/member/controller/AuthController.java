@@ -26,6 +26,7 @@ import com.ss.hanarowa.global.security.JwtUtil;
 import com.ss.hanarowa.global.security.TokenBlacklistService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 
 import io.swagger.v3.oas.annotations.Operation;

@@ -109,7 +109,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			out.flush();
 			out.close();
 		}
-		System.out.println(">>> JwtFilter path=" + request.getRequestURI()
-			+ " authHeader=" + request.getHeader(HttpHeaders.AUTHORIZATION));
 	}
 }
