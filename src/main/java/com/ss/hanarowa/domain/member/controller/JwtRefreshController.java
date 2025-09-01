@@ -81,7 +81,7 @@ public class JwtRefreshController {
 
 	private boolean isSomeLeftTime(long exp) {
 		long nowSec = System.currentTimeMillis() / 1000;
-		return (exp - nowSec) < 60 * 60; // 만료까지 1시간 미만
+		return (exp - nowSec) < 60 * 60;
 	}
 
 	private boolean didExpireToken(String accessToken) {

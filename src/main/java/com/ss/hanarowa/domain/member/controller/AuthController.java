@@ -127,7 +127,7 @@ public class AuthController {
 				log.info("토큰에서 이메일 추출: {}", email);
 				
 				// accessToken을 블랙리스트에 추가 (토큰 만료시간 추출)
-				long expirationTime = ((Number) claims.get("exp")).longValue() * 1000; // JWT exp는 초 단위
+				long expirationTime = ((Number) claims.get("exp")).longValue() * 1000;
 				tokenBlacklistService.blacklistToken(accessToken, expirationTime);
 				log.info("accessToken 블랙리스트 추가 완료");
 				
