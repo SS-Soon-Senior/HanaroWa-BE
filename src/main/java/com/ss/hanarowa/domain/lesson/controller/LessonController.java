@@ -65,9 +65,11 @@ public class LessonController {
 	}
 
 	@GetMapping("/list/{branchId}")
-	@Operation(summary = "지점별 강좌 목록 가져오기", description = "사용자가 지점별 강좌 목록 최신순으로 가져오기 조회합니다.")
-	public ResponseEntity<ApiResponse<LessonListByBranchIdResponseDTO>> getLessonListByBranchId(@PathVariable Long branchId) {
-		LessonListByBranchIdResponseDTO lessonList = lessonService.getLessonListByBranchId(branchId);
+	@Operation(summary = "지점별 카테고리별 강좌 목록 가져오기", description = "사용자가 지점별 카테고리별 강좌 목록 최신순으로 가져오기 조회합니다.")
+	public ResponseEntity<ApiResponse<LessonListByBranchIdResponseDTO>> getLessonListByBranchId(
+			@PathVariable Long branchId,
+			@RequestParam(required = false) List<String> categories) {
+		LessonListByBranchIdResponseDTO lessonList = lessonService.getLessonListByBranchId(branchId, categories);
 		return ResponseEntity.ok(ApiResponse.onSuccess(lessonList));
 	}
 
