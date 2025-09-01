@@ -21,5 +21,5 @@ public interface LessonService {
 
 	void applyForLesson(Long lessonGisuId, String email); // 강좌 신청
 	
-	void createLesson(CreateLessonRequestDTO createLessonRequestDTO, String email); // 강좌 개설
+	void createLesson(CreateLessonRequestDTO createLessonRequestDTO, String email,String imageUrl); // 강좌 개설
 }

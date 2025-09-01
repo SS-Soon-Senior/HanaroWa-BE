@@ -58,6 +58,8 @@ dependencies {
     runtimeOnly 'com.h2database:h2' // 필요 없으면 제거 가능
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    implementation 'software.amazon.awssdk:s3:2.25.39'
 }
 
 jar {
