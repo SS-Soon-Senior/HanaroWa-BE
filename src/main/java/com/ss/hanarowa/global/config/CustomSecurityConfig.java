@@ -64,7 +64,8 @@ public class CustomSecurityConfig {
 					"/broadcast/**",
 					"/swagger.html",
 					"/member/refresh",
-					"/auth/logout"
+					"/auth/logout",
+					"/branch"
 				).permitAll()
 				.anyRequest().authenticated()
 			)
