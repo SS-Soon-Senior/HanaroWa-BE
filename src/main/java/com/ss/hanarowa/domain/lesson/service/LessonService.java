@@ -15,7 +15,7 @@ public interface LessonService {
 
 	LessonMoreDetailResponseDTO getLessonMoreDetail(Long lessonId);
 
-	LessonListByBranchIdResponseDTO getLessonListByBranchId(Long branchId, List<String> categories);
+	LessonListByBranchIdResponseDTO getLessonListByBranchId(Long branchId);
 
 	List<LessonListSearchResponseDTO> getLessonListSearch(String query);
 
