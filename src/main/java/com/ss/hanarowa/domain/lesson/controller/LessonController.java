@@ -2,9 +2,11 @@ package com.ss.hanarowa.domain.lesson.controller;
 
 import java.util.List;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -125,10 +127,10 @@ public class LessonController {
 		List<LessonListResponseDTO> offeredLessons = lessonService.getAllOfferedLessons(memberId);
 		return ResponseEntity.ok(new OfferedLessonListResponseDTO(offeredLessons));
 	}
-	@PostMapping("/create")
+	@PostMapping(path = "/create",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@Operation(summary = "강좌 개설", description = "사용자가 새로운 강좌를 개설합니다.")
 	public ResponseEntity<ApiResponse<Void>> createLesson(
-		@Valid @RequestBody CreateLessonRequestDTO createLessonRequestDTO, Authentication authentication) {
+		@Valid @ModelAttribute CreateLessonRequestDTO createLessonRequestDTO, Authentication authentication) {
 
 		try {
 			String email = authentication.getName();
