@@ -13,13 +13,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Schema(description = "AI 추천 응답 DTO")
-public class CourseRecResponseDto {
+public class RecResponseDto {
 
 	@Schema(description = "AI가 추천한 강좌 목록")
 	private List<Recommendation> recommendations;
 
-	// Gemini API의 JSON 응답을 파싱하기 위해 모든 필드를 받는 생성자가 필요할 수 있습니다.
-	public CourseRecResponseDto(List<Recommendation> recommendations) {
+	public RecResponseDto(List<Recommendation> recommendations) {
 		this.recommendations = recommendations;
 	}
 }
