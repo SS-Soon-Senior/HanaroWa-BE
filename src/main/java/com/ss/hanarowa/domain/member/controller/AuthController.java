@@ -66,6 +66,9 @@ public class AuthController {
 			Member member = memberRepository.findByEmail(loginRequest.getEmail())
 											.orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
+			if(member.getDeletedAt() != null) {
+				throw new GeneralException(ErrorStatus.MEMBER_NOT_FOUND);
+			}
 			member.updateRefreshToken(tokenDto.getRefreshToken());
 
 			// AccessToken 쿠키
