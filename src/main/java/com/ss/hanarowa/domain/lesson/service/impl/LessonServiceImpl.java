@@ -138,9 +138,16 @@ public class LessonServiceImpl implements LessonService {
 			LessonRoom room = gisu.getLessonRoom();
 
 			String formattedStartedAt = getFormattedStartedAt(myLesson.getOpenedAt());
-
 			//4월 5일 (금) 오후 2:00
 			String formattedLessonFirstDate = getFormattedLessonFirstDate(gisu);
+
+			boolean isprogress = isprogress(gisu);
+			List<Review> byMemberAndLessonGisu = reviewRepository.findByMemberAndLessonGisu(member, gisu);
+
+			boolean reviewed = true;
+			if (byMemberAndLessonGisu.isEmpty()) {
+				reviewed = false;
+			}
 
 			return LessonListResponseDTO.builder()
 										.lessonId(lesson.getId())
@@ -150,14 +157,25 @@ public class LessonServiceImpl implements LessonService {
 										.lessonName(lesson.getLessonName())
 										.instructorName(lesson.getMember().getName())
 										.duration(formattedLessonFirstDate)
+										.reservedAt(formattedLessonFirstDate)
 										.lessonRoomName(room.getName())
+										.isInProgress(isprogress)
+										.isReviewed(reviewed)
 										.build();
 		}).toList();
 	}
 
+	private static boolean isprogress(LessonGisu gisu) {
+		String endDateString = gisu.getDuration().split(" ")[2];
+
+		LocalDate endDate = LocalDate.parse(endDateString);
+
+		LocalDate today = LocalDate.now();
+		return !today.isAfter(endDate);
+	}
+
 	private static String getFormattedLessonFirstDate(LessonGisu gisu) {
 		String[] parts = gisu.getDuration().split(" ");
-
 		// 1. 시작 날짜 추출 및 포맷팅 (항상 첫 번째 요소)
 		String startDateString = parts[0];
 		LocalDate startDate = LocalDate.parse(startDateString);
