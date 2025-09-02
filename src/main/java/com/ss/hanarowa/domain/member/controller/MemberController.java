@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ss.hanarowa.domain.member.dto.request.MemberRegistRequestDTO;
 import com.ss.hanarowa.domain.member.dto.request.ModifyPasswdRequestDTO;
 import com.ss.hanarowa.domain.member.dto.request.MemberInfoRequestDTO;
 import com.ss.hanarowa.domain.member.dto.response.MemberInfoResponseDTO;
@@ -42,16 +41,8 @@ public class MemberController {
 		return ResponseEntity.ok(ApiResponse.onSuccess(dto));
 	}
 
-	@PostMapping("/regist")
-	@Operation(summary = "일반 회원가입")
-	public ResponseEntity<ApiResponse<String>> regist(@Valid @RequestBody MemberRegistRequestDTO memberRegistRequestDTO) {
-		memberService.credentialRegist(memberRegistRequestDTO);
-		return ResponseEntity.ok(ApiResponse.onSuccess("회원가입 완료"));
-	}
-
-
 	@PostMapping("/info")
-	@Operation(summary = "전화번호, 생일등록")
+	@Operation(summary = "전화번호, 생일등록(회원가입 중)")
 	public ResponseEntity<ApiResponse<Void>> info(@Valid @RequestBody MemberInfoRequestDTO memberInfoRequestDTO, Authentication authentication) {
 		String email = authentication.getName();
 
@@ -69,7 +60,7 @@ public class MemberController {
 	}
 
 	@PatchMapping
-	@Operation(summary = "회원 정보 수정")
+	@Operation(summary = "회원 정보 수정(회원가입 후)")
 	public ResponseEntity<ApiResponse<MemberInfoRequestDTO>> modifyInfo(@Valid @RequestBody MemberInfoRequestDTO memberInfoRequestDTO, Authentication authentication) {
 		String email = authentication.getName();
 
