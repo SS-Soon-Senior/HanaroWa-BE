@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -150,21 +151,14 @@ public class FacilityServiceImpl implements FacilityService {
 	}
 
 	@Override
-	public List<FacilityReservationResponseDTO> getAllMyFacilityReservations(Long memberId, Authentication authentication) {
+	public List<FacilityReservationResponseDTO> getAllMyFacilityReservations(String email) {
 
-		if (authentication == null || !authentication.isAuthenticated()) {
-			throw new GeneralException(ErrorStatus.MEMBER_NOT_FOUND);
-		}
-
-		String email = authentication.getName();
 		Member currentUser = memberRepository.findByEmail(email)
 											 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_AUTHORITY));
 
-		if (!currentUser.getId().equals(memberId)) {
-			throw new GeneralException(ErrorStatus.LESSONLIST_NOT_AUTHORITY);
-		}
+		List<FacilityTime> reservations = facilityTimeRepository.findAllByMemberId(currentUser.getId());
 
-		List<FacilityTime> reservations = facilityTimeRepository.findAllByMemberId(memberId);
+
 		if (reservations.isEmpty()) {
 			throw new GeneralException(ErrorStatus.FACILITY_NOT_FOUND);
 		}
@@ -174,12 +168,28 @@ public class FacilityServiceImpl implements FacilityService {
 			Branch branch = facility.getBranch();
 			Location location = branch.getLocation();
 
+			//8월 25일 (월) 오후 3:00 처럼 format
+			DateTimeFormatter formatter = DateTimeFormatter
+				.ofPattern("M월 d일 (E) a h:mm")
+				.withLocale(Locale.KOREAN);
+
+			String formattedStartedAt = reservation.getStartedAt().format(formatter);
+
+			//2024.03.03 format
+			DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+			String formattedReservedAt = reservation.getReservedAt().format(formatter2);
+
+			LocalDateTime now = LocalDateTime.now();
+
+			boolean isUpcoming = reservation.getStartedAt().isAfter(now);
+
 			return FacilityReservationResponseDTO.builder()
 												 .facilityId(facility.getId())
 												 .facilityName(facility.getName())
-												 .startedAt(reservation.getStartedAt())
-												 .duration(reservation.getStartedAt() + " ~ " + reservation.getEndedAt())
+												 .startedAt(formattedStartedAt)
+												 .duration(formattedReservedAt)
 												 .placeName(location.getName() + " " + branch.getName())
+												 .isUsed(isUpcoming)
 												 .build();
 		}).toList();
 	}

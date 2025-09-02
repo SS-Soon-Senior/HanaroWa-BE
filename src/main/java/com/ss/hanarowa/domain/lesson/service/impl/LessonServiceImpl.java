@@ -1,6 +1,9 @@
 package com.ss.hanarowa.domain.lesson.service.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -8,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ss.hanarowa.domain.lesson.dto.request.CreateLessonRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.MyOpenLessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.entity.Lesson;
 import com.ss.hanarowa.domain.lesson.entity.LessonGisu;
 import com.ss.hanarowa.domain.lesson.entity.LessonRoom;
@@ -38,6 +42,7 @@ import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -118,8 +123,10 @@ public class LessonServiceImpl implements LessonService {
 
 	// 신청 강좌 목록
 	@Override
-	public List<LessonListResponseDTO> getAllAppliedLessons(Long memberId) {
-		List<MyLesson> myLessons = myLessonRepository.findAllByMemberId(memberId);
+	public List<LessonListResponseDTO> getAllAppliedLessons(String email) {
+		Member member = memberRepository.findByEmail(email).orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+
+		List<MyLesson> myLessons = myLessonRepository.findAllByMemberId(member.getId());
 
 		if (myLessons.isEmpty()) {
 			throw new GeneralException(ErrorStatus.APPLIED_NOT_FOUND);
@@ -130,23 +137,69 @@ public class LessonServiceImpl implements LessonService {
 			Lesson lesson = gisu.getLesson();
 			LessonRoom room = gisu.getLessonRoom();
 
+			String formattedStartedAt = getFormattedStartedAt(myLesson.getOpenedAt());
+
+			//4월 5일 (금) 오후 2:00
+			String formattedLessonFirstDate = getFormattedLessonFirstDate(gisu);
+
 			return LessonListResponseDTO.builder()
 										.lessonId(lesson.getId())
 										.lessonGisuId(gisu.getId())
 										.lessonState(gisu.getLessonState())
-										.startedAt(gisu.getStartedAt())
+										.startedAt(formattedStartedAt)
 										.lessonName(lesson.getLessonName())
 										.instructorName(lesson.getMember().getName())
-										.duration(gisu.getDuration())
+										.duration(formattedLessonFirstDate)
 										.lessonRoomName(room.getName())
 										.build();
 		}).toList();
 	}
 
+	private static String getFormattedLessonFirstDate(LessonGisu gisu) {
+		String[] parts = gisu.getDuration().split(" ");
+
+		// 1. 시작 날짜 추출 및 포맷팅 (항상 첫 번째 요소)
+		String startDateString = parts[0];
+		LocalDate startDate = LocalDate.parse(startDateString);
+		DateTimeFormatter dateFormatter = DateTimeFormatter
+			.ofPattern("M월 d일 (E)")
+			.withLocale(Locale.KOREAN);
+		String formattedDate = startDate.format(dateFormatter);
+
+		// 마지막 요소("17:00-18:00" 또는 "17:00")를 가져옴
+		String timePart = parts[parts.length - 1];
+		String startTimeString;
+
+		// 시간 부분이 "17:00-18:00" 같은 범위인지 확인
+		if (timePart.contains("-")) {
+			startTimeString = timePart.split("-")[0];
+		} else {
+			// "17:00" 같은 단일 시간 형식일 경우
+			startTimeString = timePart;
+		}
+
+		LocalTime startTime = LocalTime.parse(startTimeString);
+		DateTimeFormatter timeFormatter = DateTimeFormatter
+			.ofPattern("a h:mm")
+			.withLocale(Locale.KOREAN);
+		String formattedTime = startTime.format(timeFormatter);
+
+		return formattedDate + " " + formattedTime;
+	}
+
+	private static String getFormattedStartedAt(LocalDateTime time) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+		String formattedStartedAt = time.format(formatter);
+		return formattedStartedAt;
+	}
+
+
+
 	// 개설 강좌 목록
 	@Override
-	public List<LessonListResponseDTO> getAllOfferedLessons(Long memberId) {
-		List<Lesson> offeredLessons = lessonRepository.findAllByMemberId(memberId);
+	public List<MyOpenLessonListResponseDTO> getAllOfferedLessons(String email) {
+		Member member = memberRepository.findByEmail(email).orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+		List<Lesson> offeredLessons = lessonRepository.findAllByMemberId(member.getId());
 
 		if (offeredLessons.isEmpty()) {
 			throw new GeneralException(ErrorStatus.OFFERED_NOT_FOUND);
@@ -155,20 +208,23 @@ public class LessonServiceImpl implements LessonService {
 		return offeredLessons.stream()
 							 .flatMap(lesson -> lesson.getLessonGisus().stream().map(gisu -> {
 								 LessonRoom room = gisu.getLessonRoom();
-								 return LessonListResponseDTO.builder()
+								 String formattedStartedAt = getFormattedLessonFirstDate(gisu);
+
+								 String lessonOpenedAt = getFormattedStartedAt(lesson.getOpenedAt());
+
+								 return MyOpenLessonListResponseDTO.builder()
 															 .lessonId(lesson.getId())
 															 .lessonGisuId(gisu.getId())
 															 .lessonState(gisu.getLessonState())
-															 .startedAt(gisu.getStartedAt())
+															 .startedAt(formattedStartedAt)
 															 .lessonName(lesson.getLessonName())
 															 .instructorName(lesson.getMember().getName())
-															 .duration(gisu.getDuration())
 															 .lessonRoomName(room.getName())
+															 .openedAt(lessonOpenedAt)
 															 .build();
 							 }))
 							 .toList();
 	}
-
 
 	@Override
 	public LessonListByBranchIdResponseDTO getLessonListByBranchId(Long branchId, List<String> categories){

@@ -1,7 +1,12 @@
 package com.ss.hanarowa.domain.member.entity;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.ss.hanarowa.domain.lesson.entity.LessonGisu;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
@@ -35,4 +40,8 @@ public class MyLesson { //수강신청 내역(내가 수업을 듣는거)
 	@JoinColumn(name = "lessonGisuId",
 		foreignKey = @ForeignKey(name = "fk_MyLesson_LessonGisu"), nullable = false)
 	private LessonGisu lessonGisu;
+
+	@CreationTimestamp
+	@Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", insertable = false, updatable = false)
+	private LocalDateTime openedAt;
 }
