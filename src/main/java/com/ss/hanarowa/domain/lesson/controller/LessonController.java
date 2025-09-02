@@ -46,7 +46,6 @@ import lombok.extern.slf4j.Slf4j;
 public class LessonController {
 	private final LessonService lessonService;
 	private final ReviewService reviewService;
-	private final MemberRepository memberRepository;
 	private final S3Service s3Service;
 
 	@PostMapping("/{lessonGisuId}/review")
@@ -85,9 +84,8 @@ public class LessonController {
 
 
 	@Operation(summary="신청 강좌 목록 보기")
-	@GetMapping("/reservation/applied/{memberId}")
+	@GetMapping("/reservation/applied")
 	public ResponseEntity<AppliedLessonListResponseDTO> getAllAppliedLessons(
-		@PathVariable Long memberId,
 		Authentication authentication) {
 
 		if (authentication == null || !authentication.isAuthenticated()) {
@@ -95,21 +93,14 @@ public class LessonController {
 		}
 
 		String email = authentication.getName();
-		Member currentUser = memberRepository.findByEmail(email)
-											 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
-		if (!currentUser.getId().equals(memberId)) {
-			throw new GeneralException(ErrorStatus.LESSONLIST_NOT_AUTHORITY);
-		}
-
-		List<LessonListResponseDTO> appliedLessons = lessonService.getAllAppliedLessons(memberId);
+		List<LessonListResponseDTO> appliedLessons = lessonService.getAllAppliedLessons(email);
 		return ResponseEntity.ok(new AppliedLessonListResponseDTO(appliedLessons));
 	}
 
 	@Operation(summary="개설 강좌 목록 보기")
-	@GetMapping("/reservation/offered/{memberId}")
+	@GetMapping("/reservation/offered")
 	public ResponseEntity<OfferedLessonListResponseDTO> getAllOfferedLessons(
-		@PathVariable Long memberId,
 		Authentication authentication) {
 
 		if (authentication == null || !authentication.isAuthenticated()) {
@@ -117,14 +108,8 @@ public class LessonController {
 		}
 
 		String email = authentication.getName();
-		Member currentUser = memberRepository.findByEmail(email)
-											 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
-		if (!currentUser.getId().equals(memberId)) {
-			throw new GeneralException(ErrorStatus.LESSONLIST_NOT_AUTHORITY);
-		}
-
-		List<LessonListResponseDTO> offeredLessons = lessonService.getAllOfferedLessons(memberId);
+		List<LessonListResponseDTO> offeredLessons = lessonService.getAllOfferedLessons(email);
 		return ResponseEntity.ok(new OfferedLessonListResponseDTO(offeredLessons));
 	}
 	@PostMapping(path = "/create",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
