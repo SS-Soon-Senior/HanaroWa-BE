@@ -1,8 +1,13 @@
 package com.ss.hanarowa.domain.facility.entity;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.ss.hanarowa.global.entity.BaseEntity;
 import com.ss.hanarowa.domain.member.entity.Member;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
@@ -38,4 +43,8 @@ public class FacilityTime extends BaseEntity {
 	@JoinColumn(name = "memberId",
 		foreignKey = @ForeignKey(name = "fk_FacilityTime_Member"), nullable = false)
 	private Member member;
+
+	@CreationTimestamp
+	@Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", insertable = false, updatable = false)
+	private LocalDateTime reservedAt;
 }
