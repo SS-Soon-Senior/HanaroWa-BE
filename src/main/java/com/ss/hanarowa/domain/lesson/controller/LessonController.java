@@ -22,6 +22,7 @@ import com.ss.hanarowa.domain.lesson.dto.response.LessonListSearchResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.AppliedLessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonMoreDetailResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.MyOpenLessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.OfferedLessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.service.LessonService;
 import com.ss.hanarowa.domain.lesson.service.ReviewService;
@@ -109,7 +110,7 @@ public class LessonController {
 
 		String email = authentication.getName();
 
-		List<LessonListResponseDTO> offeredLessons = lessonService.getAllOfferedLessons(email);
+		List<MyOpenLessonListResponseDTO> offeredLessons = lessonService.getAllOfferedLessons(email);
 		return ResponseEntity.ok(new OfferedLessonListResponseDTO(offeredLessons));
 	}
 	@PostMapping(path = "/create",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
