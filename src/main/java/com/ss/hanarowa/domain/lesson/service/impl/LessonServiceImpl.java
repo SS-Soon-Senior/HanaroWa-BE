@@ -227,13 +227,21 @@ public class LessonServiceImpl implements LessonService {
 	}
 
 	@Override
-	public LessonListByBranchIdResponseDTO getLessonListByBranchId(Long branchId){
+	public LessonListByBranchIdResponseDTO getLessonListByBranchId(Long branchId, List<String> categories){
 		// 지점 조회
 		Branch branch = branchRepository.findById(branchId)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.BRANCH_NOT_FOUND));
 
 		// 지점별 강좌 목록 조회 (최신순)
 		List<Lesson> lessons = lessonRepository.findByBranchIdOrderByIdDesc(branchId);
+
+		if (categories != null && !categories.isEmpty()) {
+			lessons = lessons.stream()
+				.filter(lesson -> {
+					return categories.contains(lesson.getCategory().toString());
+				})
+				.toList();
+		}
 
 		// 각 강좌별 LessonGisu 정보 및 수강 인원 수 조회
 		List<LessonInfoResponseDTO> lessonInfos = lessons.stream()

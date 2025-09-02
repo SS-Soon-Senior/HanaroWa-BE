@@ -54,6 +54,7 @@ public class CustomSecurityConfig {
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(
 					"/auth/signup",
+					"/auth/reissue",
 					"/auth/signin",
 					"/auth/signin/**",
 					"/oauth2/**",
