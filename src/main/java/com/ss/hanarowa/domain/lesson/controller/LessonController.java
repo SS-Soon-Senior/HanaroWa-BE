@@ -22,6 +22,7 @@ import com.ss.hanarowa.domain.lesson.dto.response.LessonListSearchResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.AppliedLessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonMoreDetailResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.MyOpenLessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.OfferedLessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.service.LessonService;
 import com.ss.hanarowa.domain.lesson.service.ReviewService;
@@ -69,9 +70,11 @@ public class LessonController {
 	}
 
 	@GetMapping("/list/{branchId}")
-	@Operation(summary = "지점별 강좌 목록 가져오기", description = "사용자가 지점별 강좌 목록 최신순으로 가져오기 조회합니다.")
-	public ResponseEntity<ApiResponse<LessonListByBranchIdResponseDTO>> getLessonListByBranchId(@PathVariable Long branchId) {
-		LessonListByBranchIdResponseDTO lessonList = lessonService.getLessonListByBranchId(branchId);
+	@Operation(summary = "지점별 카테고리별 강좌 목록 가져오기", description = "사용자가 지점별 카테고리별 강좌 목록 최신순으로 가져오기 조회합니다.")
+	public ResponseEntity<ApiResponse<LessonListByBranchIdResponseDTO>> getLessonListByBranchId(
+			@PathVariable Long branchId,
+			@RequestParam(required = false) List<String> categories) {
+		LessonListByBranchIdResponseDTO lessonList = lessonService.getLessonListByBranchId(branchId, categories);
 		return ResponseEntity.ok(ApiResponse.onSuccess(lessonList));
 	}
 
@@ -109,7 +112,7 @@ public class LessonController {
 
 		String email = authentication.getName();
 
-		List<LessonListResponseDTO> offeredLessons = lessonService.getAllOfferedLessons(email);
+		List<MyOpenLessonListResponseDTO> offeredLessons = lessonService.getAllOfferedLessons(email);
 		return ResponseEntity.ok(new OfferedLessonListResponseDTO(offeredLessons));
 	}
 	@PostMapping(path = "/create",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

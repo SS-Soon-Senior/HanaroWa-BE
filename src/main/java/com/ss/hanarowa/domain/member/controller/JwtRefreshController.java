@@ -73,6 +73,14 @@ public class JwtRefreshController {
 												  .build();
 			response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 		}
+		ResponseCookie accessCookie = ResponseCookie.from("accessToken",newAccessToken)
+			.httpOnly(false)
+			.secure(false)
+			.path("/")
+			.maxAge(Duration.ofHours(1))
+			.sameSite("Lax")
+			.build();
+		response.setHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(Map.of(
 			"accessToken", newAccessToken

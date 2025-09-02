@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ss.hanarowa.domain.lesson.dto.request.CreateLessonRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.MyOpenLessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.entity.Lesson;
 import com.ss.hanarowa.domain.lesson.entity.LessonGisu;
 import com.ss.hanarowa.domain.lesson.entity.LessonRoom;
@@ -136,9 +137,9 @@ public class LessonServiceImpl implements LessonService {
 			Lesson lesson = gisu.getLesson();
 			LessonRoom room = gisu.getLessonRoom();
 
-			String formattedStartedAt = getFormattedStartedAt(gisu);
+			String formattedStartedAt = getFormattedStartedAt(myLesson.getOpenedAt());
 
-			//강의 시작날짜 결과: "2025-01-05"
+			//4월 5일 (금) 오후 2:00
 			String formattedLessonFirstDate = getFormattedLessonFirstDate(gisu);
 
 			return LessonListResponseDTO.builder()
@@ -186,9 +187,9 @@ public class LessonServiceImpl implements LessonService {
 		return formattedDate + " " + formattedTime;
 	}
 
-	private static String getFormattedStartedAt(LessonGisu gisu) {
+	private static String getFormattedStartedAt(LocalDateTime time) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-		String formattedStartedAt = gisu.getStartedAt().format(formatter);
+		String formattedStartedAt = time.format(formatter);
 		return formattedStartedAt;
 	}
 
@@ -196,7 +197,7 @@ public class LessonServiceImpl implements LessonService {
 
 	// 개설 강좌 목록
 	@Override
-	public List<LessonListResponseDTO> getAllOfferedLessons(String email) {
+	public List<MyOpenLessonListResponseDTO> getAllOfferedLessons(String email) {
 		Member member = memberRepository.findByEmail(email).orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 		List<Lesson> offeredLessons = lessonRepository.findAllByMemberId(member.getId());
 
@@ -204,38 +205,43 @@ public class LessonServiceImpl implements LessonService {
 			throw new GeneralException(ErrorStatus.OFFERED_NOT_FOUND);
 		}
 
-
-
 		return offeredLessons.stream()
 							 .flatMap(lesson -> lesson.getLessonGisus().stream().map(gisu -> {
 								 LessonRoom room = gisu.getLessonRoom();
-								 String formattedStartedAt = getFormattedStartedAt(gisu);
+								 String formattedStartedAt = getFormattedLessonFirstDate(gisu);
 
-								 //강의 시작날짜 결과: "2025-01-05"
-								 String formattedLessonFirstDate = getFormattedLessonFirstDate(gisu);
-								 return LessonListResponseDTO.builder()
+								 String lessonOpenedAt = getFormattedStartedAt(lesson.getOpenedAt());
+
+								 return MyOpenLessonListResponseDTO.builder()
 															 .lessonId(lesson.getId())
 															 .lessonGisuId(gisu.getId())
 															 .lessonState(gisu.getLessonState())
 															 .startedAt(formattedStartedAt)
 															 .lessonName(lesson.getLessonName())
 															 .instructorName(lesson.getMember().getName())
-															 .duration(formattedLessonFirstDate)
 															 .lessonRoomName(room.getName())
+															 .openedAt(lessonOpenedAt)
 															 .build();
 							 }))
 							 .toList();
 	}
 
-
 	@Override
-	public LessonListByBranchIdResponseDTO getLessonListByBranchId(Long branchId){
+	public LessonListByBranchIdResponseDTO getLessonListByBranchId(Long branchId, List<String> categories){
 		// 지점 조회
 		Branch branch = branchRepository.findById(branchId)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.BRANCH_NOT_FOUND));
 
 		// 지점별 강좌 목록 조회 (최신순)
 		List<Lesson> lessons = lessonRepository.findByBranchIdOrderByIdDesc(branchId);
+
+		if (categories != null && !categories.isEmpty()) {
+			lessons = lessons.stream()
+				.filter(lesson -> {
+					return categories.contains(lesson.getCategory().toString());
+				})
+				.toList();
+		}
 
 		// 각 강좌별 LessonGisu 정보 및 수강 인원 수 조회
 		List<LessonInfoResponseDTO> lessonInfos = lessons.stream()

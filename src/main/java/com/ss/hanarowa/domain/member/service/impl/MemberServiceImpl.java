@@ -13,6 +13,7 @@ import com.ss.hanarowa.domain.branch.repository.BranchRepository;
 import com.ss.hanarowa.domain.member.dto.request.MemberRegistRequestDTO;
 import com.ss.hanarowa.domain.member.dto.request.ModifyPasswdRequestDTO;
 import com.ss.hanarowa.domain.member.entity.Member;
+import com.ss.hanarowa.domain.member.entity.Role;
 import com.ss.hanarowa.domain.member.repository.MemberRepository;
 import com.ss.hanarowa.domain.member.dto.request.MemberInfoRequestDTO;
 import com.ss.hanarowa.domain.member.service.MemberService;
@@ -43,7 +44,7 @@ public class MemberServiceImpl implements MemberService {
 			.email(memberRegistRequestDTO.getEmail())
 			.name(memberRegistRequestDTO.getName())
 			.password(memberRegistRequestDTO.getPassword())
-			.role(memberRegistRequestDTO.getRole())
+			.role(Role.USERS)
 			.build();
 
 		memberRepository.save(member);
