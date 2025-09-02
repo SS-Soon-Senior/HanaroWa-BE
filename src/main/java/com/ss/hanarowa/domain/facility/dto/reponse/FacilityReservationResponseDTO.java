@@ -14,7 +14,8 @@ import lombok.NoArgsConstructor;
 public class FacilityReservationResponseDTO {
 	private long facilityId;
 	private String facilityName;
-	private LocalDateTime startedAt;
+	private String startedAt;
 	private String duration;
 	private String placeName;
+	private String reservedAt;
 }
