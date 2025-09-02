@@ -51,7 +51,7 @@ public class MemberController {
 
 
 	@PostMapping("/info")
-	@Operation(summary = "전화번호, 생일등록")
+	@Operation(summary = "전화번호, 생일등록(회원가입 중)")
 	public ResponseEntity<ApiResponse<Void>> info(@Valid @RequestBody MemberInfoRequestDTO memberInfoRequestDTO, Authentication authentication) {
 		String email = authentication.getName();
 
@@ -69,7 +69,7 @@ public class MemberController {
 	}
 
 	@PatchMapping
-	@Operation(summary = "회원 정보 수정")
+	@Operation(summary = "회원 정보 수정(회원가입 후)")
 	public ResponseEntity<ApiResponse<MemberInfoRequestDTO>> modifyInfo(@Valid @RequestBody MemberInfoRequestDTO memberInfoRequestDTO, Authentication authentication) {
 		String email = authentication.getName();
 
