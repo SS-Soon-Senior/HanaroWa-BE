@@ -84,7 +84,6 @@ public class MemberController {
 
 		String email = authentication.getName();
 
-
 		memberService.modifyPassword(modifyDTO, email);
 		return ResponseEntity.ok(ApiResponse.onSuccess("비밀번호 수정 완료"));
 	}
