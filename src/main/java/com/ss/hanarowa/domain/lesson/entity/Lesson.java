@@ -1,7 +1,10 @@
 package com.ss.hanarowa.domain.lesson.entity;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ss.hanarowa.domain.branch.entity.Branch;
@@ -70,4 +73,8 @@ public class Lesson {
 	@OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL)
 	@Builder.Default
 	private List<LessonGisu> lessonGisus = new ArrayList<>();
+
+	@CreationTimestamp
+	@Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", insertable = false, updatable = false)
+	private LocalDateTime openedAt;
 }

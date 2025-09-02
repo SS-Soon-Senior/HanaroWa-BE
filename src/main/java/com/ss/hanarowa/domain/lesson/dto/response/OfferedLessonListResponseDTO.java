@@ -14,5 +14,5 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OfferedLessonListResponseDTO {
-	private List<LessonListResponseDTO> offeredLessonList;
+	private List<MyOpenLessonListResponseDTO> offeredLessonList;
 }
