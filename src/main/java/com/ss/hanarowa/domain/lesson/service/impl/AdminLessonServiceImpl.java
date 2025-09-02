@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ss.hanarowa.domain.lesson.dto.request.LessonGisuStateUpdateRequestDto;
 import com.ss.hanarowa.domain.lesson.dto.request.UpdateLessonDetailRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.AdminLessonListResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.AdminManageLessonResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.CurriculumResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonDetailResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuResponseDTO;
@@ -18,6 +19,7 @@ import com.ss.hanarowa.domain.branch.repository.BranchRepository;
 import com.ss.hanarowa.domain.lesson.entity.Curriculum;
 import com.ss.hanarowa.domain.lesson.entity.Lesson;
 import com.ss.hanarowa.domain.lesson.entity.LessonGisu;
+import com.ss.hanarowa.domain.lesson.entity.LessonState;
 import com.ss.hanarowa.domain.lesson.repository.CurriculumRepository;
 import com.ss.hanarowa.domain.lesson.repository.LessonGisuRepository;
 import com.ss.hanarowa.domain.lesson.service.AdminLessonService;
@@ -49,12 +51,21 @@ public class AdminLessonServiceImpl implements AdminLessonService {
 		}
 
 		return lessons.stream()
-			.map(l -> AdminLessonListResponseDTO.builder()
-				.lessonName(l.getLessonName())
-				.instructor(l.getInstructor())
-				.instruction(l.getInstruction())
-				.lessonImg(l.getLessonImg())
-				.build())
+			.flatMap(lesson -> lesson.getLessonGisus().stream()
+				.filter(gisu -> gisu.getLessonState() == LessonState.APPROVED)
+				.map(gisu -> {
+					int participantCount = myLessonRepository.countByLessonGisuId(gisu.getId());
+					return AdminLessonListResponseDTO.builder()
+						.id(lesson.getId())
+						.lessonName(lesson.getLessonName())
+						.instructor(lesson.getInstructor())
+						.lessonImg(lesson.getLessonImg())
+						.duration(gisu.getDuration())
+						.participants(participantCount)
+						.capacity(gisu.getCapacity())
+						.lessonFee(gisu.getLessonFee())
+						.build();
+				}))
 			.toList();
 	}
 
@@ -171,5 +182,26 @@ public class AdminLessonServiceImpl implements AdminLessonService {
 		}
 
 		return getLessonDetail(lessonId);
+	}
+
+	@Override
+	public List<AdminManageLessonResponseDTO> getManageLessons() {
+		List<Lesson> lessons = lessonRepository.findAll();
+
+		if (lessons.isEmpty()) {
+			throw new GeneralException(ErrorStatus.LESSON_NOT_FOUND);
+		}
+
+		return lessons.stream()
+			.flatMap(lesson -> lesson.getLessonGisus().stream()
+				.map(gisu -> AdminManageLessonResponseDTO.builder()
+					.id(gisu.getId())
+					.lessonName(lesson.getLessonName())
+					.instructor(lesson.getInstructor())
+					.description(lesson.getDescription())
+					.duration(gisu.getDuration())
+					.state(gisu.getLessonState())
+					.build()))
+			.toList();
 	}
 }
