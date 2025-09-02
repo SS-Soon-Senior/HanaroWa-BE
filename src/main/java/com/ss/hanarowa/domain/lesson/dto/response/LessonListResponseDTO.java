@@ -17,7 +17,7 @@ public class LessonListResponseDTO {
 	private Long lessonId;
 	private Long lessonGisuId;
 	private LessonState lessonState;
-	private LocalDateTime startedAt;
+	private String startedAt;
 	private String lessonName;
 	private String instructorName;
 	private String duration;

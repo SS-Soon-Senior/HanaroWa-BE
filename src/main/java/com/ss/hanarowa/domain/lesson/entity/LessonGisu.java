@@ -44,7 +44,7 @@ public class LessonGisu extends BaseEntity {
 	@Column(nullable = false)
 	private int lessonFee;
 
-	@Column(nullable = false, length = 50)
+	@Column(nullable = false, length = 100)
 	private String duration;
 
 	@Enumerated(EnumType.STRING)

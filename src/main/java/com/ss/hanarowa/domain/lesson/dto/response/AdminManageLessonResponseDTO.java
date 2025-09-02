@@ -1,5 +1,6 @@
 package com.ss.hanarowa.domain.lesson.dto.response;
 
+import com.ss.hanarowa.domain.lesson.entity.LessonState;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,13 +12,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AdminLessonListResponseDTO {
+public class AdminManageLessonResponseDTO {
 	Long id;
 	String lessonName;
 	String instructor;
-	String lessonImg;
+	String description;
 	String duration;
-	int participants;
-	int capacity;
-	int lessonFee;
+	LessonState state;
 }
