@@ -65,14 +65,14 @@ public class FacilityController {
 		return ResponseEntity.ok(ApiResponse.onSuccess(null));
 	}
 
-	@GetMapping("/reservation/{memberId}")
+	@GetMapping("/reservation")
 	@Operation(summary = "시설 예약 목록 조회", description = "시설 예약 목록을 조회합니다.")
 	public ResponseEntity<ApiResponse<List<FacilityReservationResponseDTO>>> getAllMyFacilityReservations(
-		@PathVariable Long memberId,
 		Authentication authentication) {
 
+		String email = authentication.getName();
 		List<FacilityReservationResponseDTO> reservations =
-			facilityService.getAllMyFacilityReservations(memberId, authentication);
+			facilityService.getAllMyFacilityReservations(email);
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(reservations));
 	}

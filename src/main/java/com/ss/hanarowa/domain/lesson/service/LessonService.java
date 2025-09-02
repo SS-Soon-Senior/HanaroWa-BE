@@ -9,9 +9,9 @@ import com.ss.hanarowa.domain.lesson.dto.response.LessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonMoreDetailResponseDTO;
 
 public interface LessonService {
-	List<LessonListResponseDTO> getAllAppliedLessons(Long memberId); // 신청 강좌
+	List<LessonListResponseDTO> getAllAppliedLessons(String email); // 신청 강좌
 
-	List<LessonListResponseDTO> getAllOfferedLessons(Long memberId); //개설 강좌
+	List<LessonListResponseDTO> getAllOfferedLessons(String email); //개설 강좌
 
 	LessonMoreDetailResponseDTO getLessonMoreDetail(Long lessonId);
 

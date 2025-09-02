@@ -151,21 +151,14 @@ public class FacilityServiceImpl implements FacilityService {
 	}
 
 	@Override
-	public List<FacilityReservationResponseDTO> getAllMyFacilityReservations(Long memberId, Authentication authentication) {
+	public List<FacilityReservationResponseDTO> getAllMyFacilityReservations(String email) {
 
-		if (authentication == null || !authentication.isAuthenticated()) {
-			throw new GeneralException(ErrorStatus.MEMBER_NOT_FOUND);
-		}
-
-		String email = authentication.getName();
 		Member currentUser = memberRepository.findByEmail(email)
 											 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_AUTHORITY));
 
-		if (!currentUser.getId().equals(memberId)) {
-			throw new GeneralException(ErrorStatus.LESSONLIST_NOT_AUTHORITY);
-		}
+		List<FacilityTime> reservations = facilityTimeRepository.findAllByMemberId(currentUser.getId());
 
-		List<FacilityTime> reservations = facilityTimeRepository.findAllByMemberId(memberId);
+
 		if (reservations.isEmpty()) {
 			throw new GeneralException(ErrorStatus.FACILITY_NOT_FOUND);
 		}

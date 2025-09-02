@@ -122,8 +122,10 @@ public class LessonServiceImpl implements LessonService {
 
 	// 신청 강좌 목록
 	@Override
-	public List<LessonListResponseDTO> getAllAppliedLessons(Long memberId) {
-		List<MyLesson> myLessons = myLessonRepository.findAllByMemberId(memberId);
+	public List<LessonListResponseDTO> getAllAppliedLessons(String email) {
+		Member member = memberRepository.findByEmail(email).orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+
+		List<MyLesson> myLessons = myLessonRepository.findAllByMemberId(member.getId());
 
 		if (myLessons.isEmpty()) {
 			throw new GeneralException(ErrorStatus.APPLIED_NOT_FOUND);
@@ -194,8 +196,9 @@ public class LessonServiceImpl implements LessonService {
 
 	// 개설 강좌 목록
 	@Override
-	public List<LessonListResponseDTO> getAllOfferedLessons(Long memberId) {
-		List<Lesson> offeredLessons = lessonRepository.findAllByMemberId(memberId);
+	public List<LessonListResponseDTO> getAllOfferedLessons(String email) {
+		Member member = memberRepository.findByEmail(email).orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+		List<Lesson> offeredLessons = lessonRepository.findAllByMemberId(member.getId());
 
 		if (offeredLessons.isEmpty()) {
 			throw new GeneralException(ErrorStatus.OFFERED_NOT_FOUND);
