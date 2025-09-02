@@ -30,7 +30,4 @@ public class MemberRegistRequestDTO {
 	)
 	private String password;
 
-	@Builder.Default
-	private Role role = Role.USERS;
-
 }

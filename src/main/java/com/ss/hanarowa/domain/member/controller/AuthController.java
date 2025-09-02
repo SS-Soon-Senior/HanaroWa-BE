@@ -18,11 +18,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.hanarowa.domain.branch.dto.response.BranchResponseDTO;
+import com.ss.hanarowa.domain.member.dto.request.MemberRegistRequestDTO;
 import com.ss.hanarowa.domain.member.dto.response.LoginResponseDTO;
 import com.ss.hanarowa.domain.member.dto.request.LoginRequestDTO;
 import com.ss.hanarowa.domain.member.dto.response.TokenResponseDTO;
 import com.ss.hanarowa.domain.member.entity.Member;
-import com.ss.hanarowa.domain.member.repository.MemberRepository;
+import com.ss.hanarowa.domain.member.service.MemberService;
 import com.ss.hanarowa.global.exception.GeneralException;
 import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 import com.ss.hanarowa.global.response.ApiResponse;
@@ -35,6 +36,7 @@ import jakarta.transaction.Transactional;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 	
@@ -44,8 +46,15 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class AuthController {
 	private final AuthenticationManager authenticationManager;
-	private final MemberRepository memberRepository;
 	private final TokenBlacklistService tokenBlacklistService;
+	private final MemberService memberService;
+
+	@PostMapping("/signup")
+	@Operation(summary = "일반 회원가입")
+	public ResponseEntity<ApiResponse<String>> signup(@Valid @RequestBody MemberRegistRequestDTO memberRegistRequestDTO) {
+		memberService.credentialRegist(memberRegistRequestDTO);
+		return ResponseEntity.ok(ApiResponse.onSuccess("회원가입 완료"));
+	}
 
 	@PostMapping("/signin")
 	@Tag(name = "로그인", description = "사용자 로그인")
@@ -63,8 +72,7 @@ public class AuthController {
 
 			TokenResponseDTO tokenDto = JwtUtil.createTokens(authenticate);
 
-			Member member = memberRepository.findByEmail(loginRequest.getEmail())
-											.orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+			Member member = memberService.getMemberByEmail(loginRequest.getEmail());
 
 			if(member.getDeletedAt() != null) {
 				throw new GeneralException(ErrorStatus.MEMBER_NOT_FOUND);
@@ -147,12 +155,10 @@ public class AuthController {
 				log.info("accessToken 블랙리스트 추가 완료");
 				
 				// Member의 refreshToken 삭제
-				Member member = memberRepository.findByEmail(email)
-					.orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+				Member member = memberService.getMemberByEmail(email);
 				log.info("로그아웃 전 refreshToken: {}", member.getRefreshToken() != null ? "존재함" : "없음");
 				
 				member.clearRefreshToken();
-				memberRepository.save(member);
 				log.info("refreshToken 삭제 완료");
 				
 			} catch (Exception e) {

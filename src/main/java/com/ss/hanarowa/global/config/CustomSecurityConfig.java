@@ -53,8 +53,8 @@ public class CustomSecurityConfig {
 			.httpBasic(AbstractHttpConfigurer::disable)
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(
+					"/auth/signup",
 					"/auth/reissue",
-					"/member/regist",
 					"/auth/signin",
 					"/auth/signin/**",
 					"/oauth2/**",
