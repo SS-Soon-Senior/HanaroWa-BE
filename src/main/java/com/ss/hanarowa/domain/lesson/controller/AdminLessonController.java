@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ss.hanarowa.domain.lesson.dto.request.LessonGisuStateUpdateRequestDto;
 import com.ss.hanarowa.domain.lesson.dto.request.UpdateLessonDetailRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.AdminLessonListResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.AdminManageLessonResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonDetailResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuStateUpdateResponseDto;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonMemberResponseDTO;
@@ -85,5 +86,14 @@ public class AdminLessonController {
 	public ResponseEntity<ApiResponse<LessonDetailResponseDTO>> updateLessonDetail(@PathVariable Long lessonId, @Valid @RequestBody UpdateLessonDetailRequestDTO requestDTO){
 		log.info("[관리자] Controller : 강좌 상세 수정 - lessonId: {}, requestDTO: {}", lessonId, requestDTO);
 		return ResponseEntity.ok(ApiResponse.onSuccess(adminLessonService.updateLessonDetail(lessonId,requestDTO)));
+	}
+
+	@PreAuthorize("hasRole('ADMIN')")
+	@Operation(summary = "관리자 강좌 관리 목록")
+	@GetMapping("/manage")
+	public ResponseEntity<ApiResponse<List<AdminManageLessonResponseDTO>>> getManageLessons(){
+		log.debug("[관리자] Controller : 강좌 관리 목록 가져오기");
+		List<AdminManageLessonResponseDTO> list = adminLessonService.getManageLessons();
+		return ResponseEntity.ok(ApiResponse.onSuccess(list));
 	}
 }
