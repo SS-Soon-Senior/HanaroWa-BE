@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ss.hanarowa.domain.ai.client.GeminiApiClient;
 import com.ss.hanarowa.domain.ai.dto.response.CourseRecResponseDto;
 import com.ss.hanarowa.domain.ai.dto.response.JobRecResponseDto;
+import com.ss.hanarowa.domain.ai.dto.response.RecResponseDto;
 import com.ss.hanarowa.domain.ai.service.AIRecService;
 import com.ss.hanarowa.domain.lesson.entity.Lesson;
 import com.ss.hanarowa.domain.lesson.repository.LessonRepository;
@@ -36,7 +37,7 @@ public class AIRecServiceImpl implements AIRecService {
 	private final ObjectMapper objectMapper;
 
 	@Override
-	public CourseRecResponseDto recommendCourses(String interest) {
+	public RecResponseDto recommendCourses(String interest) {
 		// DB에서 강좌 목록 조회
 		List<Lesson> lessons = lessonRepository.findAll();
 
@@ -59,7 +60,7 @@ public class AIRecServiceImpl implements AIRecService {
 	}
 
 	@Override
-	public JobRecResponseDto recommendJobs(String experience) {
+	public RecResponseDto recommendJobs(String experience) {
 		String email = getCurrentUserEmail();
 		Member member = memberRepository.findByEmail(email)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
@@ -118,11 +119,13 @@ public class AIRecServiceImpl implements AIRecService {
 				{
 				  "recommendations": [
 					{
-					  "courseName": "추천 강좌명",
+					  "name": "추천 강좌명",
+					  "description": "이 강좌에 대한 설명...",
 					  "reason": "이 강좌를 추천하는 이유..."
 					},
 					{
-					  "courseName": "다음 추천 강좌명",
+					  "name": "다음 추천 강좌명",
+					  "description": "이 강좌에 대한 설명...",
 					  "reason": "이 강좌를 추천하는 이유..."
 					}
 				  ]
@@ -157,7 +160,7 @@ public class AIRecServiceImpl implements AIRecService {
 				{
 				  "recommendations": [
 					{
-					  "jobName": "추천 직업명",
+					  "name": "추천 직업명",
 					  "description": "이 직업에 대한 설명...",
 					  "reason": "이 직업이 시니어에게 적합한 이유..."
 					}
@@ -170,7 +173,7 @@ public class AIRecServiceImpl implements AIRecService {
 		);
 	}
 
-	private JobRecResponseDto parseJobResponse(String jsonResponse) {
+	private RecResponseDto parseJobResponse(String jsonResponse) {
 		try {
 			log.info("Raw response from Gemini API: {}", jsonResponse);
 
@@ -181,13 +184,13 @@ public class AIRecServiceImpl implements AIRecService {
 				cleanedJson = cleanedJson.substring(3, cleanedJson.length() - 3).trim();
 			}
 
-			return objectMapper.readValue(cleanedJson, JobRecResponseDto.class);
+			return objectMapper.readValue(cleanedJson, RecResponseDto.class);
 		} catch (Exception e) {
 			throw new GeneralException(ErrorStatus.AI_API_ERROR);
 		}
 	}
 
-	private CourseRecResponseDto parseCourseResponse(String jsonResponse) {
+	private RecResponseDto parseCourseResponse(String jsonResponse) {
 		try {
 
 			String cleanedJson = jsonResponse.trim();
@@ -197,7 +200,7 @@ public class AIRecServiceImpl implements AIRecService {
 				cleanedJson = cleanedJson.substring(3, cleanedJson.length() - 3).trim();
 			}
 
-			return objectMapper.readValue(cleanedJson, CourseRecResponseDto.class);
+			return objectMapper.readValue(cleanedJson, RecResponseDto.class);
 		} catch (Exception e) {
 			throw new GeneralException(ErrorStatus.AI_API_ERROR);
 		}

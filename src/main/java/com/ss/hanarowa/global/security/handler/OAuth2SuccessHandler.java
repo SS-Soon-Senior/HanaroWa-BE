@@ -1,7 +1,10 @@
 package com.ss.hanarowa.global.security.handler;
 
 import java.io.IOException;
+import java.time.Duration;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -36,24 +39,34 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 		// JWT 토큰 발급
 		TokenResponseDTO tokenDto = JwtUtil.createTokens(authentication);
 
-		// RefreshToken DB 저장
+		// RefreshToken 저장
 		member.updateRefreshToken(tokenDto.getRefreshToken());
 		memberRepository.save(member);
 
-		// 추가 정보 입력 필요 여부 확인
+		ResponseCookie accessCookie = ResponseCookie.from("accessToken", tokenDto.getAccessToken())
+													.httpOnly(false)
+													.secure(false)
+													.path("/")
+													.maxAge(Duration.ofHours(1))
+													.sameSite("Lax")
+													.build();
+		response.setHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+
+		ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokenDto.getRefreshToken())
+													 .httpOnly(true)
+													 .secure(false)
+													 .path("/")
+													 .maxAge(Duration.ofDays(7))
+													 .sameSite("Strict")
+													 .build();
+		response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
 		String baseRedirectUrl = "http://localhost:3000";
 		String path = (member.getPhoneNumber() == null || member.getBirth() == null)
 			? "/auth/signup/info"
 			: "/";
+		getRedirectStrategy().sendRedirect(request, response, baseRedirectUrl + path);
 
-		// 토큰을 쿼리파라미터에 포함시켜 리다이렉트
-		String redirectUrl = String.format(
-			"%s%s?accessToken=%s&refreshToken=%s",
-			baseRedirectUrl, path,
-			tokenDto.getAccessToken(),
-			tokenDto.getRefreshToken()
-		);
-
-		getRedirectStrategy().sendRedirect(request, response, redirectUrl);
 	}
 }
+

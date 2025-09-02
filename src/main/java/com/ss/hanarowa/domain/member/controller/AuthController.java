@@ -1,8 +1,11 @@
 package com.ss.hanarowa.domain.member.controller;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Map;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -47,7 +50,10 @@ public class AuthController {
 	@PostMapping("/signin")
 	@Tag(name = "로그인", description = "사용자 로그인")
 	@Transactional
-	public ResponseEntity<ApiResponse<LoginResponseDTO>> signin(@RequestBody LoginRequestDTO loginRequest) {
+	public ResponseEntity<ApiResponse<LoginResponseDTO>> signin(
+		@RequestBody LoginRequestDTO loginRequest,
+		HttpServletResponse response
+	) {
 		try {
 			Authentication authenticate = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(
@@ -58,9 +64,33 @@ public class AuthController {
 			TokenResponseDTO tokenDto = JwtUtil.createTokens(authenticate);
 
 			Member member = memberRepository.findByEmail(loginRequest.getEmail())
-				.orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+											.orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
+			if(member.getDeletedAt() != null) {
+				throw new GeneralException(ErrorStatus.MEMBER_NOT_FOUND);
+			}
 			member.updateRefreshToken(tokenDto.getRefreshToken());
+
+			// AccessToken 쿠키
+			ResponseCookie accessCookie = ResponseCookie.from("accessToken", tokenDto.getAccessToken())
+														.httpOnly(false)
+														.secure(false)
+														.path("/")
+														.maxAge(Duration.ofHours(1))
+														.sameSite("Lax")
+														.build();
+			response.setHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+
+			// RefreshToken 쿠키
+			ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokenDto.getRefreshToken())
+														 .httpOnly(true)
+														 .secure(false)
+														 .path("/")
+														 .maxAge(Duration.ofDays(7))
+														 .sameSite("Strict")
+														 .build();
+			response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
 
 			String redirectUrl = (member.getPhoneNumber() == null || member.getBirth() == null)
 				? "http://localhost:3000/auth/signup/info"
@@ -69,26 +99,30 @@ public class AuthController {
 			BranchResponseDTO branchDto = null;
 			if (member.getBranch() != null) {
 				branchDto = BranchResponseDTO.builder()
-					.branchId(member.getBranch().getId())
-					.locationName(member.getBranch().getLocation().getName())
-					.branchName(member.getBranch().getName())
-					.build();
+											 .branchId(member.getBranch().getId())
+											 .locationName(member.getBranch().getLocation().getName())
+											 .branchName(member.getBranch().getName())
+											 .build();
 			}
 
-			LoginResponseDTO response = LoginResponseDTO.builder()
-				.url(redirectUrl)
-				.tokens(tokenDto)
-				.branch(branchDto)
-				.name(member.getName())
-				.birth(member.getBirth())
-				.phoneNumber(member.getPhoneNumber())
-				.build();
+			LoginResponseDTO responseDto = LoginResponseDTO.builder()
+														   .url(redirectUrl)
+														   .tokens(TokenResponseDTO.builder()
+																				   .email(tokenDto.getEmail())
+																				   .accessToken(tokenDto.getAccessToken())
+																				   .build())
+														   .branch(branchDto)
+														   .name(member.getName())
+														   .birth(member.getBirth())
+														   .phoneNumber(member.getPhoneNumber())
+														   .build();
 
-			return ResponseEntity.ok(ApiResponse.onSuccess(response));
+			return ResponseEntity.ok(ApiResponse.onSuccess(responseDto));
 		} catch (AuthenticationException e) {
 			throw new GeneralException(ErrorStatus.MEMBER_AUTHENTICATION_FAILED);
 		}
 	}
+
 
 	@PostMapping("/logout")
 	@Operation(summary = "로그아웃", description = "사용자 로그아웃 및 refreshToken 삭제")
@@ -108,7 +142,7 @@ public class AuthController {
 				log.info("토큰에서 이메일 추출: {}", email);
 				
 				// accessToken을 블랙리스트에 추가 (토큰 만료시간 추출)
-				long expirationTime = ((Number) claims.get("exp")).longValue() * 1000; // JWT exp는 초 단위
+				long expirationTime = ((Number) claims.get("exp")).longValue() * 1000;
 				tokenBlacklistService.blacklistToken(accessToken, expirationTime);
 				log.info("accessToken 블랙리스트 추가 완료");
 				
