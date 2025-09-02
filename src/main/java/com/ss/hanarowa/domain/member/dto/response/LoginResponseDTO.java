@@ -1,7 +1,6 @@
 package com.ss.hanarowa.domain.member.dto.response;
 
 import java.time.LocalDate;
-import java.util.Map;
 
 import com.ss.hanarowa.domain.branch.dto.response.BranchResponseDTO;
 
