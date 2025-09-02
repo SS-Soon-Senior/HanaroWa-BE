@@ -179,12 +179,17 @@ public class FacilityServiceImpl implements FacilityService {
 			DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 			String formattedReservedAt = reservation.getReservedAt().format(formatter2);
 
+			LocalDateTime now = LocalDateTime.now();
+
+			boolean isUpcoming = reservation.getStartedAt().isAfter(now);
+
 			return FacilityReservationResponseDTO.builder()
 												 .facilityId(facility.getId())
 												 .facilityName(facility.getName())
 												 .startedAt(formattedStartedAt)
 												 .duration(formattedReservedAt)
 												 .placeName(location.getName() + " " + branch.getName())
+												 .isUsed(isUpcoming)
 												 .build();
 		}).toList();
 	}
