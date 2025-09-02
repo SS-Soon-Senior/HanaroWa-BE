@@ -21,5 +21,5 @@ public interface FacilityService {
 	
 	List<AdminFacilityResponseDTO> getAllFacilityReservations();
 
-	List<FacilityReservationResponseDTO> getAllMyFacilityReservations(Long memberId, Authentication authentication);
+	List<FacilityReservationResponseDTO> getAllMyFacilityReservations(String email);
 }

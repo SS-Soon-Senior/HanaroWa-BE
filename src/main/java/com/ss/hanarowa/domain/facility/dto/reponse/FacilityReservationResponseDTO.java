@@ -18,4 +18,5 @@ public class FacilityReservationResponseDTO {
 	private String duration;
 	private String placeName;
 	private String reservedAt;
+	private Boolean isUsed;
 }
