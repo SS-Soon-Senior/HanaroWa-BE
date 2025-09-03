@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +28,7 @@ import com.ss.hanarowa.domain.lesson.dto.response.MyOpenLessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.TimeAvailabilityResponseDTO;
 import com.ss.hanarowa.domain.lesson.service.LessonService;
 import com.ss.hanarowa.domain.lesson.service.ReviewService;
+import com.ss.hanarowa.domain.member.service.MemberService;
 import com.ss.hanarowa.global.S3Service;
 import com.ss.hanarowa.global.exception.GeneralException;
 import com.ss.hanarowa.global.response.ApiResponse;
@@ -47,6 +49,7 @@ public class LessonController {
 	private final LessonService lessonService;
 	private final ReviewService reviewService;
 	private final S3Service s3Service;
+	private final MemberService memberService;
 
 	@PostMapping("/{lessonGisuId}/review")
 	@Operation(summary = "강좌 기수 리뷰 작성", description = "사용자가 특정 강좌 기수에 대한 리뷰를 작성합니다.")
@@ -143,6 +146,14 @@ public class LessonController {
 		
 		TimeAvailabilityResponseDTO result = lessonService.checkTimeAvailability(requestDTO);
 		return ResponseEntity.ok(ApiResponse.onSuccess(result));
+	}
+
+	@DeleteMapping("/{lessonGisuId}")
+	@Operation(summary = "강의 예약 취소", description = "강의 예약을 취소합니다.")
+	public ResponseEntity<ApiResponse<Void>> deleteLessonReservation(@PathVariable Long lessonGisuId, Authentication authentication){
+		String email = authentication.getName();
+		lessonService.deleteLessonReservation(lessonGisuId, email);
+		return ResponseEntity.ok(ApiResponse.onSuccess(null));
 	}
 
 }
