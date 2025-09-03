@@ -22,6 +22,7 @@ public class LessonMoreDetailResponseDTO {
 	private String description;
 	private Category category;
 	private String lessonImg;
+	private String lessonRoom;
 	private List<ReviewResponseDTO> reviews;
 	private double averageRating;
 	private int totalReviews;
