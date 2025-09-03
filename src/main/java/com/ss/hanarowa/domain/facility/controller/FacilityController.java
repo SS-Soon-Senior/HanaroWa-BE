@@ -13,12 +13,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityDetailResponseDTO;
+import com.ss.hanarowa.domain.facility.dto.reponse.FacilityListResponseDTO;
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityReservationResponseDTO;
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityResponseDTO;
 import com.ss.hanarowa.domain.facility.dto.request.FacilityReservationDTO;
 import com.ss.hanarowa.domain.facility.service.FacilityService;
+import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.service.MemberService;
+import com.ss.hanarowa.global.exception.GeneralException;
 import com.ss.hanarowa.global.response.ApiResponse;
+import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,12 +38,28 @@ public class FacilityController {
 	private final FacilityService facilityService;
 	private final MemberService memberService;
 
-	@GetMapping("/{branchId}")
-	@Operation(summary = "시설 리스트 목록 API", description = "시설 리스트 목록을 조회합니다.")
-	public ResponseEntity<ApiResponse<List<FacilityResponseDTO>>> getFacilityByBranchId(@PathVariable Long branchId) {
-		List<FacilityResponseDTO> list = facilityService.getAllFacilities(branchId);
-		return ResponseEntity.ok(ApiResponse.onSuccess(list));
+	@GetMapping
+	@Operation(summary = "내 지점 시설 목록 API", description = "로그인한 멤버의 branchId로 시설 목록을 조회합니다.")
+	public ResponseEntity<ApiResponse<FacilityListResponseDTO>> getFacilityByBranchId(Authentication authentication) {
+		// 로그인한 사용자 가져오기
+		String email = authentication.getName();
+		Member member = memberService.getMemberByEmail(email);
+
+		// branchId와 branchName 추출
+		Long branchId = member.getBranch().getId();
+		String branchName = member.getBranch().getName();
+
+		// 해당 branch의 시설 리스트 조회
+		List<FacilityResponseDTO> facilities = facilityService.getAllFacilities(branchId);
+
+		// 응답 DTO 조립
+		FacilityListResponseDTO responseDto = new FacilityListResponseDTO(branchName, facilities);
+
+		return ResponseEntity.ok(ApiResponse.onSuccess(responseDto));
 	}
+
+
+
 
 	@GetMapping("/detail/{facilityId}")
 	@Operation(summary = "시설 상세보기", description = "시설 상세를 조회합니다.")
