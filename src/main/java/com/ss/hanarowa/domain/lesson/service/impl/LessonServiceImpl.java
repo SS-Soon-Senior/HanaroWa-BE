@@ -3,17 +3,24 @@ package com.ss.hanarowa.domain.lesson.service.impl;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.DayOfWeek;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.ArrayList;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ss.hanarowa.domain.lesson.dto.request.CreateLessonRequestDTO;
+import com.ss.hanarowa.domain.lesson.dto.request.TimeAvailabilityRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.TimeAvailabilityResponseDTO;
 import com.ss.hanarowa.domain.lesson.entity.Lesson;
 import com.ss.hanarowa.domain.lesson.entity.LessonGisu;
 import com.ss.hanarowa.domain.lesson.entity.LessonRoom;
+import com.ss.hanarowa.domain.lesson.entity.RoomTime;
 import com.ss.hanarowa.domain.lesson.entity.LessonState;
 import com.ss.hanarowa.domain.lesson.entity.Curriculum;
 import com.ss.hanarowa.domain.branch.entity.Branch;
@@ -24,6 +31,7 @@ import com.ss.hanarowa.domain.lesson.dto.response.LessonListSearchResponseDTO;
 import com.ss.hanarowa.domain.lesson.repository.LessonGisuRepository;
 import com.ss.hanarowa.domain.lesson.repository.LessonRepository;
 import com.ss.hanarowa.domain.lesson.repository.LessonRoomRepository;
+import com.ss.hanarowa.domain.lesson.repository.RoomTimeRepository;
 import com.ss.hanarowa.domain.lesson.repository.CurriculumRepository;
 import com.ss.hanarowa.domain.lesson.service.LessonService;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonMoreDetailResponseDTO;
@@ -54,6 +62,7 @@ public class LessonServiceImpl implements LessonService {
 	private final MemberRepository memberRepository;
 	private final LessonGisuRepository lessonGisuRepository;
 	private final LessonRoomRepository lessonRoomRepository;
+	private final RoomTimeRepository roomTimeRepository;
 	private final CurriculumRepository curriculumRepository;
 
 	@Override
@@ -188,8 +197,7 @@ public class LessonServiceImpl implements LessonService {
 
 	private static String getFormattedStartedAt(LessonGisu gisu) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-		String formattedStartedAt = gisu.getStartedAt().format(formatter);
-		return formattedStartedAt;
+		return gisu.getStartedAt().format(formatter);
 	}
 
 
@@ -350,8 +358,10 @@ public class LessonServiceImpl implements LessonService {
 		Lesson savedLesson = lessonRepository.save(lesson);
 
 		for (CreateLessonRequestDTO.CreateLessonGisuRequestDTO gisuDto : createLessonRequestDTO.getLessonGisus()) {
-			LessonRoom lessonRoom = lessonRoomRepository.findById(gisuDto.getLessonRoomId())
-				.orElseThrow(() -> new GeneralException(ErrorStatus.LESSON_ROOM_NOT_FOUND));
+			LessonRoom assignedRoom = assignAvailableRoom(branch.getId(), gisuDto.getDuration());
+			if (assignedRoom == null) {
+				throw new GeneralException(ErrorStatus.LESSON_ROOM_NOT_AVAILABLE);
+			}
 
 			LessonGisu lessonGisu = LessonGisu.builder()
 				.capacity(gisuDto.getCapacity())
@@ -359,11 +369,13 @@ public class LessonServiceImpl implements LessonService {
 				.duration(gisuDto.getDuration())
 				.lessonState(LessonState.PENDING)
 				.lesson(savedLesson)
-				.lessonRoom(lessonRoom)
+				.lessonRoom(assignedRoom)
 				.startedAt(LocalDateTime.now())
 				.build();
 
 			LessonGisu savedLessonGisu = lessonGisuRepository.save(lessonGisu);
+
+			createRoomTimeSlots(assignedRoom, savedLessonGisu, gisuDto.getDuration());
 
 			for (CreateLessonRequestDTO.CreateCurriculumRequestDTO curriculumDto : gisuDto.getCurriculums()) {
 				Curriculum curriculum = Curriculum.builder()
@@ -375,5 +387,156 @@ public class LessonServiceImpl implements LessonService {
 				curriculumRepository.save(curriculum);
 			}
 		}
+	}
+
+	private LessonRoom assignAvailableRoom(Long branchId, String duration) {
+		List<LessonRoom> availableRooms = lessonRoomRepository.findByBranchId(branchId);
+		
+		for (LessonRoom room : availableRooms) {
+			if (isRoomAvailable(room.getId(), duration)) {
+				return room;
+			}
+		}
+		
+		return null;
+	}
+
+	private boolean isRoomAvailable(Long roomId, String duration) {
+		List<LocalDateTime[]> timeSlots = parseDuration(duration);
+		
+		for (LocalDateTime[] timeSlot : timeSlots) {
+			List<RoomTime> conflicts = roomTimeRepository.findConflictingRoomTimes(
+				roomId, timeSlot[0], timeSlot[1]
+			);
+			
+			if (!conflicts.isEmpty()) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+
+	private List<LocalDateTime[]> parseDuration(String duration) {
+		List<LocalDateTime[]> timeSlots = new ArrayList<>();
+		
+		// 패턴: 2025-09-02 ~ 2025-09-29 tue-thu 17:00-18:00
+		Pattern pattern = Pattern.compile("(\\d{4}-\\d{2}-\\d{2})\\s*~\\s*(\\d{4}-\\d{2}-\\d{2})\\s+(\\w+(?:-\\w+)?)\\s+(\\d{2}:\\d{2})-(\\d{2}:\\d{2})");
+		Matcher matcher = pattern.matcher(duration);
+		
+		if (matcher.find()) {
+			LocalDate startDate = LocalDate.parse(matcher.group(1));
+			LocalDate endDate = LocalDate.parse(matcher.group(2));
+			String daysStr = matcher.group(3);
+			LocalTime startTime = LocalTime.parse(matcher.group(4));
+			LocalTime endTime = LocalTime.parse(matcher.group(5));
+			
+			List<DayOfWeek> lessonDays = parseDays(daysStr);
+			
+			LocalDate currentDate = startDate;
+			while (!currentDate.isAfter(endDate)) {
+				if (lessonDays.contains(currentDate.getDayOfWeek())) {
+					LocalDateTime slotStart = currentDate.atTime(startTime);
+					LocalDateTime slotEnd = currentDate.atTime(endTime);
+					timeSlots.add(new LocalDateTime[]{slotStart, slotEnd});
+				}
+				currentDate = currentDate.plusDays(1);
+			}
+		}
+		
+		return timeSlots;
+	}
+
+	private List<DayOfWeek> parseDays(String daysStr) {
+		List<DayOfWeek> days = new ArrayList<>();
+		String[] dayRanges = daysStr.split("-");
+		
+		if (dayRanges.length == 2) {
+			DayOfWeek startDay = parseDayOfWeek(dayRanges[0]);
+			DayOfWeek endDay = parseDayOfWeek(dayRanges[1]);
+			
+			DayOfWeek currentDay = startDay;
+			while (true) {
+				days.add(currentDay);
+				if (currentDay == endDay) break;
+				currentDay = currentDay.plus(1);
+			}
+		} else {
+			days.add(parseDayOfWeek(daysStr));
+		}
+		
+		return days;
+	}
+
+	private DayOfWeek parseDayOfWeek(String dayStr) {
+		return switch (dayStr.toLowerCase()) {
+			case "mon" -> DayOfWeek.MONDAY;
+			case "tue" -> DayOfWeek.TUESDAY;
+			case "wed" -> DayOfWeek.WEDNESDAY;
+			case "thu" -> DayOfWeek.THURSDAY;
+			case "fri" -> DayOfWeek.FRIDAY;
+			case "sat" -> DayOfWeek.SATURDAY;
+			case "sun" -> DayOfWeek.SUNDAY;
+			default -> DayOfWeek.MONDAY;
+		};
+	}
+
+	private void createRoomTimeSlots(LessonRoom room, LessonGisu lessonGisu, String duration) {
+		List<LocalDateTime[]> timeSlots = parseDuration(duration);
+		
+		for (LocalDateTime[] timeSlot : timeSlots) {
+			RoomTime roomTime = RoomTime.builder()
+				.lessonRoom(room)
+				.startedAt(timeSlot[0])
+				.endedAt(timeSlot[1])
+				.build();
+			
+			roomTimeRepository.save(roomTime);
+		}
+	}
+
+	@Override
+	public TimeAvailabilityResponseDTO checkTimeAvailability(TimeAvailabilityRequestDTO requestDTO) {
+		List<LessonRoom> availableRooms = lessonRoomRepository.findByBranchId(requestDTO.getBranchId());
+		List<LocalDateTime[]> timeSlots = parseDuration(requestDTO.getDuration());
+		
+		List<TimeAvailabilityResponseDTO.TimeSlotAvailability> timeSlotAvailabilities = new ArrayList<>();
+		int totalAvailableSlots = 0;
+		
+		for (LocalDateTime[] timeSlot : timeSlots) {
+			int availableRoomsForSlot = 0;
+			
+			for (LessonRoom room : availableRooms) {
+				List<RoomTime> conflicts = roomTimeRepository.findConflictingRoomTimes(
+					room.getId(), timeSlot[0], timeSlot[1]
+				);
+				
+				if (conflicts.isEmpty()) {
+					availableRoomsForSlot++;
+				}
+			}
+			
+			TimeAvailabilityResponseDTO.TimeSlotAvailability slotAvailability = 
+				TimeAvailabilityResponseDTO.TimeSlotAvailability.builder()
+					.startTime(timeSlot[0])
+					.endTime(timeSlot[1])
+					.available(availableRoomsForSlot > 0)
+					.availableRoomsCount(availableRoomsForSlot)
+					.build();
+			
+			timeSlotAvailabilities.add(slotAvailability);
+			
+			if (availableRoomsForSlot > 0) {
+				totalAvailableSlots++;
+			}
+		}
+		
+		boolean overallAvailable = totalAvailableSlots == timeSlots.size();
+		
+		return TimeAvailabilityResponseDTO.builder()
+			.available(overallAvailable)
+			.availableRoomsCount(overallAvailable ? availableRooms.size() : 0)
+			.timeSlots(timeSlotAvailabilities)
+			.build();
 	}
 }
