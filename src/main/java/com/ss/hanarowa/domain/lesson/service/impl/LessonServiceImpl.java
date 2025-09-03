@@ -151,6 +151,7 @@ public class LessonServiceImpl implements LessonService {
 			}
 
 			boolean isnotopened = isNotOpened(gisu);
+			String branchname = gisu.getLesson().getBranch().getName();
 
 			return LessonListResponseDTO.builder()
 										.lessonId(lesson.getId())
@@ -161,7 +162,7 @@ public class LessonServiceImpl implements LessonService {
 										.instructorName(lesson.getMember().getName())
 										.duration(formattedLessonFirstDate)
 										.reservedAt(formattedLessonFirstDate)
-										.lessonRoomName(room.getName())
+										.lessonRoomName(branchname + " " +room.getName())
 										.isInProgress(isprogress)
 										.isReviewed(reviewed)
 										.isNotStarted(isnotopened)
@@ -194,6 +195,7 @@ public class LessonServiceImpl implements LessonService {
 								 boolean isprogress = isprogress(gisu);
 								 String lessonOpenedAt = getFormattedStartedAt(lesson.getOpenedAt());
 
+								 String branchname = gisu.getLesson().getBranch().getName();
 								 return MyOpenLessonListResponseDTO.builder()
 															 .lessonId(lesson.getId())
 															 .lessonGisuId(gisu.getId())
@@ -201,7 +203,7 @@ public class LessonServiceImpl implements LessonService {
 															 .startedAt(formattedStartedAt)
 															 .lessonName(lesson.getLessonName())
 															 .instructorName(lesson.getMember().getName())
-															 .lessonRoomName(room.getName())
+															 .lessonRoomName(branchname + " " + room.getName())
 															 .openedAt(lessonOpenedAt)
 									  						 .isInProgress(isprogress)
 															 .build();
