@@ -32,10 +32,10 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/admin/lesson")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminLessonController {
 	private final AdminLessonService adminLessonService;
 
-	@PreAuthorize("hasRole('ADMIN')")
 	@Operation(summary ="강좌 개설 신청 내역")
 	@GetMapping
 	public ResponseEntity<ApiResponse<List<AdminLessonListResponseDTO>>> getAdminAllLessons(){
@@ -52,7 +52,6 @@ public class AdminLessonController {
 	 * @return
 	 */
 
-	@PreAuthorize("hasRole('ADMIN')")
 	@Operation(summary = "강좌 개설 신청 상태 변경 (승인/거절)")
 	@PatchMapping("/{lessonGisuId}/state")
 	public ResponseEntity<ApiResponse<LessonGisuStateUpdateResponseDto>> updateLessonState(
@@ -64,14 +63,12 @@ public class AdminLessonController {
 		return ResponseEntity.ok(ApiResponse.onSuccess(result));
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
 	@Operation(summary="관리자 강좌 상세 보기")
 	@GetMapping("/{lessonId}")
 	public ResponseEntity<ApiResponse<LessonDetailResponseDTO>> getLessonDetail(@PathVariable Long lessonId){
 		return ResponseEntity.ok(ApiResponse.onSuccess(adminLessonService.getLessonDetail(lessonId)));
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
 	@Operation(summary = "관리자 강좌별 신청 회원 현황")
 	@GetMapping("/{lessonGisuId}/member")
 	public ResponseEntity<ApiResponse<List<LessonMemberResponseDTO>>> getLessonMembers(@PathVariable Long lessonGisuId){
@@ -80,7 +77,6 @@ public class AdminLessonController {
 	}
 
 
-	@PreAuthorize("hasRole('ADMIN')")
 	@Operation(summary="관리자 강좌 상세 수정하기")
 	@PatchMapping("/{lessonId}")
 	public ResponseEntity<ApiResponse<LessonDetailResponseDTO>> updateLessonDetail(@PathVariable Long lessonId, @Valid @RequestBody UpdateLessonDetailRequestDTO requestDTO){
@@ -88,7 +84,6 @@ public class AdminLessonController {
 		return ResponseEntity.ok(ApiResponse.onSuccess(adminLessonService.updateLessonDetail(lessonId,requestDTO)));
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
 	@Operation(summary = "관리자 강좌 관리 목록")
 	@GetMapping("/manage")
 	public ResponseEntity<ApiResponse<List<AdminManageLessonResponseDTO>>> getManageLessons(){

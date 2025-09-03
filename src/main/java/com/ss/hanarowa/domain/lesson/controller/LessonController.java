@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,19 +16,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ss.hanarowa.domain.lesson.dto.request.MyReservationPageResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.request.ReviewRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.request.CreateLessonRequestDTO;
+import com.ss.hanarowa.domain.lesson.dto.request.TimeAvailabilityRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListByBranchIdResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListSearchResponseDTO;
-import com.ss.hanarowa.domain.lesson.dto.response.AppliedLessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonMoreDetailResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.MyOpenLessonListResponseDTO;
-import com.ss.hanarowa.domain.lesson.dto.response.OfferedLessonListResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.TimeAvailabilityResponseDTO;
 import com.ss.hanarowa.domain.lesson.service.LessonService;
 import com.ss.hanarowa.domain.lesson.service.ReviewService;
-import com.ss.hanarowa.domain.member.entity.Member;
-import com.ss.hanarowa.domain.member.repository.MemberRepository;
+import com.ss.hanarowa.domain.member.service.MemberService;
 import com.ss.hanarowa.global.S3Service;
 import com.ss.hanarowa.global.exception.GeneralException;
 import com.ss.hanarowa.global.response.ApiResponse;
@@ -48,6 +49,7 @@ public class LessonController {
 	private final LessonService lessonService;
 	private final ReviewService reviewService;
 	private final S3Service s3Service;
+	private final MemberService memberService;
 
 	@PostMapping("/{lessonGisuId}/review")
 	@Operation(summary = "강좌 기수 리뷰 작성", description = "사용자가 특정 강좌 기수에 대한 리뷰를 작성합니다.")
@@ -85,35 +87,23 @@ public class LessonController {
 		return ResponseEntity.ok(ApiResponse.onSuccess(lessonList));
 	}
 
-
-	@Operation(summary="신청 강좌 목록 보기")
-	@GetMapping("/reservation/applied")
-	public ResponseEntity<AppliedLessonListResponseDTO> getAllAppliedLessons(
+	@Operation(summary="내 예약 목록 가져오기")
+	@GetMapping("/reservation")
+	public ResponseEntity<ApiResponse<MyReservationPageResponseDTO>> getAllOfferedLessons(
 		Authentication authentication) {
-
 		if (authentication == null || !authentication.isAuthenticated()) {
 			throw new GeneralException(ErrorStatus.MEMBER_NOT_AUTHORITY);
 		}
-
-		String email = authentication.getName();
-
-		List<LessonListResponseDTO> appliedLessons = lessonService.getAllAppliedLessons(email);
-		return ResponseEntity.ok(new AppliedLessonListResponseDTO(appliedLessons));
-	}
-
-	@Operation(summary="개설 강좌 목록 보기")
-	@GetMapping("/reservation/offered")
-	public ResponseEntity<OfferedLessonListResponseDTO> getAllOfferedLessons(
-		Authentication authentication) {
-
-		if (authentication == null || !authentication.isAuthenticated()) {
-			throw new GeneralException(ErrorStatus.MEMBER_NOT_AUTHORITY);
-		}
-
 		String email = authentication.getName();
 
 		List<MyOpenLessonListResponseDTO> offeredLessons = lessonService.getAllOfferedLessons(email);
-		return ResponseEntity.ok(new OfferedLessonListResponseDTO(offeredLessons));
+		List<LessonListResponseDTO> appliedLessons = lessonService.getAllAppliedLessons(email);
+		MyReservationPageResponseDTO myReservationPageResponseDTO =
+			MyReservationPageResponseDTO.builder()
+				.myOpenLessonList(offeredLessons)
+				.lessonList(appliedLessons)
+				.build();
+		return ResponseEntity.ok(ApiResponse.onSuccess(myReservationPageResponseDTO));
 	}
 	@PostMapping(path = "/create",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@Operation(summary = "강좌 개설", description = "사용자가 새로운 강좌를 개설합니다.")
@@ -147,6 +137,23 @@ public class LessonController {
 		lessonService.applyForLesson(lessonGisuId, email); // 서비스 메서드 호출 변경
 		String result = "강좌 기수 ID :" + lessonGisuId.toString();
 		return ResponseEntity.ok(ApiResponse.onSuccess(result));
+	}
+
+	@PostMapping("/check/availability")
+	@Operation(summary = "시간대 사용 가능 여부 확인", description = "강좌 개설 전 해당 시간대에 사용 가능한 강의실이 있는지 확인합니다.")
+	public ResponseEntity<ApiResponse<TimeAvailabilityResponseDTO>> checkTimeAvailability(
+		@RequestBody @Valid TimeAvailabilityRequestDTO requestDTO) {
+		
+		TimeAvailabilityResponseDTO result = lessonService.checkTimeAvailability(requestDTO);
+		return ResponseEntity.ok(ApiResponse.onSuccess(result));
+	}
+
+	@DeleteMapping("/{lessonGisuId}")
+	@Operation(summary = "강의 예약 취소", description = "강의 예약을 취소합니다.")
+	public ResponseEntity<ApiResponse<Void>> deleteLessonReservation(@PathVariable Long lessonGisuId, Authentication authentication){
+		String email = authentication.getName();
+		lessonService.deleteLessonReservation(lessonGisuId, email);
+		return ResponseEntity.ok(ApiResponse.onSuccess(null));
 	}
 
 }
