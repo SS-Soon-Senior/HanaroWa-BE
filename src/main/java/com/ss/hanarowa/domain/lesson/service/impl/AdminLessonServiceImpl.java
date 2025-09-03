@@ -110,6 +110,7 @@ public class AdminLessonServiceImpl implements AdminLessonService {
 			lessonGisuDTOs.add(LessonGisuResponseDTO.builder()
 				.id(lessonGisu.getId())
 				.capacity(lessonGisu.getCapacity())
+				.lessonRoom(lessonGisu.getLessonRoom().getName())
 				.lessonFee(lessonGisu.getLessonFee())
 				.duration(lessonGisu.getDuration())
 				.lessonState(lessonGisu.getLessonState())

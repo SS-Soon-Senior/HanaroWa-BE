@@ -90,6 +90,7 @@ public class LessonServiceImpl implements LessonService {
 					.lessonFee(lessonGisu.getLessonFee())
 					.duration(lessonGisu.getDuration())
 					.lessonState(lessonGisu.getLessonState())
+					.lessonRoom(lessonGisu.getLessonRoom().getName())
 					.currentEnrollment(currentEnrollment)
 					.curriculums(curriculumDTOs)
 					.build();
