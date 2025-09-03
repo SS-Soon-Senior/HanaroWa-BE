@@ -23,6 +23,7 @@ import com.ss.hanarowa.domain.member.dto.response.LoginResponseDTO;
 import com.ss.hanarowa.domain.member.dto.request.LoginRequestDTO;
 import com.ss.hanarowa.domain.member.dto.response.TokenResponseDTO;
 import com.ss.hanarowa.domain.member.entity.Member;
+import com.ss.hanarowa.domain.member.entity.Role;
 import com.ss.hanarowa.domain.member.service.MemberService;
 import com.ss.hanarowa.global.exception.GeneralException;
 import com.ss.hanarowa.global.response.code.status.ErrorStatus;
@@ -100,9 +101,16 @@ public class AuthController {
 			response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
 
-			String redirectUrl = (member.getPhoneNumber() == null || member.getBirth() == null)
-				? "http://localhost:3000/auth/signup/info"
-				: "http://localhost:3000";
+			String redirectUrl;
+			if(member.getRole() == Role.ADMIN) {
+				redirectUrl = "http://localhost:3000/admin";
+			}
+			else if(member.getPhoneNumber() == null || member.getBirth() == null) {
+				redirectUrl = "http://localhost:3000/auth/signup/info";
+			}
+			else {
+				redirectUrl = "http://localhost:3000";
+			}
 
 			BranchResponseDTO branchDto = null;
 			if (member.getBranch() != null) {
