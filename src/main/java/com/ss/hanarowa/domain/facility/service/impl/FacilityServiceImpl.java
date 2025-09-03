@@ -161,35 +161,18 @@ public class FacilityServiceImpl implements FacilityService {
 			throw new GeneralException(ErrorStatus.FACILITY_NOT_FOUND);
 		}
 
-		return reservations.stream().map(reservation -> {
-			Facility facility = reservation.getFacility();
-			Branch branch = facility.getBranch();
-			Location location = branch.getLocation();
-
-			//8월 25일 (월) 오후 3:00 처럼 format
-			DateTimeFormatter formatter = DateTimeFormatter
-				.ofPattern("M월 d일 (E) a h:mm")
-				.withLocale(Locale.KOREAN);
-
-			String formattedStartedAt = reservation.getStartedAt().format(formatter);
-
-			//2024.03.03 format
-			DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-			String formattedReservedAt = reservation.getReservedAt().format(formatter2);
-
-			LocalDateTime now = LocalDateTime.now();
-
-			boolean isUpcoming = reservation.getStartedAt().isAfter(now);
-
-			return FacilityReservationResponseDTO.builder()
-												 .facilityId(facility.getId())
-												 .facilityName(facility.getName())
-												 .startedAt(formattedStartedAt)
-												 .duration(formattedReservedAt)
-												 .placeName(location.getName() + " " + branch.getName())
-												 .isUsed(isUpcoming)
-												 .build();
-		}).toList();
+		return reservations.stream()
+			.map(reservation -> FacilityReservationResponseDTO.builder()
+				.reservationId(reservation.getId())
+				.facilityName(reservation.getFacility().getName())
+				.memberName(reservation.getMember().getName())
+				.memberEmail(reservation.getMember().getEmail())
+				.branchName(reservation.getFacility().getBranch().getName())
+				.startedAt(getFormattedLessonFirstDate(reservation.getStartedAt()))
+				.reservedAt(reservedTime(reservation.getReservedAt()))
+				.isUsed(isUsed(reservation.getEndedAt()))
+				.build())
+			.collect(Collectors.toList());
 	}
 	public String getFormattedLessonFirstDate(LocalDateTime time) {
 		try {
