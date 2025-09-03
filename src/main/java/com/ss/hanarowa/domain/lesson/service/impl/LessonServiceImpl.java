@@ -531,11 +531,12 @@ public class LessonServiceImpl implements LessonService {
 			}
 		}
 		
-		boolean overallAvailable = totalAvailableSlots == timeSlots.size();
+		// 개별 시간대별로 판단하도록 변경 - 일부 시간대가 사용 가능하면 전체적으로도 사용 가능
+		boolean overallAvailable = totalAvailableSlots > 0;
 		
 		return TimeAvailabilityResponseDTO.builder()
 			.available(overallAvailable)
-			.availableRoomsCount(overallAvailable ? availableRooms.size() : 0)
+			.availableRoomsCount(availableRooms.size()) // 전체 방 수 반환
 			.timeSlots(timeSlotAvailabilities)
 			.build();
 	}
