@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.ss.hanarowa.domain.branch.entity.Branch;
@@ -143,9 +142,9 @@ public class FacilityServiceImpl implements FacilityService {
 				.memberName(reservation.getMember().getName())
 				.memberEmail(reservation.getMember().getEmail())
 				.branchName(reservation.getFacility().getBranch().getName())
-				.locationName(reservation.getFacility().getBranch().getLocation().getName())
-				.startedAt(reservation.getStartedAt())
-				.endedAt(reservation.getEndedAt())
+				.startedAt(getFormattedLessonFirstDate(reservation.getStartedAt()))
+				.reservedAt(reservedTime(reservation.getReservedAt()))
+				.isUsed(isUsed(reservation.getEndedAt()))
 				.build())
 			.collect(Collectors.toList());
 	}
@@ -191,6 +190,35 @@ public class FacilityServiceImpl implements FacilityService {
 												 .isUsed(isUpcoming)
 												 .build();
 		}).toList();
+	}
+	public String getFormattedLessonFirstDate(LocalDateTime time) {
+		try {
+			DateTimeFormatter dateFormatter = DateTimeFormatter
+				.ofPattern("M월 d일 (E)")
+				.withLocale(Locale.KOREAN);
+			String formattedDate = time.format(dateFormatter);
+
+			DateTimeFormatter timeFormatter = DateTimeFormatter
+				.ofPattern("a h:mm")
+				.withLocale(Locale.KOREAN);
+			String formattedTime = time.format(timeFormatter);
+
+			return formattedDate + " " + formattedTime;
+
+		} catch (Exception e) {
+			return "날짜/시간 형식 오류";
+		}
+	}
+
+	public boolean isUsed(LocalDateTime time) {
+		LocalDateTime today = LocalDateTime.now();
+		return today.isAfter(time);
+	}
+
+	public String reservedTime(LocalDateTime time) {
+		DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+
+		return time.format(formatter2);
 	}
 }
 
