@@ -27,4 +27,6 @@ public interface LessonService {
 	void createLesson(CreateLessonRequestDTO createLessonRequestDTO, String email,String imageUrl); // 강좌 개설
 
 	TimeAvailabilityResponseDTO checkTimeAvailability(TimeAvailabilityRequestDTO requestDTO); // 시간대 사용 가능 여부 확인
+
+	void deleteLessonReservation(Long lessonGisuId, String email);
 }

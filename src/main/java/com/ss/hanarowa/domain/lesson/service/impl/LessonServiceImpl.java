@@ -193,9 +193,6 @@ public class LessonServiceImpl implements LessonService {
 		Member member = memberRepository.findByEmail(email).orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 		List<Lesson> offeredLessons = lessonRepository.findAllByMemberId(member.getId());
 
-		if (offeredLessons.isEmpty()) {
-			throw new GeneralException(ErrorStatus.OFFERED_NOT_FOUND);
-		}
 
 		return offeredLessons.stream()
 							 .flatMap(lesson -> lesson.getLessonGisus().stream().map(gisu -> {
@@ -618,6 +615,14 @@ public class LessonServiceImpl implements LessonService {
 			.availableRoomsCount(availableRooms.size()) // 전체 방 수 반환
 			.timeSlots(timeSlotAvailabilities)
 			.build();
+	}
+
+	@Override
+	@Transactional
+	public void deleteLessonReservation(Long lessonGisuId, String email) {
+		Member member = memberRepository.findByEmail(email)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+		myLessonRepository.deleteByMemberAndLessonGisuId(member, lessonGisuId);
 	}
 
 	private TimeAvailabilityResponseDTO checkAllTimeSlotsAvailability(List<LessonRoom> availableRooms, String duration) {
