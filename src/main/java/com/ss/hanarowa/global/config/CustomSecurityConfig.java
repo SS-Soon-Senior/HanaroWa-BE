@@ -22,8 +22,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.ss.hanarowa.global.security.CustomAuthenticationEntryPoint;
 import com.ss.hanarowa.global.security.CustomOAuth2UserService;
 import com.ss.hanarowa.global.security.JwtAuthenticationFilter;
-import com.ss.hanarowa.global.security.handler.CustomAccessDeiniedHandler;
-import com.ss.hanarowa.global.security.handler.LoginSuccessHandler;
+import com.ss.hanarowa.global.security.handler.CustomAccessDeniedHandler;
 import com.ss.hanarowa.global.security.handler.OAuth2SuccessHandler;
 
 import lombok.RequiredArgsConstructor;
@@ -37,7 +36,7 @@ public class CustomSecurityConfig {
 	private final CustomOAuth2UserService customOAuth2UserService;
 	private final OAuth2SuccessHandler oAuth2SuccessHandler;
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
-	private final CustomAccessDeiniedHandler customAccessDeiniedHandler;
+	private final CustomAccessDeniedHandler customAccessDeniedHandler;
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http,
 		CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
@@ -74,7 +73,7 @@ public class CustomSecurityConfig {
 				.anyRequest().authenticated()
 			)
 			.exceptionHandling(config -> {
-				config.accessDeniedHandler(customAccessDeiniedHandler);
+				config.accessDeniedHandler(customAccessDeniedHandler);
 				config.authenticationEntryPoint(customAuthenticationEntryPoint);
 			})
 
