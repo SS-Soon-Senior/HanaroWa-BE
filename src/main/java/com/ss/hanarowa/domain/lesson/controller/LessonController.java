@@ -18,11 +18,13 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ss.hanarowa.domain.lesson.dto.request.MyReservationPageResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.request.ReviewRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.request.CreateLessonRequestDTO;
+import com.ss.hanarowa.domain.lesson.dto.request.TimeAvailabilityRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListByBranchIdResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListSearchResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonMoreDetailResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.MyOpenLessonListResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.TimeAvailabilityResponseDTO;
 import com.ss.hanarowa.domain.lesson.service.LessonService;
 import com.ss.hanarowa.domain.lesson.service.ReviewService;
 import com.ss.hanarowa.global.S3Service;
@@ -131,6 +133,15 @@ public class LessonController {
 		String email = authentication.getName();
 		lessonService.applyForLesson(lessonGisuId, email); // 서비스 메서드 호출 변경
 		String result = "강좌 기수 ID :" + lessonGisuId.toString();
+		return ResponseEntity.ok(ApiResponse.onSuccess(result));
+	}
+
+	@PostMapping("/check/availability")
+	@Operation(summary = "시간대 사용 가능 여부 확인", description = "강좌 개설 전 해당 시간대에 사용 가능한 강의실이 있는지 확인합니다.")
+	public ResponseEntity<ApiResponse<TimeAvailabilityResponseDTO>> checkTimeAvailability(
+		@RequestBody @Valid TimeAvailabilityRequestDTO requestDTO) {
+		
+		TimeAvailabilityResponseDTO result = lessonService.checkTimeAvailability(requestDTO);
 		return ResponseEntity.ok(ApiResponse.onSuccess(result));
 	}
 
