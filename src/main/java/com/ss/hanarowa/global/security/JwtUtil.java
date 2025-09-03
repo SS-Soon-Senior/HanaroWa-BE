@@ -56,7 +56,7 @@ public class JwtUtil {
 			"role", role
 		);
 
-		String accessToken = generateToken(claims, 1000000);
+		String accessToken = generateToken(claims, 30);
 		String refreshToken = generateToken(Map.of("email", email), 60 * 24);
 
 		return TokenResponseDTO.builder()
@@ -90,5 +90,17 @@ public class JwtUtil {
 		}
 
 		return claim;
+	}
+
+	public static Map<String, Object> getClaimsEvenIfExpired(String token) {
+		try {
+			return Jwts.parserBuilder()
+					   .setSigningKey(K)
+					   .build()
+					   .parseClaimsJws(token)
+					   .getBody();
+		} catch (ExpiredJwtException e) {
+			return e.getClaims();
+		}
 	}
 }
