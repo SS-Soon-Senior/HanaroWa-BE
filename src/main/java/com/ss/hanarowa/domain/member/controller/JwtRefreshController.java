@@ -44,7 +44,7 @@ public class JwtRefreshController {
 		}
 		String accessToken = authHeader.substring(7);
 
-		// accessToken이 아직 만료 안 됐으면 그대로 반환
+		// accessToken 만료 여부 확인
 		if (!didExpireToken(accessToken)) {
 			return ResponseEntity.ok(ApiResponse.onSuccess(Map.of(
 				"accessToken", accessToken
@@ -52,15 +52,23 @@ public class JwtRefreshController {
 		}
 
 		// refreshToken 검증
-		Map<String, Object> claim = JwtUtil.validateToken(refreshToken);
+		Map<String, Object> refreshClaim = JwtUtil.validateToken(refreshToken);
+
+		// accessToken claim 복원 (만료여도 꺼낼 수 있도록)
+		Map<String, Object> originalClaim = JwtUtil.getClaimsEvenIfExpired(accessToken);
 
 		// 새 accessToken 발급
-		String newAccessToken = JwtUtil.generateToken(claim, 10);
+		Map<String, Object> claims = Map.of(
+			"email", originalClaim.get("email"),
+			"role", originalClaim.get("role")
+		);
+		String newAccessToken = JwtUtil.generateToken(claims, 30);
+
 
 		// refreshToken도 갱신할지 여부 확인
-		Number expNumber = (Number) claim.get("exp");
+		Number expNumber = (Number) refreshClaim.get("exp");
 		String newRefreshToken = isSomeLeftTime(expNumber.longValue())
-			? JwtUtil.generateToken(claim, 60 * 24)
+			? JwtUtil.generateToken(refreshClaim, 60 * 24)
 			: refreshToken;
 
 		if (!newRefreshToken.equals(refreshToken)) {
@@ -73,13 +81,15 @@ public class JwtRefreshController {
 												  .build();
 			response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 		}
-		ResponseCookie accessCookie = ResponseCookie.from("accessToken",newAccessToken)
-			.httpOnly(false)
-			.secure(false)
-			.path("/")
-			.maxAge(Duration.ofHours(1))
-			.sameSite("Lax")
-			.build();
+
+		// 새 accessToken 도 쿠키에 넣어주기
+		ResponseCookie accessCookie = ResponseCookie.from("accessToken", newAccessToken)
+													.httpOnly(false)
+													.secure(false)
+													.path("/")
+													.maxAge(Duration.ofHours(1))
+													.sameSite("Lax")
+													.build();
 		response.setHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(Map.of(
@@ -95,10 +105,12 @@ public class JwtRefreshController {
 	private boolean didExpireToken(String accessToken) {
 		try {
 			JwtUtil.validateToken(accessToken);
+			return false;
 		} catch (CustomJwtException e) {
-			return true;
+			log.info("didExpireToken error: {}", e.getMessage());
+			return e.getMessage() != null && e.getMessage().contains("Expired");
 		}
-		return false;
 	}
 }
+
 

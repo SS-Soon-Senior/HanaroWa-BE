@@ -43,18 +43,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		"/login/oauth2/code/naver"
 	);
 
-
 	@Override
-	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+	protected void doFilterInternal(@NonNull HttpServletRequest request,
+		@NonNull HttpServletResponse response,
 		@NonNull FilterChain filterChain) throws ServletException, IOException {
 
-		String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-
 		String path = request.getRequestURI();
-		if (PERMIT_ALL_URLS.contains(path)) {
+
+		if (PERMIT_ALL_URLS.contains(path) || path.equals("/auth/reissue")) {
 			filterChain.doFilter(request, response);
 			return;
 		}
+
+		String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
 			filterChain.doFilter(request, response);
@@ -63,7 +64,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 		try {
 			String token = authHeader.substring(7);
-			
+
 			// 블랙리스트 검증
 			if (tokenBlacklistService.isBlacklisted(token)) {
 				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -74,8 +75,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				String json = mapper.writeValueAsString(reason);
 
 				response.getWriter().write(json);
+				return;
 			}
-			
+
 			Map<String, Object> claims = JwtUtil.validateToken(token);
 
 			String email = (String) claims.get("email");
@@ -84,12 +86,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 			MemberAuthResponseDTO dto = new MemberAuthResponseDTO(email, "", role);
 
-			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-				dto, null, dto.getAuthorities()
-			);
+			UsernamePasswordAuthenticationToken authenticationToken =
+				new UsernamePasswordAuthenticationToken(dto, null, dto.getAuthorities());
 
 			SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
 
 			filterChain.doFilter(request, response);
 
@@ -101,8 +101,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			PrintWriter out = response.getWriter();
 
 			ApiResponse<Object> errorResponse = ApiResponse.onFailure(
-				ErrorStatus.TOKEN_INVALID.getCode(), 
-				ErrorStatus.TOKEN_INVALID.getMessage(), 
+				ErrorStatus.TOKEN_INVALID.getCode(),
+				ErrorStatus.TOKEN_INVALID.getMessage(),
 				null
 			);
 			out.println(objectMapper.writeValueAsString(errorResponse));
