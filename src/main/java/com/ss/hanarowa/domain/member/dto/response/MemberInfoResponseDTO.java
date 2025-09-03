@@ -20,6 +20,6 @@ public class MemberInfoResponseDTO {
 
 	private String phone;
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy년 MM월 dd일")
 	private LocalDate birth;
 }
