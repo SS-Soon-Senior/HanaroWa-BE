@@ -20,4 +20,5 @@ public class MyOpenLessonListResponseDTO {
 	private String instructorName;
 	private String lessonRoomName;
 	private String openedAt;
+	private boolean isInProgress;
 }

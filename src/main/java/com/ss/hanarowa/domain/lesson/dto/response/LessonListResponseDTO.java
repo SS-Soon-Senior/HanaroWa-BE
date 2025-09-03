@@ -25,4 +25,5 @@ public class LessonListResponseDTO {
 	private String reservedAt;
 	private boolean isReviewed;
 	private boolean isInProgress;
+	private boolean isNotStarted;
 }
