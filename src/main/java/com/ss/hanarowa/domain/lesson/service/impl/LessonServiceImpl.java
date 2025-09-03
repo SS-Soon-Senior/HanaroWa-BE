@@ -498,6 +498,14 @@ public class LessonServiceImpl implements LessonService {
 	@Override
 	public TimeAvailabilityResponseDTO checkTimeAvailability(TimeAvailabilityRequestDTO requestDTO) {
 		List<LessonRoom> availableRooms = lessonRoomRepository.findByBranchId(requestDTO.getBranchId());
+		
+		// duration이 시간 정보를 포함하지 않는 경우 (예: "2025-09-04 ~ 2025-09-30 mon-wed")
+		// 모든 가능한 시간대의 가용성을 체크
+		if (!requestDTO.getDuration().matches(".*\\d{2}:\\d{2}-\\d{2}:\\d{2}.*")) {
+			return checkAllTimeSlotsAvailability(availableRooms, requestDTO.getDuration());
+		}
+		
+		// 기존 로직: 특정 시간이 포함된 경우
 		List<LocalDateTime[]> timeSlots = parseDuration(requestDTO.getDuration());
 		
 		List<TimeAvailabilityResponseDTO.TimeSlotAvailability> timeSlotAvailabilities = new ArrayList<>();
@@ -539,5 +547,88 @@ public class LessonServiceImpl implements LessonService {
 			.availableRoomsCount(availableRooms.size()) // 전체 방 수 반환
 			.timeSlots(timeSlotAvailabilities)
 			.build();
+	}
+
+	private TimeAvailabilityResponseDTO checkAllTimeSlotsAvailability(List<LessonRoom> availableRooms, String duration) {
+		// 가능한 모든 시간대 정의 (9시부터 22시까지 1시간씩)
+		List<LocalTime> possibleStartTimes = new ArrayList<>();
+		for (int hour = 9; hour <= 21; hour++) {
+			possibleStartTimes.add(LocalTime.of(hour, 0));
+		}
+		
+		// duration에서 날짜와 요일 정보 추출
+		List<LocalDate> targetDates = parseDurationWithoutTime(duration);
+		
+		List<TimeAvailabilityResponseDTO.TimeSlotAvailability> timeSlotAvailabilities = new ArrayList<>();
+		int totalAvailableSlots = 0;
+		
+		// 각 날짜의 각 시간대 체크
+		for (LocalDate date : targetDates) {
+			for (LocalTime startTime : possibleStartTimes) {
+				LocalTime endTime = startTime.plusHours(1);
+				LocalDateTime slotStart = date.atTime(startTime);
+				LocalDateTime slotEnd = date.atTime(endTime);
+				
+				int availableRoomsForSlot = 0;
+				
+				for (LessonRoom room : availableRooms) {
+					List<RoomTime> conflicts = roomTimeRepository.findConflictingRoomTimes(
+						room.getId(), slotStart, slotEnd
+					);
+					
+					if (conflicts.isEmpty()) {
+						availableRoomsForSlot++;
+					}
+				}
+				
+				TimeAvailabilityResponseDTO.TimeSlotAvailability slotAvailability = 
+					TimeAvailabilityResponseDTO.TimeSlotAvailability.builder()
+						.startTime(slotStart)
+						.endTime(slotEnd)
+						.available(availableRoomsForSlot > 0)
+						.availableRoomsCount(availableRoomsForSlot)
+						.build();
+				
+				timeSlotAvailabilities.add(slotAvailability);
+				
+				if (availableRoomsForSlot > 0) {
+					totalAvailableSlots++;
+				}
+			}
+		}
+		
+		boolean overallAvailable = totalAvailableSlots > 0;
+		
+		return TimeAvailabilityResponseDTO.builder()
+			.available(overallAvailable)
+			.availableRoomsCount(availableRooms.size())
+			.timeSlots(timeSlotAvailabilities)
+			.build();
+	}
+
+	private List<LocalDate> parseDurationWithoutTime(String duration) {
+		List<LocalDate> dates = new ArrayList<>();
+		
+		// 패턴: 2025-09-04 ~ 2025-09-30 mon-wed
+		Pattern pattern = Pattern.compile("(\\d{4}-\\d{2}-\\d{2})\\s*~\\s*(\\d{4}-\\d{2}-\\d{2})\\s+(\\w+(?:-\\w+)?)");
+		Matcher matcher = pattern.matcher(duration);
+		
+		if (matcher.find()) {
+			LocalDate startDate = LocalDate.parse(matcher.group(1));
+			LocalDate endDate = LocalDate.parse(matcher.group(2));
+			String daysStr = matcher.group(3);
+			
+			List<DayOfWeek> lessonDays = parseDays(daysStr);
+			
+			LocalDate currentDate = startDate;
+			while (!currentDate.isAfter(endDate)) {
+				if (lessonDays.contains(currentDate.getDayOfWeek())) {
+					dates.add(currentDate);
+				}
+				currentDate = currentDate.plusDays(1);
+			}
+		}
+		
+		return dates;
 	}
 }
