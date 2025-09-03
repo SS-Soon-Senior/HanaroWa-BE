@@ -21,6 +21,7 @@ public class LessonGisuResponseDTO {
 	private int lessonFee;
 	private String duration;
 	private LessonState lessonState;
+	private String lessonRoom;
 	private int currentEnrollment;
 	private List<CurriculumResponseDTO> curriculums;
 }
