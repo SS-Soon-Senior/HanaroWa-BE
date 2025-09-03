@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.DayOfWeek;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -147,9 +148,19 @@ public class LessonServiceImpl implements LessonService {
 			LessonRoom room = gisu.getLessonRoom();
 
 			String formattedStartedAt = getFormattedStartedAt(myLesson.getOpenedAt());
-
 			//4월 5일 (금) 오후 2:00
 			String formattedLessonFirstDate = getFormattedLessonFirstDate(gisu);
+
+			boolean isprogress = isprogress(gisu);
+			List<Review> byMemberAndLessonGisu = reviewRepository.findByMemberAndLessonGisu(member, gisu);
+
+			boolean reviewed = true;
+			if (byMemberAndLessonGisu.isEmpty()) {
+				reviewed = false;
+			}
+
+			boolean isnotopened = isNotOpened(gisu);
+			String branchname = gisu.getLesson().getBranch().getName();
 
 			return LessonListResponseDTO.builder()
 										.lessonId(lesson.getId())
@@ -159,46 +170,19 @@ public class LessonServiceImpl implements LessonService {
 										.lessonName(lesson.getLessonName())
 										.instructorName(lesson.getMember().getName())
 										.duration(formattedLessonFirstDate)
-										.lessonRoomName(room.getName())
+										.reservedAt(formattedLessonFirstDate)
+										.lessonRoomName(branchname + " " +room.getName())
+										.isInProgress(isprogress)
+										.isReviewed(reviewed)
+										.isNotStarted(isnotopened)
 										.build();
 		}).toList();
 	}
 
-	private static String getFormattedLessonFirstDate(LessonGisu gisu) {
-		String[] parts = gisu.getDuration().split(" ");
-
-		// 1. 시작 날짜 추출 및 포맷팅 (항상 첫 번째 요소)
-		String startDateString = parts[0];
-		LocalDate startDate = LocalDate.parse(startDateString);
-		DateTimeFormatter dateFormatter = DateTimeFormatter
-			.ofPattern("M월 d일 (E)")
-			.withLocale(Locale.KOREAN);
-		String formattedDate = startDate.format(dateFormatter);
-
-		// 마지막 요소("17:00-18:00" 또는 "17:00")를 가져옴
-		String timePart = parts[parts.length - 1];
-		String startTimeString;
-
-		// 시간 부분이 "17:00-18:00" 같은 범위인지 확인
-		if (timePart.contains("-")) {
-			startTimeString = timePart.split("-")[0];
-		} else {
-			// "17:00" 같은 단일 시간 형식일 경우
-			startTimeString = timePart;
-		}
-
-		LocalTime startTime = LocalTime.parse(startTimeString);
-		DateTimeFormatter timeFormatter = DateTimeFormatter
-			.ofPattern("a h:mm")
-			.withLocale(Locale.KOREAN);
-		String formattedTime = startTime.format(timeFormatter);
-
-		return formattedDate + " " + formattedTime;
-	}
-
 	private static String getFormattedStartedAt(LocalDateTime time) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-		return gisu.getStartedAt().format(formatter);
+		return time.format(formatter);
+
 	}
 
 
@@ -218,8 +202,10 @@ public class LessonServiceImpl implements LessonService {
 								 LessonRoom room = gisu.getLessonRoom();
 								 String formattedStartedAt = getFormattedLessonFirstDate(gisu);
 
+								 boolean isprogress = isprogress(gisu);
 								 String lessonOpenedAt = getFormattedStartedAt(lesson.getOpenedAt());
 
+								 String branchname = gisu.getLesson().getBranch().getName();
 								 return MyOpenLessonListResponseDTO.builder()
 															 .lessonId(lesson.getId())
 															 .lessonGisuId(gisu.getId())
@@ -227,8 +213,9 @@ public class LessonServiceImpl implements LessonService {
 															 .startedAt(formattedStartedAt)
 															 .lessonName(lesson.getLessonName())
 															 .instructorName(lesson.getMember().getName())
-															 .lessonRoomName(room.getName())
+															 .lessonRoomName(branchname + " " + room.getName())
 															 .openedAt(lessonOpenedAt)
+									  						 .isInProgress(isprogress)
 															 .build();
 							 }))
 							 .toList();
@@ -392,6 +379,84 @@ public class LessonServiceImpl implements LessonService {
 
 				curriculumRepository.save(curriculum);
 			}
+		}
+	}
+
+	// ✅ [수정] 시작 날짜를 안전하게 추출하는 헬퍼 메소드
+	public LocalDate getStartDate(String duration) {
+		try {
+			String dateRangePart = duration.split(" ")[0]; // "2025-01-01~2025-02-28"
+			String startDateString = dateRangePart.split("~")[0]; // "2025-01-01"
+			return LocalDate.parse(startDateString);
+		} catch (ArrayIndexOutOfBoundsException | DateTimeParseException e) {
+			// log.error("강의 기간 문자열에서 시작 날짜를 파싱할 수 없습니다: {}", duration, e);
+			// 기본값이나 예외 처리가 필요하다면 여기에 추가
+			return null;
+		}
+	}
+
+	// ✅ [수정] 종료 날짜를 안전하게 추출하는 헬퍼 메소드
+	public LocalDate getEndDate(String duration) {
+		try {
+			String dateRangePart = duration.split(" ")[0]; // "2025-01-01~2025-02-28"
+			String endDateString = dateRangePart.split("~")[1]; // "2025-02-28"
+			return LocalDate.parse(endDateString);
+		} catch (ArrayIndexOutOfBoundsException | DateTimeParseException e) {
+			// log.error("강의 기간 문자열에서 종료 날짜를 파싱할 수 없습니다: {}", duration, e);
+			return null;
+		}
+	}
+
+	// ✅ [수정] isNotOpened 메소드
+	public boolean isNotOpened(LessonGisu gisu) {
+		LocalDate startDate = getStartDate(gisu.getDuration());
+		if (startDate == null) return false; // 파싱 실패 시 처리
+
+		LocalDate today = LocalDate.now();
+		return today.isBefore(startDate);
+	}
+
+	// ✅ [수정] isprogress 메소드
+	public boolean isprogress(LessonGisu gisu) {
+		LocalDate endDate = getEndDate(gisu.getDuration());
+		if (endDate == null) return false; // 파싱 실패 시 처리
+
+		LocalDate today = LocalDate.now();
+		return !today.isAfter(endDate);
+	}
+
+	// ✅ [수정] getFormattedLessonFirstDate 메소드
+	public String getFormattedLessonFirstDate(LessonGisu gisu) {
+		try {
+			LocalDate startDate = getStartDate(gisu.getDuration());
+			if (startDate == null) return "날짜 정보 없음";
+
+			DateTimeFormatter dateFormatter = DateTimeFormatter
+				.ofPattern("M월 d일 (E)")
+				.withLocale(Locale.KOREAN);
+			String formattedDate = startDate.format(dateFormatter);
+
+			String[] parts = gisu.getDuration().split(" ");
+			String timePart = parts[parts.length - 1];
+			String startTimeString;
+
+			if (timePart.contains("-")) {
+				startTimeString = timePart.split("-")[0];
+			} else {
+				startTimeString = timePart;
+			}
+
+			LocalTime startTime = LocalTime.parse(startTimeString);
+			DateTimeFormatter timeFormatter = DateTimeFormatter
+				.ofPattern("a h:mm")
+				.withLocale(Locale.KOREAN);
+			String formattedTime = startTime.format(timeFormatter);
+
+			return formattedDate + " " + formattedTime;
+
+		} catch (Exception e) {
+			// log.error("날짜/시간 포맷팅 중 오류 발생: {}", gisu.getDuration(), e);
+			return "날짜/시간 형식 오류";
 		}
 	}
 
