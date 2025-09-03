@@ -139,10 +139,6 @@ public class LessonServiceImpl implements LessonService {
 
 		List<MyLesson> myLessons = myLessonRepository.findAllByMemberId(member.getId());
 
-		if (myLessons.isEmpty()) {
-			throw new GeneralException(ErrorStatus.APPLIED_NOT_FOUND);
-		}
-
 		return myLessons.stream().map(myLesson -> {
 			LessonGisu gisu = myLesson.getLessonGisu();
 			Lesson lesson = gisu.getLesson();
