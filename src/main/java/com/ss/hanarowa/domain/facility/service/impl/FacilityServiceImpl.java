@@ -158,7 +158,6 @@ public class FacilityServiceImpl implements FacilityService {
 
 		List<FacilityTime> reservations = facilityTimeRepository.findAllByMemberId(currentUser.getId());
 
-
 		if (reservations.isEmpty()) {
 			throw new GeneralException(ErrorStatus.FACILITY_NOT_FOUND);
 		}
