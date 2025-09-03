@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private final TokenBlacklistService tokenBlacklistService;
 
 	private static final List<String> PERMIT_ALL_URLS = Arrays.asList(
-		"/member/regist",
+		"/auth/signup",
 		"/auth/signin",
 		"/member/refresh",
 		"/oauth2/authorization/kakao",
@@ -69,11 +69,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 				response.setContentType("application/json;charset=UTF-8");
 
-				ReasonDTO reason = ErrorStatus.MEMBER_NOT_AUTHORITY.getReason();
+				ReasonDTO reason = ErrorStatus.TOKEN_INVALID.getReason();
 				ObjectMapper mapper = new ObjectMapper();
 				String json = mapper.writeValueAsString(reason);
 
 				response.getWriter().write(json);
+				return;
 			}
 			
 			Map<String, Object> claims = JwtUtil.validateToken(token);
