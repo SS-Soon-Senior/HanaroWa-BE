@@ -140,7 +140,6 @@ public class FacilityServiceImpl implements FacilityService {
 				.reservationId(reservation.getId())
 				.facilityName(reservation.getFacility().getName())
 				.memberName(reservation.getMember().getName())
-				.memberEmail(reservation.getMember().getEmail())
 				.branchName(reservation.getFacility().getBranch().getName())
 				.startedAt(getFormattedLessonFirstDate(reservation.getStartedAt()))
 				.reservedAt(reservedTime(reservation.getReservedAt()))
