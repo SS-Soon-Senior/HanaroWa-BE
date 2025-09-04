@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ss.hanarowa.domain.branch.dto.response.BranchResponseDTO;
 import com.ss.hanarowa.domain.member.dto.request.ModifyPasswdRequestDTO;
 import com.ss.hanarowa.domain.member.dto.request.MemberInfoRequestDTO;
 import com.ss.hanarowa.domain.member.dto.response.MemberInfoResponseDTO;
@@ -78,6 +79,18 @@ public class MemberController {
 		memberService.modifyPassword(modifyDTO, email);
 		return ResponseEntity.ok(ApiResponse.onSuccess("비밀번호 수정 완료"));
 	}
+	/**
+	 * 자신의 지점 조회
+	 */
+	@GetMapping("/branch")
+	@Operation(summary = "자신의 지점 조회 API", description = "로그인한 회원의 지점 정보를 조회합니다.")
+	@Tag(name = "지점", description = "지점 관련 API")
+	public ResponseEntity<ApiResponse<BranchResponseDTO>> getMyBranch(Authentication authentication) {
+		String email = authentication.getName();
+		BranchResponseDTO branchInfo = memberService.getMemberBranch(email);
+		return ResponseEntity.ok(ApiResponse.onSuccess(branchInfo));
+	}
+
 	/**
 	 * 지점 선택/수정
 	 */
