@@ -7,6 +7,8 @@ import com.ss.hanarowa.domain.member.dto.request.ModifyPasswdRequestDTO;
 import com.ss.hanarowa.domain.member.entity.Member;
 
 public interface MemberService {
+
+	void logout(String accessToken, String refreshToken);
 	void credentialRegist(MemberRegistRequestDTO memberRegistRequestDTO);
 	void infoRegist(MemberInfoRequestDTO memberInfoRequestDTO, String email);
 	void withdraw(String email);

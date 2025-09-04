@@ -1,6 +1,7 @@
 package com.ss.hanarowa.domain.member.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -20,6 +21,8 @@ import com.ss.hanarowa.domain.member.dto.request.MemberInfoRequestDTO;
 import com.ss.hanarowa.domain.member.service.MemberService;
 import com.ss.hanarowa.global.exception.GeneralException;
 import com.ss.hanarowa.global.response.code.status.ErrorStatus;
+import com.ss.hanarowa.global.security.JwtUtil;
+import com.ss.hanarowa.global.security.TokenBlacklistService;
 import com.ss.hanarowa.global.util.Format;
 
 import lombok.RequiredArgsConstructor;
@@ -31,6 +34,26 @@ public class MemberServiceImpl implements MemberService {
 	private final MemberRepository memberRepository;
 	private final BranchRepository branchRepository;
 	private final PasswordEncoder passwordEncoder;
+
+	private final TokenBlacklistService tokenBlacklistService;
+
+	@Transactional
+	public void logout(String accessToken, String refreshToken) {
+		if (accessToken != null && !accessToken.isEmpty()) {
+			// accessToken 블랙리스트 로직
+			Map<String, Object> claims = JwtUtil.validateToken(accessToken);
+			long expirationTime = ((Number) claims.get("exp")).longValue() * 1000;
+			tokenBlacklistService.blacklistToken(accessToken, expirationTime);
+		}
+
+		if (refreshToken != null && !refreshToken.isEmpty()) {
+			// DB에서 refreshToken 삭제 로직
+			Map<String, Object> claims = JwtUtil.validateToken(refreshToken);
+			String email = (String) claims.get("email");
+			Member member = getMemberByEmail(email); // 이 메소드는 이미 있다고 가정
+			member.clearRefreshToken();
+		}
+	}
 
 	@Override
 	public void credentialRegist(MemberRegistRequestDTO memberRegistRequestDTO) {
