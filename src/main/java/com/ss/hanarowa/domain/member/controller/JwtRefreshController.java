@@ -35,7 +35,7 @@ public class JwtRefreshController {
 
 	@PostMapping("/reissue")
 	@Tag(name = "RefreshToken", description = "리프레시 토큰 재발급")
-	public ResponseEntity<ApiResponse<Map<String, Object>>> refresh(
+	public ResponseEntity<ApiResponse<Void>> refresh(
 		@CookieValue(value = "refreshToken", required = false) String refreshToken,
 		HttpServletResponse response
 	) {
@@ -47,22 +47,33 @@ public class JwtRefreshController {
 		String email = (String) refreshClaim.get("email");
 		Member member = memberService.getMemberByEmail(email);
 
-		// 새 AccessToken
 		Map<String, Object> claims = Map.of("email", email, "role", member.getRole().name());
-		String newAccessToken = JwtUtil.generateToken(claims, 1);
 
-		// 새 쿠키 세팅
+		// 2. 새로운 AccessToken과 RefreshToken을 모두 생성 (Refresh Token Rotation)
+		String newAccessToken = JwtUtil.generateToken(claims, 30);
+		String newRefreshToken = JwtUtil.generateToken(claims, 7 * 24 * 60);
+
+		// 3. 새 AccessToken 쿠키 설정
 		ResponseCookie accessCookie = ResponseCookie.from("accessToken", newAccessToken)
-													.httpOnly(true)
-													.secure(false)
-													.path("/")
-													.maxAge(Duration.ofMinutes(30))
-													.sameSite("Lax")
-													.build();
+			.httpOnly(true)
+			.secure(false) // 프로덕션에서는 true로 변경
+			.path("/")
+			.maxAge(Duration.ofMinutes(30))
+			.sameSite("Lax")
+			.build();
 		response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 
-		return ResponseEntity.ok(ApiResponse.onSuccess(Map.of("accessToken", newAccessToken)));
+		// 4. 새 RefreshToken 쿠키 설정
+		ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", newRefreshToken)
+			.httpOnly(true)
+			.secure(false) // 프로덕션에서는 true로 변경
+			.path("/")
+			.maxAge(Duration.ofDays(7))
+			.sameSite("Strict")
+			.build();
+		response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
+		// 5. 본문 없이 성공 응답만 반환
+		return ResponseEntity.ok(ApiResponse.onSuccess(null));
 	}
 }
-
-
