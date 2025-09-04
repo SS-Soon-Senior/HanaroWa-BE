@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.ss.hanarowa.domain.branch.entity.Branch;
+import com.ss.hanarowa.domain.branch.repository.BranchRepository;
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityDetailResponseDTO;
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityImageResponseDTO;
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityReservationResponseDTO;
@@ -38,6 +40,7 @@ public class FacilityServiceImpl implements FacilityService {
 	private final FacilityRepository facilityRepository;
 	private final FacilityTimeRepository facilityTimeRepository;
 	private final MemberRepository memberRepository;
+	private final BranchRepository branchRepository;
 
 	@Override
 	public List<FacilityResponseDTO> getAllFacilities(long branchId) {
@@ -149,5 +152,10 @@ public class FacilityServiceImpl implements FacilityService {
 			.collect(Collectors.toList());
 	}
 
+	public String getBranchName(Long branchId) {
+		return branchRepository.findById(branchId)
+							   .map(Branch::getName)
+							   .orElseThrow(() -> new RuntimeException("해당 지점을 찾을 수 없습니다. branchId=" + branchId));
+	}
 }
 
