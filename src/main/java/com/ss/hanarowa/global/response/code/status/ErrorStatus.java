@@ -46,6 +46,7 @@ public enum ErrorStatus implements BaseErrorCode {
 	LESSON_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "LESSONROOM404", "해당 강의실을 찾을 수 없습니다."),
 	LESSON_ROOM_NOT_AVAILABLE(HttpStatus.BAD_REQUEST, "LESSONROOM400", "해당 시간대에 사용 가능한 강의실이 없습니다."),
 	CURRICULUM_NOT_FOUND(HttpStatus.NOT_FOUND,"CURRICULUM404","해당 커리큘럼을 찾을 수 없습니다."),
+	REVIEW_ALREADY_EXISTS(HttpStatus.CONFLICT, "LESSON409", "이미 해당 기수에 대한 리뷰를 작성하셨습니다."),
 
 	//Gemini API 관련 에러
 	AI_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI500", "AI 서비스 요청 중 오류가 발생했습니다.");
