@@ -56,7 +56,7 @@ public class JwtUtil {
 			"role", role
 		);
 
-		String accessToken = generateToken(claims, 30);
+		String accessToken = generateToken(claims, 1);
 		String refreshToken = generateToken(Map.of("email", email), 60 * 24);
 
 		return TokenResponseDTO.builder()

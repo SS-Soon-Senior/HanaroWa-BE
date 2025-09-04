@@ -18,6 +18,7 @@ import com.ss.hanarowa.domain.member.entity.Role;
 import com.ss.hanarowa.global.response.ApiResponse;
 import com.ss.hanarowa.global.response.code.ReasonDTO;
 import com.ss.hanarowa.global.response.code.status.ErrorStatus;
+import com.ss.hanarowa.global.security.exception.CustomJwtException;
 
 import jakarta.servlet.FilterChain;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-	
+
 	private final TokenBlacklistService tokenBlacklistService;
 
 	private static final List<String> PERMIT_ALL_URLS = Arrays.asList(
@@ -44,70 +45,54 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	);
 
 	@Override
-	protected void doFilterInternal(@NonNull HttpServletRequest request,
-		@NonNull HttpServletResponse response,
-		@NonNull FilterChain filterChain) throws ServletException, IOException {
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+		throws ServletException, IOException {
 
 		String path = request.getRequestURI();
-
 		if (PERMIT_ALL_URLS.contains(path) || path.equals("/auth/reissue")) {
 			filterChain.doFilter(request, response);
 			return;
 		}
 
 		String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
 			filterChain.doFilter(request, response);
 			return;
 		}
 
+		String token = authHeader.substring(7);
+
 		try {
-			String token = authHeader.substring(7);
-
-			// 블랙리스트 검증
 			if (tokenBlacklistService.isBlacklisted(token)) {
-				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-				response.setContentType("application/json;charset=UTF-8");
-
-				ReasonDTO reason = ErrorStatus.TOKEN_INVALID.getReason();
-				ObjectMapper mapper = new ObjectMapper();
-				String json = mapper.writeValueAsString(reason);
-
-				response.getWriter().write(json);
-				return;
+				throw new CustomJwtException("Blacklisted");
 			}
 
 			Map<String, Object> claims = JwtUtil.validateToken(token);
-
-			String email = (String) claims.get("email");
-			String roleStr = (String) claims.get("role");
-			Role role = Role.valueOf(roleStr);
-
-			MemberAuthResponseDTO dto = new MemberAuthResponseDTO(email, "", role);
-
-			UsernamePasswordAuthenticationToken authenticationToken =
-				new UsernamePasswordAuthenticationToken(dto, null, dto.getAuthorities());
-
-			SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
-			filterChain.doFilter(request, response);
-
-		} catch (Exception e) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			response.setContentType("application/json;charset=UTF-8");
-
-			ObjectMapper objectMapper = new ObjectMapper();
-			PrintWriter out = response.getWriter();
-
-			ApiResponse<Object> errorResponse = ApiResponse.onFailure(
-				ErrorStatus.TOKEN_INVALID.getCode(),
-				ErrorStatus.TOKEN_INVALID.getMessage(),
-				null
-			);
-			out.println(objectMapper.writeValueAsString(errorResponse));
-			out.flush();
-			out.close();
+			setAuthenticationFromClaims(claims);
+		} catch (CustomJwtException e) {
+			if ("Expired".equals(e.getMessage())) {
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				response.setHeader("Token-Expired", "true");
+				return;
+			} else {
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				return;
+			}
 		}
+
+		filterChain.doFilter(request, response);
+	}
+
+	private void setAuthenticationFromClaims(Map<String, Object> claims) {
+		String email = (String)claims.get("email");
+		String roleStr = (String)claims.get("role");
+		Role role = Role.valueOf(roleStr);
+
+		MemberAuthResponseDTO dto = new MemberAuthResponseDTO(email, "", role);
+
+		UsernamePasswordAuthenticationToken authenticationToken =
+			new UsernamePasswordAuthenticationToken(dto, null, dto.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 	}
 }
