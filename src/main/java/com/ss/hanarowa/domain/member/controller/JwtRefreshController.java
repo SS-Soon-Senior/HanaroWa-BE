@@ -8,9 +8,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.hanarowa.domain.member.entity.Member;
@@ -19,7 +17,6 @@ import com.ss.hanarowa.global.exception.GeneralException;
 import com.ss.hanarowa.global.response.ApiResponse;
 import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 import com.ss.hanarowa.global.security.JwtUtil;
-import com.ss.hanarowa.global.security.exception.CustomJwtException;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -37,6 +34,7 @@ public class JwtRefreshController {
 	}
 
 	@PostMapping("/reissue")
+	@Tag(name = "RefreshToken", description = "리프레시 토큰 재발급")
 	public ResponseEntity<ApiResponse<Map<String, Object>>> refresh(
 		@CookieValue(value = "refreshToken", required = false) String refreshToken,
 		HttpServletResponse response

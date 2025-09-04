@@ -91,16 +91,4 @@ public class JwtUtil {
 
 		return claim;
 	}
-
-	public static Map<String, Object> getClaimsEvenIfExpired(String token) {
-		try {
-			return Jwts.parserBuilder()
-					   .setSigningKey(K)
-					   .build()
-					   .parseClaimsJws(token)
-					   .getBody();
-		} catch (ExpiredJwtException e) {
-			return e.getClaims();
-		}
-	}
 }
