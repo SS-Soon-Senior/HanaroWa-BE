@@ -2,8 +2,6 @@ package com.ss.hanarowa.domain.lesson.dto.response;
 
 import java.util.List;
 
-import org.springframework.transaction.annotation.Transactional;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
