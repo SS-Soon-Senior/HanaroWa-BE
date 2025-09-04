@@ -1,11 +1,8 @@
 package com.ss.hanarowa.domain.member.controller;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.Map;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,6 +28,7 @@ import com.ss.hanarowa.global.response.ApiResponse;
 import com.ss.hanarowa.global.security.JwtUtil;
 import com.ss.hanarowa.global.security.TokenBlacklistService;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -81,25 +79,20 @@ public class AuthController {
 			member.updateRefreshToken(tokenDto.getRefreshToken());
 
 			// AccessToken 쿠키
-			ResponseCookie accessCookie = ResponseCookie.from("accessToken", tokenDto.getAccessToken())
-														.httpOnly(false)
-														.secure(false)
-														.path("/")
-														.maxAge(Duration.ofHours(1))
-														.sameSite("Lax")
-														.build();
-			response.setHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+			Cookie accessCookie = new Cookie("accessToken", tokenDto.getAccessToken());
+			accessCookie.setHttpOnly(false);
+			accessCookie.setSecure(false); // 운영 HTTPS면 true
+			accessCookie.setPath("/");
+			accessCookie.setMaxAge(60);
+			response.addCookie(accessCookie);
 
 			// RefreshToken 쿠키
-			ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokenDto.getRefreshToken())
-														 .httpOnly(true)
-														 .secure(false)
-														 .path("/")
-														 .maxAge(Duration.ofDays(7))
-														 .sameSite("Strict")
-														 .build();
-			response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
-
+			Cookie refreshCookie = new Cookie("refreshToken", tokenDto.getRefreshToken());
+			refreshCookie.setHttpOnly(true);
+			refreshCookie.setSecure(false);
+			refreshCookie.setPath("/");
+			refreshCookie.setMaxAge(7 * 24 * 60 * 60);
+			response.addCookie(refreshCookie);
 
 			String redirectUrl;
 			if(member.getRole() == Role.ADMIN) {
@@ -126,6 +119,7 @@ public class AuthController {
 														   .tokens(TokenResponseDTO.builder()
 																				   .email(tokenDto.getEmail())
 																				   .accessToken(tokenDto.getAccessToken())
+															   						.refreshToken(tokenDto.getRefreshToken())
 																				   .build())
 														   .branch(branchDto)
 														   .name(member.getName())
@@ -138,7 +132,6 @@ public class AuthController {
 			throw new GeneralException(ErrorStatus.MEMBER_AUTHENTICATION_FAILED);
 		}
 	}
-
 
 	@PostMapping("/logout")
 	@Operation(summary = "로그아웃", description = "사용자 로그아웃 및 refreshToken 삭제")

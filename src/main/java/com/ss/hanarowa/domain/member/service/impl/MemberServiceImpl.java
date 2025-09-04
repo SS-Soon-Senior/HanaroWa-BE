@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ss.hanarowa.domain.branch.dto.response.BranchResponseDTO;
 import com.ss.hanarowa.domain.branch.entity.Branch;
 import com.ss.hanarowa.domain.branch.repository.BranchRepository;
 import com.ss.hanarowa.domain.member.dto.request.MemberRegistRequestDTO;
@@ -105,6 +106,23 @@ public class MemberServiceImpl implements MemberService {
 
 		member.setBranch(branch);
 		memberRepository.save(member);
+	}
+
+	@Override
+	public BranchResponseDTO getMemberBranch(String email) {
+		Member member = memberRepository.findByEmail(email)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+		
+		Branch branch = member.getBranch();
+		if (branch == null) {
+			throw new GeneralException(ErrorStatus.BRANCH_NOT_FOUND);
+		}
+		
+		return BranchResponseDTO.builder()
+			.branchId(branch.getId())
+			.branchName(branch.getName())
+			.locationName(branch.getLocation().getName())
+			.build();
 	}
 
 	@Override

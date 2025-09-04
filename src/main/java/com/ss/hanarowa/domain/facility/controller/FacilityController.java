@@ -20,9 +20,7 @@ import com.ss.hanarowa.domain.facility.dto.request.FacilityReservationDTO;
 import com.ss.hanarowa.domain.facility.service.FacilityService;
 import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.service.MemberService;
-import com.ss.hanarowa.global.exception.GeneralException;
 import com.ss.hanarowa.global.response.ApiResponse;
-import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -57,8 +55,6 @@ public class FacilityController {
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(responseDto));
 	}
-
-
 
 
 	@GetMapping("/detail/{facilityId}")

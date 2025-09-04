@@ -2,8 +2,6 @@ package com.ss.hanarowa.domain.lesson.dto.response;
 
 import java.util.List;
 
-import com.ss.hanarowa.domain.lesson.entity.Lesson;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

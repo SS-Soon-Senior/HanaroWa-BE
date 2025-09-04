@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.ss.hanarowa.domain.member.dto.response.TokenResponseDTO;
 import com.ss.hanarowa.domain.member.entity.Member;
+import com.ss.hanarowa.domain.member.entity.Role;
 import com.ss.hanarowa.domain.member.repository.MemberRepository;
 import com.ss.hanarowa.domain.member.service.MemberService;
 import com.ss.hanarowa.global.exception.GeneralException;
@@ -18,39 +19,51 @@ import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 import com.ss.hanarowa.global.security.CustomOAuth2User;
 import com.ss.hanarowa.global.security.JwtUtil;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
 	private final MemberRepository memberRepository;
 
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-		Authentication authentication) throws IOException, ServletException {
+		Authentication authentication) throws IOException {
+		Member member;
 
-		CustomOAuth2User principal = (CustomOAuth2User) authentication.getPrincipal();
-		Member member = principal.getMember();
+		if (authentication.getPrincipal() instanceof CustomOAuth2User principal) {
+			member = principal.getMember();
+		} else {
+			String email = authentication.getName();
+			member = memberRepository.findByEmail(email)
+									 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+		}
 
-		// JWT 토큰 발급
+		// JWT 발급
 		TokenResponseDTO tokenDto = JwtUtil.createTokens(authentication);
-
-		// RefreshToken 저장
 		member.updateRefreshToken(tokenDto.getRefreshToken());
 		memberRepository.save(member);
 
+		// 공통 쿠키 세팅
+		addTokenCookies(response, tokenDto);
+
+		// 공통 redirect 처리
+		String redirectUrl = getRedirectUrl(member);
+		getRedirectStrategy().sendRedirect(request, response, redirectUrl);
+	}
+
+	private void addTokenCookies(HttpServletResponse response, TokenResponseDTO tokenDto) {
 		ResponseCookie accessCookie = ResponseCookie.from("accessToken", tokenDto.getAccessToken())
-													.httpOnly(false)
+													.httpOnly(true)
 													.secure(false)
 													.path("/")
-													.maxAge(Duration.ofHours(1))
+													.maxAge(Duration.ofMinutes(1))
 													.sameSite("Lax")
 													.build();
-		response.setHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+		response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 
 		ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokenDto.getRefreshToken())
 													 .httpOnly(true)
@@ -60,13 +73,16 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 													 .sameSite("Strict")
 													 .build();
 		response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+	}
 
-		String baseRedirectUrl = "http://localhost:3000";
-		String path = (member.getPhoneNumber() == null || member.getBirth() == null)
-			? "/auth/signup/info"
-			: "/";
-		getRedirectStrategy().sendRedirect(request, response, baseRedirectUrl + path);
-
+	private String getRedirectUrl(Member member) {
+		if (member.getRole() == Role.ADMIN) {
+			return "http://localhost:3000/admin";
+		} else if (member.getPhoneNumber() == null || member.getBirth() == null) {
+			return "http://localhost:3000/auth/signup/info";
+		} else {
+			return "http://localhost:3000";
+		}
 	}
 }
 

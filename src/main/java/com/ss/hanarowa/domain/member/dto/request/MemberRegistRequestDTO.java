@@ -1,7 +1,5 @@
 package com.ss.hanarowa.domain.member.dto.request;
 
-import com.ss.hanarowa.domain.member.entity.Role;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

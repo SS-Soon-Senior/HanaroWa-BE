@@ -6,16 +6,12 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.ss.hanarowa.domain.branch.entity.Branch;
-import com.ss.hanarowa.domain.branch.entity.Location;
-import com.ss.hanarowa.domain.facility.dto.reponse.AdminFacilityResponseDTO;
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityDetailResponseDTO;
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityImageResponseDTO;
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityReservationResponseDTO;
@@ -32,6 +28,7 @@ import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.repository.MemberRepository;
 import com.ss.hanarowa.global.exception.GeneralException;
 import com.ss.hanarowa.global.response.code.status.ErrorStatus;
+import com.ss.hanarowa.global.util.Format;
 
 import lombok.RequiredArgsConstructor;
 
@@ -131,22 +128,6 @@ public class FacilityServiceImpl implements FacilityService {
 			.build();
 	}
 
-	@Override
-	public List<AdminFacilityResponseDTO> getAllFacilityReservations() {
-		List<FacilityTime> reservations = facilityTimeRepository.findAllByOrderByIdDesc();
-		
-		return reservations.stream()
-			.map(reservation -> AdminFacilityResponseDTO.builder()
-				.reservationId(reservation.getId())
-				.facilityName(reservation.getFacility().getName())
-				.memberName(reservation.getMember().getName())
-				.branchName(reservation.getFacility().getBranch().getName())
-				.startedAt(getFormattedLessonFirstDate(reservation.getStartedAt()))
-				.reservedAt(reservedTime(reservation.getReservedAt()))
-				.isUsed(isUsed(reservation.getEndedAt()))
-				.build())
-			.collect(Collectors.toList());
-	}
 
 	@Override
 	public List<FacilityReservationResponseDTO> getAllMyFacilityReservations(String email) {
@@ -160,42 +141,13 @@ public class FacilityServiceImpl implements FacilityService {
 			.map(reservation -> FacilityReservationResponseDTO.builder()
 				.reservationId(reservation.getId())
 				.facilityName(reservation.getFacility().getName())
-				.memberName(reservation.getMember().getName())
 				.branchName(reservation.getFacility().getBranch().getName())
-				.startedAt(getFormattedLessonFirstDate(reservation.getStartedAt()))
-				.reservedAt(reservedTime(reservation.getReservedAt()))
-				.isUsed(isUsed(reservation.getEndedAt()))
+				.startedAt(Format.getFormattedDate(reservation.getStartedAt()))
+				.reservedAt(Format.reservedTime(reservation.getReservedAt()))
+				.isUsed(Format.isUsed(reservation.getStartedAt()))
 				.build())
 			.collect(Collectors.toList());
 	}
-	public String getFormattedLessonFirstDate(LocalDateTime time) {
-		try {
-			DateTimeFormatter dateFormatter = DateTimeFormatter
-				.ofPattern("M월 d일 (E)")
-				.withLocale(Locale.KOREAN);
-			String formattedDate = time.format(dateFormatter);
 
-			DateTimeFormatter timeFormatter = DateTimeFormatter
-				.ofPattern("a h:mm")
-				.withLocale(Locale.KOREAN);
-			String formattedTime = time.format(timeFormatter);
-
-			return formattedDate + " " + formattedTime;
-
-		} catch (Exception e) {
-			return "날짜/시간 형식 오류";
-		}
-	}
-
-	public boolean isUsed(LocalDateTime time) {
-		LocalDateTime today = LocalDateTime.now();
-		return today.isAfter(time);
-	}
-
-	public String reservedTime(LocalDateTime time) {
-		DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-
-		return time.format(formatter2);
-	}
 }
 

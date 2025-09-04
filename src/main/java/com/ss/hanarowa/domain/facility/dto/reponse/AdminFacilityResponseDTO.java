@@ -1,7 +1,5 @@
 package com.ss.hanarowa.domain.facility.dto.reponse;
 
-import java.time.LocalDateTime;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
