@@ -59,8 +59,6 @@ public class FacilityController {
 	}
 
 
-
-
 	@GetMapping("/detail/{facilityId}")
 	@Operation(summary = "시설 상세보기", description = "시설 상세를 조회합니다.")
 	public ResponseEntity<ApiResponse<FacilityDetailResponseDTO>> getDetailFacility(@PathVariable Long facilityId) {
