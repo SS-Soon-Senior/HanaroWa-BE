@@ -165,7 +165,7 @@ public class LessonServiceImpl implements LessonService {
 										.lessonState(gisu.getLessonState())
 										.startedAt(formattedStartedAt)
 										.lessonName(lesson.getLessonName())
-										.instructorName(lesson.getMember().getName())
+										.instructorName(lesson.getInstructor())
 										.duration(formattedLessonFirstDate)
 										.reservedAt(formattedLessonFirstDate)
 										.lessonRoomName(branchname + " " +room.getName())
@@ -206,7 +206,7 @@ public class LessonServiceImpl implements LessonService {
 															 .lessonState(gisu.getLessonState())
 															 .startedAt(formattedStartedAt)
 															 .lessonName(lesson.getLessonName())
-															 .instructorName(lesson.getMember().getName())
+															 .instructorName(lesson.getInstructor())
 															 .lessonRoomName(branchname + " " + room.getName())
 															 .openedAt(lessonOpenedAt)
 									  						 .isInProgress(isprogress)
@@ -320,6 +320,7 @@ public class LessonServiceImpl implements LessonService {
 			.build();
 
 		myLessonRepository.save(newMyLesson);
+
 	}
 
 	@Override
