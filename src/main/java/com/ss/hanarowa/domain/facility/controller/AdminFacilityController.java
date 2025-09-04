@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.hanarowa.domain.facility.dto.reponse.AdminFacilityResponseDTO;
-import com.ss.hanarowa.domain.facility.service.FacilityService;
+import com.ss.hanarowa.domain.facility.service.AdminFacilityService;
 import com.ss.hanarowa.global.response.ApiResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,19 +26,19 @@ import lombok.extern.slf4j.Slf4j;
 @PreAuthorize("hasRole('ADMIN')")
 @Tag(name = "[관리자] 시설", description = "관리자 시설 관련 API")
 public class AdminFacilityController {
-	private final FacilityService facilityService;
+	private final AdminFacilityService adminFacilityService;
 
 	@GetMapping("")
 	@Operation(summary = "시설 예약 내역 API", description = "모든 시설 예약 내역을 최신순으로 조회합니다.")
 	public ResponseEntity<ApiResponse<List<AdminFacilityResponseDTO>>> getAdminFacilityList() {
-		List<AdminFacilityResponseDTO> reservations = facilityService.getAllFacilityReservations();
+		List<AdminFacilityResponseDTO> reservations = adminFacilityService.getAllFacilityReservations();
 		return ResponseEntity.ok(ApiResponse.onSuccess(reservations));
 	}
 
 	@DeleteMapping("/{reservationId}")
 	@Operation(summary = "시설 예약 내역 취소 API", description = "시설 예약 내역을 관리자가 취소합니다.")
 	public ResponseEntity<ApiResponse<Void>> deleteAdminFacilityTime(@PathVariable Long reservationId) {
-		facilityService.deleteFacilityReservation(reservationId);
+		adminFacilityService.deleteFacilityReservation(reservationId);
 		return ResponseEntity.ok(ApiResponse.onSuccess(null));
 	}
 }
