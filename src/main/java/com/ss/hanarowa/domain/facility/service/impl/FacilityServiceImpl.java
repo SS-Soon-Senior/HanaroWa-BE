@@ -143,7 +143,7 @@ public class FacilityServiceImpl implements FacilityService {
 				.branchName(reservation.getFacility().getBranch().getName())
 				.startedAt(getFormattedLessonFirstDate(reservation.getStartedAt()))
 				.reservedAt(reservedTime(reservation.getReservedAt()))
-				.isUsed(isUsed(reservation.getEndedAt()))
+				.isUsed(isUsed(reservation.getStartedAt()))
 				.build())
 			.collect(Collectors.toList());
 	}
@@ -164,7 +164,7 @@ public class FacilityServiceImpl implements FacilityService {
 				.branchName(reservation.getFacility().getBranch().getName())
 				.startedAt(getFormattedLessonFirstDate(reservation.getStartedAt()))
 				.reservedAt(reservedTime(reservation.getReservedAt()))
-				.isUsed(isUsed(reservation.getEndedAt()))
+				.isUsed(isUsed(reservation.getStartedAt()))
 				.build())
 			.collect(Collectors.toList());
 	}
