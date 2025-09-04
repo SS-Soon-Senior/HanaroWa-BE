@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,4 +35,10 @@ public class AdminFacilityController {
 		return ResponseEntity.ok(ApiResponse.onSuccess(reservations));
 	}
 
+	@DeleteMapping("/{reservationId}")
+	@Operation(summary = "시설 예약 내역 취소 API", description = "시설 예약 내역을 관리자가 취소합니다.")
+	public ResponseEntity<ApiResponse<Void>> deleteAdminFacilityTime(@PathVariable Long reservationId) {
+		facilityService.deleteFacilityReservation(reservationId);
+		return ResponseEntity.ok(ApiResponse.onSuccess(null));
+	}
 }
