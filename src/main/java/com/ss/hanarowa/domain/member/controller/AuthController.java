@@ -3,11 +3,14 @@ package com.ss.hanarowa.domain.member.controller;
 import java.io.IOException;
 import java.util.Map;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -133,42 +136,28 @@ public class AuthController {
 		}
 	}
 
-	@PostMapping("/logout")
-	@Operation(summary = "로그아웃", description = "사용자 로그아웃 및 refreshToken 삭제")
-	@Transactional
-	public ResponseEntity<ApiResponse<String>> logout(HttpServletRequest request) {
-		String authorizationHeader = request.getHeader("Authorization");
-		log.info("로그아웃 요청 - Authorization header: {}", authorizationHeader);
-		
-		if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-			String accessToken = authorizationHeader.substring(7);
-			log.info("액세스 토큰 추출 완료: {}", accessToken.substring(0, Math.min(20, accessToken.length())) + "...");
-			
-			try {
-				// accessToken에서 사용자 정보 추출
-				Map<String, Object> claims = JwtUtil.validateToken(accessToken);
-				String email = (String) claims.get("email");
-				log.info("토큰에서 이메일 추출: {}", email);
-				
-				// accessToken을 블랙리스트에 추가 (토큰 만료시간 추출)
-				long expirationTime = ((Number) claims.get("exp")).longValue() * 1000;
-				tokenBlacklistService.blacklistToken(accessToken, expirationTime);
-				log.info("accessToken 블랙리스트 추가 완료");
-				
-				// Member의 refreshToken 삭제
-				Member member = memberService.getMemberByEmail(email);
-				log.info("로그아웃 전 refreshToken: {}", member.getRefreshToken() != null ? "존재함" : "없음");
-				
-				member.clearRefreshToken();
-				log.info("refreshToken 삭제 완료");
-				
-			} catch (Exception e) {
-				log.error("로그아웃 처리 중 에러 발생: {}", e.getMessage());
-			}
-		} else {
-			log.warn("Authorization header가 없거나 Bearer 형식이 아님");
+	@PostMapping("/signout")
+	@Operation(summary = "로그아웃", description = "사용자 로그아웃 처리 및 쿠키 삭제")
+	// @Transactional 제거!
+	public ResponseEntity<ApiResponse<String>> logout(
+		@CookieValue(name = "accessToken", required = false) String accessToken,
+		@CookieValue(name = "refreshToken", required = false) String refreshToken,
+		HttpServletResponse response
+	) {
+		log.info("로그아웃 요청 수신");
+
+		try {
+			memberService.logout(accessToken, refreshToken);
+		} catch (Exception e) {
+			log.error("로그아웃 서비스 처리 중 에러 발생: {}", e.getMessage());
 		}
-		
+
+		ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", "").maxAge(0).path("/").build();
+		response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+
+		ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", "").maxAge(0).path("/").build();
+		response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+
 		return ResponseEntity.ok(ApiResponse.onSuccess("로그아웃이 완료되었습니다."));
 	}
 
