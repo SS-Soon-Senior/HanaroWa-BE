@@ -157,16 +157,11 @@ public class FacilityServiceImpl implements FacilityService {
 
 		List<FacilityTime> reservations = facilityTimeRepository.findAllByMemberId(currentUser.getId());
 
-		if (reservations.isEmpty()) {
-			throw new GeneralException(ErrorStatus.FACILITY_NOT_FOUND);
-		}
-
 		return reservations.stream()
 			.map(reservation -> FacilityReservationResponseDTO.builder()
 				.reservationId(reservation.getId())
 				.facilityName(reservation.getFacility().getName())
 				.memberName(reservation.getMember().getName())
-				.memberEmail(reservation.getMember().getEmail())
 				.branchName(reservation.getFacility().getBranch().getName())
 				.startedAt(getFormattedLessonFirstDate(reservation.getStartedAt()))
 				.reservedAt(reservedTime(reservation.getReservedAt()))
