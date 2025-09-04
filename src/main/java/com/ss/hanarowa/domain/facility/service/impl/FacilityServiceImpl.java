@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.ss.hanarowa.domain.branch.entity.Branch;
@@ -141,11 +140,10 @@ public class FacilityServiceImpl implements FacilityService {
 				.reservationId(reservation.getId())
 				.facilityName(reservation.getFacility().getName())
 				.memberName(reservation.getMember().getName())
-				.memberEmail(reservation.getMember().getEmail())
 				.branchName(reservation.getFacility().getBranch().getName())
-				.locationName(reservation.getFacility().getBranch().getLocation().getName())
-				.startedAt(reservation.getStartedAt())
-				.endedAt(reservation.getEndedAt())
+				.startedAt(getFormattedLessonFirstDate(reservation.getStartedAt()))
+				.reservedAt(reservedTime(reservation.getReservedAt()))
+				.isUsed(isUsed(reservation.getEndedAt()))
 				.build())
 			.collect(Collectors.toList());
 	}
@@ -158,40 +156,46 @@ public class FacilityServiceImpl implements FacilityService {
 
 		List<FacilityTime> reservations = facilityTimeRepository.findAllByMemberId(currentUser.getId());
 
-
-		if (reservations.isEmpty()) {
-			throw new GeneralException(ErrorStatus.FACILITY_NOT_FOUND);
-		}
-
-		return reservations.stream().map(reservation -> {
-			Facility facility = reservation.getFacility();
-			Branch branch = facility.getBranch();
-			Location location = branch.getLocation();
-
-			//8월 25일 (월) 오후 3:00 처럼 format
-			DateTimeFormatter formatter = DateTimeFormatter
-				.ofPattern("M월 d일 (E) a h:mm")
+		return reservations.stream()
+			.map(reservation -> FacilityReservationResponseDTO.builder()
+				.reservationId(reservation.getId())
+				.facilityName(reservation.getFacility().getName())
+				.memberName(reservation.getMember().getName())
+				.branchName(reservation.getFacility().getBranch().getName())
+				.startedAt(getFormattedLessonFirstDate(reservation.getStartedAt()))
+				.reservedAt(reservedTime(reservation.getReservedAt()))
+				.isUsed(isUsed(reservation.getEndedAt()))
+				.build())
+			.collect(Collectors.toList());
+	}
+	public String getFormattedLessonFirstDate(LocalDateTime time) {
+		try {
+			DateTimeFormatter dateFormatter = DateTimeFormatter
+				.ofPattern("M월 d일 (E)")
 				.withLocale(Locale.KOREAN);
+			String formattedDate = time.format(dateFormatter);
 
-			String formattedStartedAt = reservation.getStartedAt().format(formatter);
+			DateTimeFormatter timeFormatter = DateTimeFormatter
+				.ofPattern("a h:mm")
+				.withLocale(Locale.KOREAN);
+			String formattedTime = time.format(timeFormatter);
 
-			//2024.03.03 format
-			DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-			String formattedReservedAt = reservation.getReservedAt().format(formatter2);
+			return formattedDate + " " + formattedTime;
 
-			LocalDateTime now = LocalDateTime.now();
+		} catch (Exception e) {
+			return "날짜/시간 형식 오류";
+		}
+	}
 
-			boolean isUpcoming = reservation.getStartedAt().isAfter(now);
+	public boolean isUsed(LocalDateTime time) {
+		LocalDateTime today = LocalDateTime.now();
+		return today.isAfter(time);
+	}
 
-			return FacilityReservationResponseDTO.builder()
-												 .facilityId(facility.getId())
-												 .facilityName(facility.getName())
-												 .startedAt(formattedStartedAt)
-												 .duration(formattedReservedAt)
-												 .placeName(location.getName() + " " + branch.getName())
-												 .isUsed(isUpcoming)
-												 .build();
-		}).toList();
+	public String reservedTime(LocalDateTime time) {
+		DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+
+		return time.format(formatter2);
 	}
 }
 
