@@ -299,6 +299,7 @@ public class LessonServiceImpl implements LessonService {
 			.collect(Collectors.toList());
 	}
 
+	@Transactional
 	@Override
 	public void applyForLesson(Long lessonGisuId, String email) {
 		Member member = memberRepository.findByEmail(email)
