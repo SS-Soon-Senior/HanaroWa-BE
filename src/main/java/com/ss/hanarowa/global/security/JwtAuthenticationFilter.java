@@ -61,11 +61,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 		throws ServletException, IOException {
 
+		String p = request.getServletPath(); // context-path 제외된 경로
+		if (p.equals("/ws") || p.startsWith("/ws/") || p.equals("/broadcast") || p.startsWith("/broadcast/")) {
+			filterChain.doFilter(request, response);
+			return; // ✅ SockJS 핸드셰이크/스트림 완전 패스
+		}
 		String path = request.getRequestURI();
+
 		if (PERMIT_ALL_URLS.contains(path) || path.equals("/auth/reissue")) {
 			filterChain.doFilter(request, response);
 			return;
 		}
+
 
 		// --- 🔽 여기가 핵심 변경 부분 🔽 ---
 

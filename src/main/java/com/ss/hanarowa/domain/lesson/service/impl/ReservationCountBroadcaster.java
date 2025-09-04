@@ -27,7 +27,7 @@ public class ReservationCountBroadcaster {
 		int reserved = myLessonRepository.countByLessonGisu(lessongisu);
 		int capacity = lessongisu.getCapacity();
 		ReservationCountDTO reservationCountDTO = new ReservationCountDTO(gisuId,reserved,capacity);
-		template.convertAndSend("/topic/lessons/"+gisuId+"/count", reservationCountDTO);
+		template.convertAndSend("/topic/lesson/"+gisuId+"/count", reservationCountDTO);
 	}
 
 }
