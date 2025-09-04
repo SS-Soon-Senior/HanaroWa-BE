@@ -36,16 +36,13 @@ public class FacilityController {
 	private final FacilityService facilityService;
 	private final MemberService memberService;
 
-	@GetMapping
-	@Operation(summary = "내 지점 시설 목록 API", description = "로그인한 멤버의 branchId로 시설 목록을 조회합니다.")
-	public ResponseEntity<ApiResponse<FacilityListResponseDTO>> getFacilityByBranchId(Authentication authentication) {
-		// 로그인한 사용자 가져오기
-		String email = authentication.getName();
-		Member member = memberService.getMemberByEmail(email);
+	@GetMapping("/branch/{branchId}")
+	@Operation(summary = "지점별 시설 목록 API", description = "선택한 branchId로 시설 목록을 조회합니다.")
+	public ResponseEntity<ApiResponse<FacilityListResponseDTO>> getFacilityByBranchId(
+		@PathVariable Long branchId) {
 
-		// branchId와 branchName 추출
-		Long branchId = member.getBranch().getId();
-		String branchName = member.getBranch().getName();
+		// branchId에 해당하는 branchName 가져오기
+		String branchName = facilityService.getBranchName(branchId);
 
 		// 해당 branch의 시설 리스트 조회
 		List<FacilityResponseDTO> facilities = facilityService.getAllFacilities(branchId);
@@ -56,8 +53,7 @@ public class FacilityController {
 		return ResponseEntity.ok(ApiResponse.onSuccess(responseDto));
 	}
 
-
-	@GetMapping("/detail/{facilityId}")
+	@GetMapping("/{facilityId}")
 	@Operation(summary = "시설 상세보기", description = "시설 상세를 조회합니다.")
 	public ResponseEntity<ApiResponse<FacilityDetailResponseDTO>> getDetailFacility(@PathVariable Long facilityId) {
 		FacilityDetailResponseDTO facilityDetailResponseDTO = facilityService.getDetailFacility(facilityId);

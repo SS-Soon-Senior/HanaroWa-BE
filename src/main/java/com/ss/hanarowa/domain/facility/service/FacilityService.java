@@ -16,4 +16,6 @@ public interface FacilityService {
 	void reservateFacility(FacilityReservationDTO facilityReservationDTO, Long memberId);
 
 	List<FacilityReservationResponseDTO> getAllMyFacilityReservations(String email);
+
+	String getBranchName(Long branchId);
 }
