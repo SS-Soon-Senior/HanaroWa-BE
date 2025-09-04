@@ -87,7 +87,6 @@ public class FacilityController {
 	@Operation(summary = "시설 예약 목록 조회", description = "시설 예약 목록을 조회합니다.")
 	public ResponseEntity<ApiResponse<List<FacilityReservationResponseDTO>>> getAllMyFacilityReservations(
 		Authentication authentication) {
-
 		String email = authentication.getName();
 		List<FacilityReservationResponseDTO> reservations =
 			facilityService.getAllMyFacilityReservations(email);

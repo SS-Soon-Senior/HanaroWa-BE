@@ -23,7 +23,7 @@ import com.ss.hanarowa.global.security.CustomAuthenticationEntryPoint;
 import com.ss.hanarowa.global.security.CustomOAuth2UserService;
 import com.ss.hanarowa.global.security.JwtAuthenticationFilter;
 import com.ss.hanarowa.global.security.handler.CustomAccessDeniedHandler;
-import com.ss.hanarowa.global.security.handler.OAuth2SuccessHandler;
+import com.ss.hanarowa.global.security.handler.CustomSuccessHandler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -34,7 +34,7 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 public class CustomSecurityConfig {
 	private final CustomOAuth2UserService customOAuth2UserService;
-	private final OAuth2SuccessHandler oAuth2SuccessHandler;
+	private final CustomSuccessHandler customSuccessHandler;
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 	private final CustomAccessDeniedHandler customAccessDeniedHandler;
 	@Bean
@@ -80,7 +80,7 @@ public class CustomSecurityConfig {
 			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 			http.oauth2Login(oauth2 -> oauth2
 				.userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
-				.successHandler(oAuth2SuccessHandler)
+				.successHandler(customSuccessHandler)
 			);
 		return http.build();
 	}
