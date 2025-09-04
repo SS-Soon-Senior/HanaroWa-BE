@@ -1,7 +1,5 @@
 package com.ss.hanarowa.domain.lesson.service.impl;
 
-import java.time.LocalDateTime;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

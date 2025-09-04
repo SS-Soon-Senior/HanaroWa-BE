@@ -15,7 +15,6 @@ import com.ss.hanarowa.domain.lesson.dto.response.LessonDetailResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuStateUpdateResponseDto;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonMemberResponseDTO;
-import com.ss.hanarowa.domain.branch.repository.BranchRepository;
 import com.ss.hanarowa.domain.lesson.entity.Curriculum;
 import com.ss.hanarowa.domain.lesson.entity.Lesson;
 import com.ss.hanarowa.domain.lesson.entity.LessonGisu;
@@ -24,10 +23,8 @@ import com.ss.hanarowa.domain.lesson.repository.CurriculumRepository;
 import com.ss.hanarowa.domain.lesson.repository.LessonGisuRepository;
 import com.ss.hanarowa.domain.lesson.service.AdminLessonService;
 import com.ss.hanarowa.domain.lesson.repository.LessonRepository;
-import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.entity.MyLesson;
 import com.ss.hanarowa.domain.member.repository.MyLessonRepository;
-import com.ss.hanarowa.domain.lesson.repository.LessonRoomRepository;
 import com.ss.hanarowa.global.exception.GeneralException;
 import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 
@@ -129,9 +126,6 @@ public class AdminLessonServiceImpl implements AdminLessonService {
 			.build();
 	}
 
-	private Member getMember(MyLesson myLesson) {
-		return myLesson.getMember();
-	}
 
 	@Override
 	public List<LessonMemberResponseDTO> findAllByLessonGisuId(long lessonGisuId) {

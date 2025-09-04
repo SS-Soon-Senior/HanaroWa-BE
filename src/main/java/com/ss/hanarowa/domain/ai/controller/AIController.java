@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.hanarowa.domain.ai.dto.request.CourseRecRequestDto;
 import com.ss.hanarowa.domain.ai.dto.request.JobRecRequestDto;
-import com.ss.hanarowa.domain.ai.dto.response.JobRecResponseDto;
 import com.ss.hanarowa.domain.ai.dto.response.RecResponseDto;
 import com.ss.hanarowa.domain.ai.service.AIRecService;
 import com.ss.hanarowa.global.response.ApiResponse;
