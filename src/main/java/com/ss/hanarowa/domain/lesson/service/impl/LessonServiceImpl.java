@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.ArrayList;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,7 @@ import com.ss.hanarowa.domain.branch.repository.BranchRepository;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonInfoResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListByBranchIdResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonListSearchResponseDTO;
+import com.ss.hanarowa.domain.lesson.event.ReservationChangedEvent;
 import com.ss.hanarowa.domain.lesson.repository.LessonGisuRepository;
 import com.ss.hanarowa.domain.lesson.repository.LessonRepository;
 import com.ss.hanarowa.domain.lesson.repository.LessonRoomRepository;
@@ -66,6 +68,7 @@ public class LessonServiceImpl implements LessonService {
 	private final LessonRoomRepository lessonRoomRepository;
 	private final RoomTimeRepository roomTimeRepository;
 	private final CurriculumRepository curriculumRepository;
+	private final ApplicationEventPublisher applicationEventPublisher;
 
 	@Override
 	public LessonMoreDetailResponseDTO getLessonMoreDetail(Long lessonId) {
@@ -234,7 +237,7 @@ public class LessonServiceImpl implements LessonService {
 
 		// 각 강좌별 LessonGisu 정보 및 수강 인원 수 조회
 		List<LessonInfoResponseDTO> lessonInfos = lessons.stream()
-			.flatMap(lesson -> lesson.getLessonGisus().stream())
+			.flatMap(lesson -> lesson.getLessonGisus().stream()).filter(lessonGisu ->lessonGisu.getLessonState() == LessonState.APPROVED )
 			.map(lessonGisu -> {
 				int currentEnrollment = myLessonRepository.countByLessonGisu(lessonGisu);
 
@@ -275,7 +278,8 @@ public class LessonServiceImpl implements LessonService {
 		// 각 강좌별 LessonGisu 정보 및 수강 인원 수 조회
 		return lessons.stream()
 			.flatMap(lesson -> lesson.getLessonGisus().stream())
-			.map(lessonGisu -> {
+				.filter(lessonGisu -> lessonGisu.getLessonState() == LessonState.APPROVED)
+				.map(lessonGisu -> {
 				int currentEnrollment = myLessonRepository.countByLessonGisu(lessonGisu);
 
 				return LessonListSearchResponseDTO.builder()
@@ -296,6 +300,7 @@ public class LessonServiceImpl implements LessonService {
 			.collect(Collectors.toList());
 	}
 
+	@Transactional
 	@Override
 	public void applyForLesson(Long lessonGisuId, String email) {
 		Member member = memberRepository.findByEmail(email)
@@ -320,6 +325,7 @@ public class LessonServiceImpl implements LessonService {
 			.build();
 
 		myLessonRepository.save(newMyLesson);
+		applicationEventPublisher.publishEvent(new ReservationChangedEvent(lessonGisuId));
 
 	}
 
@@ -355,7 +361,7 @@ public class LessonServiceImpl implements LessonService {
 				.capacity(gisuDto.getCapacity())
 				.lessonFee(gisuDto.getLessonFee())
 				.duration(gisuDto.getDuration())
-				.lessonState(LessonState.PENDING)
+				.lessonState(gisuDto.getState())
 				.lesson(savedLesson)
 				.lessonRoom(assignedRoom)
 				.startedAt(LocalDateTime.now())
@@ -621,6 +627,7 @@ public class LessonServiceImpl implements LessonService {
 		Member member = memberRepository.findByEmail(email)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 		myLessonRepository.deleteByMemberAndLessonGisuId(member, lessonGisuId);
+		applicationEventPublisher.publishEvent(new ReservationChangedEvent(lessonGisuId));
 	}
 
 	private TimeAvailabilityResponseDTO checkAllTimeSlotsAvailability(List<LessonRoom> availableRooms, String duration) {

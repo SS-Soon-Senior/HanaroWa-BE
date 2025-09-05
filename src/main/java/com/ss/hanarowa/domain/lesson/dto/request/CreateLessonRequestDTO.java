@@ -5,12 +5,14 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ss.hanarowa.domain.lesson.entity.Category;
+import com.ss.hanarowa.domain.lesson.entity.LessonState;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -43,6 +45,7 @@ public class CreateLessonRequestDTO {
     @NotEmpty(message = "최소 하나의 기수는 필요합니다")
     private List<CreateLessonGisuRequestDTO> lessonGisus;
     
+    @Builder
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -59,6 +62,9 @@ public class CreateLessonRequestDTO {
         
         @NotNull(message = "강의실 ID는 필수입니다")
         private Long lessonRoomId;
+        
+        @Builder.Default
+        private LessonState state = LessonState.PENDING;
         
         @Valid
         @NotEmpty(message = "최소 하나의 커리큘럼은 필요합니다")

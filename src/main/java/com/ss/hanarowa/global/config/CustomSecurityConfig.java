@@ -68,8 +68,10 @@ public class CustomSecurityConfig {
 					"/swagger.html",
 					"/member/refresh",
 					"/auth/logout",
-					"/branch"
+					"/branch",
+					"/ws/**"
 				).permitAll()
+				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 				.anyRequest().authenticated()
 			)
 			.exceptionHandling(config -> {

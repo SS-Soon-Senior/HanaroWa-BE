@@ -25,7 +25,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		response.setContentType("application/json;charset=UTF-8");
 
-		ReasonDTO reason = ErrorStatus.MEMBER_NOT_AUTHORITY.getReason();
+		ReasonDTO reason = ErrorStatus.LESSON_ALREADY_APPLIED.getReason();
 		ObjectMapper mapper = new ObjectMapper();
 		String json = mapper.writeValueAsString(reason);
 
