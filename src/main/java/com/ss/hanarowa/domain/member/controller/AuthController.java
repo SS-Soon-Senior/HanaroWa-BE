@@ -48,14 +48,55 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class AuthController {
 	private final AuthenticationManager authenticationManager;
-	private final TokenBlacklistService tokenBlacklistService;
 	private final MemberService memberService;
 
 	@PostMapping("/signup")
 	@Operation(summary = "일반 회원가입")
-	public ResponseEntity<ApiResponse<String>> signup(@Valid @RequestBody MemberRegistRequestDTO memberRegistRequestDTO) {
+	public ResponseEntity<ApiResponse<LoginResponseDTO>> signup(@Valid @RequestBody MemberRegistRequestDTO memberRegistRequestDTO, HttpServletResponse response) {
 		memberService.credentialRegist(memberRegistRequestDTO);
-		return ResponseEntity.ok(ApiResponse.onSuccess("회원가입 완료"));
+
+		Authentication authenticate = authenticationManager.authenticate(
+			new UsernamePasswordAuthenticationToken(
+				memberRegistRequestDTO.getEmail(), memberRegistRequestDTO.getPassword()
+			));
+
+		TokenResponseDTO tokenDto = JwtUtil.createTokens(authenticate);
+
+		Member member = memberService.getMemberByEmail(memberRegistRequestDTO.getEmail());
+
+		if(member.getDeletedAt() != null) {
+			throw new GeneralException(ErrorStatus.MEMBER_NOT_FOUND);
+		}
+		member.updateRefreshToken(tokenDto.getRefreshToken());
+
+		// AccessToken 쿠키
+		Cookie accessCookie = new Cookie("accessToken", tokenDto.getAccessToken());
+		accessCookie.setHttpOnly(false);
+		accessCookie.setSecure(false); // 운영 HTTPS면 true
+		accessCookie.setPath("/");
+		accessCookie.setMaxAge(60);
+		response.addCookie(accessCookie);
+
+		// RefreshToken 쿠키
+		Cookie refreshCookie = new Cookie("refreshToken", tokenDto.getRefreshToken());
+		refreshCookie.setHttpOnly(true);
+		refreshCookie.setSecure(false);
+		refreshCookie.setPath("/");
+		refreshCookie.setMaxAge(7 * 24 * 60 * 60);
+		response.addCookie(refreshCookie);
+
+		String redirectUrl = "http://localhost:3000/auth/signup/info";
+		LoginResponseDTO responseDto = LoginResponseDTO.builder()
+			.url(redirectUrl)
+			.tokens(TokenResponseDTO.builder()
+				.email(tokenDto.getEmail())
+				.accessToken(tokenDto.getAccessToken())
+				.refreshToken(tokenDto.getRefreshToken())
+				.build())
+			.name(member.getName())
+			.build();
+
+		return ResponseEntity.ok(ApiResponse.onSuccess(responseDto));
 	}
 
 	@PostMapping("/signin")
