@@ -1,5 +1,6 @@
 package com.ss.hanarowa.domain.lesson.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,10 +9,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ss.hanarowa.domain.lesson.dto.request.LessonGisuStateUpdateRequestDto;
 import com.ss.hanarowa.domain.lesson.dto.request.UpdateLessonDetailRequestDTO;
+import com.ss.hanarowa.domain.lesson.dto.request.UpdateLessonGisuRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.AdminLessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.AdminManageLessonResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.CurriculumResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonDetailResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuDetailResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuStateUpdateResponseDto;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonMemberResponseDTO;
@@ -183,10 +186,6 @@ public class AdminLessonServiceImpl implements AdminLessonService {
 	public List<AdminManageLessonResponseDTO> getManageLessons() {
 		List<Lesson> lessons = lessonRepository.findAll();
 
-		if (lessons.isEmpty()) {
-			throw new GeneralException(ErrorStatus.LESSON_NOT_FOUND);
-		}
-
 		return lessons.stream()
 			.flatMap(lesson -> lesson.getLessonGisus().stream()
 				.map(gisu -> AdminManageLessonResponseDTO.builder()
@@ -198,5 +197,86 @@ public class AdminLessonServiceImpl implements AdminLessonService {
 					.state(gisu.getLessonState())
 					.build()))
 			.toList();
+	}
+
+	@Override
+	public LessonGisuDetailResponseDTO getLessonGisuDetail(Long lessonGisuId) {
+		LessonGisu lessonGisu = lessonGisuRepository.findById(lessonGisuId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.LESSONGISU_NOT_FOUND));
+
+		Lesson lesson = lessonGisu.getLesson();
+		
+		List<CurriculumResponseDTO> curriculums = lessonGisu.getCurriculums().stream()
+			.map(curriculum -> CurriculumResponseDTO.builder()
+				.id(curriculum.getId())
+				.content(curriculum.getContent())
+				.build())
+			.toList();
+
+		return LessonGisuDetailResponseDTO.builder()
+			.lessonName(lesson.getLessonName())
+			.instructor(lesson.getInstructor())
+			.instruction(lesson.getInstruction())
+			.description(lesson.getDescription())
+			.category(lesson.getCategory().name())
+			.lessonImg(lesson.getLessonImg())
+			.capacity(lessonGisu.getCapacity())
+			.lessonFee(lessonGisu.getLessonFee())
+			.duration(lessonGisu.getDuration())
+			.lessonState(lessonGisu.getLessonState())
+			.curriculums(curriculums)
+			.build();
+	}
+
+	@Override
+	@Transactional
+	public LessonGisuDetailResponseDTO updateLessonGisu(Long lessonGisuId, UpdateLessonGisuRequestDTO requestDTO) {
+		LessonGisu lessonGisu = lessonGisuRepository.findById(lessonGisuId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.LESSONGISU_NOT_FOUND));
+
+		Lesson lesson = lessonGisu.getLesson();
+
+		// Lesson 정보 업데이트
+		lesson.setLessonName(requestDTO.getLessonName());
+		lesson.setInstructor(requestDTO.getInstructor());
+		lesson.setInstruction(requestDTO.getInstruction());
+		lesson.setDescription(requestDTO.getDescription());
+		lesson.setCategory(requestDTO.getCategory());
+		lesson.setLessonImg(requestDTO.getLessonImg());
+		
+		// LessonGisu 정보 업데이트
+		lessonGisu.setCapacity(requestDTO.getCapacity());
+		lessonGisu.setLessonFee(requestDTO.getLessonFee());
+		lessonGisu.setDuration(requestDTO.getDuration());
+		lessonGisu.setLessonState(requestDTO.getLessonState());
+
+		// 커리큘럼 업데이트
+		if (requestDTO.getCurriculums() != null) {
+			for (int i = 0; i < requestDTO.getCurriculums().size(); i++) {
+				UpdateLessonGisuRequestDTO.UpdateCurriculumDTO curriculumDTO = requestDTO.getCurriculums().get(i);
+				
+				if (curriculumDTO.getId() != null && curriculumDTO.getId() > 0) {
+					Curriculum curriculum = curriculumRepository.findById(curriculumDTO.getId())
+						.orElseThrow(() -> new GeneralException(ErrorStatus.CURRICULUM_NOT_FOUND));
+					
+					curriculum.setContent(curriculumDTO.getContent());
+					curriculumRepository.save(curriculum);
+				} else {
+					
+					Curriculum newCurriculum = Curriculum.builder()
+						.content(curriculumDTO.getContent())
+						.lessonGisu(lessonGisu)
+						.startedAt(LocalDateTime.now())
+						.endedAt(LocalDateTime.now())
+						.build();
+
+					curriculumRepository.save(newCurriculum);
+				}
+			}
+		}
+
+		lessonRepository.save(lesson);
+		lessonGisuRepository.save(lessonGisu);
+		return getLessonGisuDetail(lessonGisuId);
 	}
 }
