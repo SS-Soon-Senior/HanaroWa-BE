@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ss.hanarowa.domain.lesson.dto.request.MyReservationPageResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.MyReservationPageResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.request.ReviewRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.request.CreateLessonRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.request.TimeAvailabilityRequestDTO;
@@ -28,7 +28,6 @@ import com.ss.hanarowa.domain.lesson.dto.response.MyOpenLessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.TimeAvailabilityResponseDTO;
 import com.ss.hanarowa.domain.lesson.service.LessonService;
 import com.ss.hanarowa.domain.lesson.service.ReviewService;
-import com.ss.hanarowa.domain.member.service.MemberService;
 import com.ss.hanarowa.global.S3Service;
 import com.ss.hanarowa.global.exception.GeneralException;
 import com.ss.hanarowa.global.response.ApiResponse;
@@ -49,7 +48,6 @@ public class LessonController {
 	private final LessonService lessonService;
 	private final ReviewService reviewService;
 	private final S3Service s3Service;
-	private final MemberService memberService;
 
 	@PostMapping("/{lessonGisuId}/review")
 	@Operation(summary = "강좌 기수 리뷰 작성", description = "사용자가 특정 강좌 기수에 대한 리뷰를 작성합니다.")
