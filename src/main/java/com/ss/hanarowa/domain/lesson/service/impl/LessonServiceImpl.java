@@ -361,7 +361,7 @@ public class LessonServiceImpl implements LessonService {
 				.capacity(gisuDto.getCapacity())
 				.lessonFee(gisuDto.getLessonFee())
 				.duration(gisuDto.getDuration())
-				.lessonState(LessonState.PENDING)
+				.lessonState(gisuDto.getState())
 				.lesson(savedLesson)
 				.lessonRoom(assignedRoom)
 				.startedAt(LocalDateTime.now())
