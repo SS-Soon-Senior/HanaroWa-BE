@@ -26,7 +26,9 @@ import com.ss.hanarowa.global.security.TokenBlacklistService;
 import com.ss.hanarowa.global.util.Format;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -62,16 +64,19 @@ public class MemberServiceImpl implements MemberService {
 			throw new GeneralException(ErrorStatus.MEMBER_EMAIL_EXIST);
 		}
 
-		memberRegistRequestDTO.setPassword(passwordEncoder.encode(memberRegistRequestDTO.getPassword()));
+		String raw = memberRegistRequestDTO.getPassword();
+		String encoded = passwordEncoder.encode(raw);
 
 		Member member = Member.builder()
 			.email(memberRegistRequestDTO.getEmail())
 			.name(memberRegistRequestDTO.getName())
-			.password(memberRegistRequestDTO.getPassword())
+			.password(encoded)
 			.role(Role.USERS)
 			.build();
 
+
 		memberRepository.save(member);
+
 	}
 
 	@Override
