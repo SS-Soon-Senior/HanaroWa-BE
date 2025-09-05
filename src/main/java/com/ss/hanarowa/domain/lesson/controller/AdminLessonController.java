@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.hanarowa.domain.lesson.dto.request.LessonGisuStateUpdateRequestDto;
 import com.ss.hanarowa.domain.lesson.dto.request.UpdateLessonDetailRequestDTO;
+import com.ss.hanarowa.domain.lesson.dto.request.UpdateLessonGisuRequestDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.AdminLessonListResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.AdminManageLessonResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonDetailResponseDTO;
+import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuDetailResponseDTO;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonGisuStateUpdateResponseDto;
 import com.ss.hanarowa.domain.lesson.dto.response.LessonMemberResponseDTO;
 import com.ss.hanarowa.domain.lesson.service.AdminLessonService;
@@ -90,5 +92,23 @@ public class AdminLessonController {
 		log.debug("[관리자] Controller : 강좌 관리 목록 가져오기");
 		List<AdminManageLessonResponseDTO> list = adminLessonService.getManageLessons();
 		return ResponseEntity.ok(ApiResponse.onSuccess(list));
+	}
+
+	@Operation(summary = "관리자 기수 상세 조회")
+	@GetMapping("/gisu/{lessonGisuId}")
+	public ResponseEntity<ApiResponse<LessonGisuDetailResponseDTO>> getLessonGisuDetail(@PathVariable Long lessonGisuId) {
+		log.info("[관리자] Controller : 기수 상세 조회 - lessonGisuId: {}", lessonGisuId);
+		LessonGisuDetailResponseDTO result = adminLessonService.getLessonGisuDetail(lessonGisuId);
+		return ResponseEntity.ok(ApiResponse.onSuccess(result));
+	}
+
+	@Operation(summary = "관리자 기수 정보 수정")
+	@PatchMapping("/gisu/{lessonGisuId}")
+	public ResponseEntity<ApiResponse<LessonGisuDetailResponseDTO>> updateLessonGisu(
+		@PathVariable Long lessonGisuId, 
+		@Valid @RequestBody UpdateLessonGisuRequestDTO requestDTO) {
+		log.info("[관리자] Controller : 기수 정보 수정 - lessonGisuId: {}, requestDTO: {}", lessonGisuId, requestDTO);
+		LessonGisuDetailResponseDTO result = adminLessonService.updateLessonGisu(lessonGisuId, requestDTO);
+		return ResponseEntity.ok(ApiResponse.onSuccess(result));
 	}
 }
