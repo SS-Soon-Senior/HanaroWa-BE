@@ -79,13 +79,6 @@ public class AdminLessonController {
 	}
 
 
-	@Operation(summary="관리자 강좌 상세 수정하기")
-	@PatchMapping("/{lessonId}")
-	public ResponseEntity<ApiResponse<LessonDetailResponseDTO>> updateLessonDetail(@PathVariable Long lessonId, @Valid @RequestBody UpdateLessonDetailRequestDTO requestDTO){
-		log.info("[관리자] Controller : 강좌 상세 수정 - lessonId: {}, requestDTO: {}", lessonId, requestDTO);
-		return ResponseEntity.ok(ApiResponse.onSuccess(adminLessonService.updateLessonDetail(lessonId,requestDTO)));
-	}
-
 	@Operation(summary = "관리자 강좌 관리 목록")
 	@GetMapping("/manage")
 	public ResponseEntity<ApiResponse<List<AdminManageLessonResponseDTO>>> getManageLessons(){
@@ -109,6 +102,14 @@ public class AdminLessonController {
 		@Valid @RequestBody UpdateLessonGisuRequestDTO requestDTO) {
 		log.info("[관리자] Controller : 기수 정보 수정 - lessonGisuId: {}, requestDTO: {}", lessonGisuId, requestDTO);
 		LessonGisuDetailResponseDTO result = adminLessonService.updateLessonGisu(lessonGisuId, requestDTO);
+		System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"+ lessonGisuId);
 		return ResponseEntity.ok(ApiResponse.onSuccess(result));
+	}
+
+	@Operation(summary="관리자 강좌 상세 수정하기")
+	@PatchMapping("/{lessonId}")
+	public ResponseEntity<ApiResponse<LessonDetailResponseDTO>> updateLessonDetail(@PathVariable Long lessonId, @Valid @RequestBody UpdateLessonDetailRequestDTO requestDTO){
+		log.info("[관리자] Controller : 강좌 상세 수정 - lessonId: {}, requestDTO: {}", lessonId, requestDTO);
+		return ResponseEntity.ok(ApiResponse.onSuccess(adminLessonService.updateLessonDetail(lessonId,requestDTO)));
 	}
 }

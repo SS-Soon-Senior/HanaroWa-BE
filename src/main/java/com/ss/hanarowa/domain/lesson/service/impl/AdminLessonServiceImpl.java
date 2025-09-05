@@ -1,5 +1,6 @@
 package com.ss.hanarowa.domain.lesson.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -251,18 +252,31 @@ public class AdminLessonServiceImpl implements AdminLessonService {
 
 		// 커리큘럼 업데이트
 		if (requestDTO.getCurriculums() != null) {
-			for (UpdateLessonGisuRequestDTO.UpdateCurriculumDTO curriculumDTO : requestDTO.getCurriculums()) {
-				Curriculum curriculum = curriculumRepository.findById(curriculumDTO.getId())
-					.orElseThrow(() -> new GeneralException(ErrorStatus.CURRICULUM_NOT_FOUND));
+			for (int i = 0; i < requestDTO.getCurriculums().size(); i++) {
+				UpdateLessonGisuRequestDTO.UpdateCurriculumDTO curriculumDTO = requestDTO.getCurriculums().get(i);
 				
-				curriculum.setContent(curriculumDTO.getContent());
-				curriculumRepository.save(curriculum);
+				if (curriculumDTO.getId() != null && curriculumDTO.getId() > 0) {
+					Curriculum curriculum = curriculumRepository.findById(curriculumDTO.getId())
+						.orElseThrow(() -> new GeneralException(ErrorStatus.CURRICULUM_NOT_FOUND));
+					
+					curriculum.setContent(curriculumDTO.getContent());
+					curriculumRepository.save(curriculum);
+				} else {
+					
+					Curriculum newCurriculum = Curriculum.builder()
+						.content(curriculumDTO.getContent())
+						.lessonGisu(lessonGisu)
+						.startedAt(LocalDateTime.now())
+						.endedAt(LocalDateTime.now())
+						.build();
+
+					curriculumRepository.save(newCurriculum);
+				}
 			}
 		}
 
 		lessonRepository.save(lesson);
 		lessonGisuRepository.save(lessonGisu);
-
 		return getLessonGisuDetail(lessonGisuId);
 	}
 }
