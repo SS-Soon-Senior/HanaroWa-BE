@@ -237,7 +237,7 @@ public class LessonServiceImpl implements LessonService {
 
 		// 각 강좌별 LessonGisu 정보 및 수강 인원 수 조회
 		List<LessonInfoResponseDTO> lessonInfos = lessons.stream()
-			.flatMap(lesson -> lesson.getLessonGisus().stream())
+			.flatMap(lesson -> lesson.getLessonGisus().stream()).filter(lessonGisu ->lessonGisu.getLessonState() == LessonState.APPROVED )
 			.map(lessonGisu -> {
 				int currentEnrollment = myLessonRepository.countByLessonGisu(lessonGisu);
 
@@ -278,7 +278,8 @@ public class LessonServiceImpl implements LessonService {
 		// 각 강좌별 LessonGisu 정보 및 수강 인원 수 조회
 		return lessons.stream()
 			.flatMap(lesson -> lesson.getLessonGisus().stream())
-			.map(lessonGisu -> {
+				.filter(lessonGisu -> lessonGisu.getLessonState() == LessonState.APPROVED)
+				.map(lessonGisu -> {
 				int currentEnrollment = myLessonRepository.countByLessonGisu(lessonGisu);
 
 				return LessonListSearchResponseDTO.builder()
