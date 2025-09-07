@@ -19,4 +19,7 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
 	List<Lesson> findByLessonNameContainingOrderByIdDesc(@Param("query") String query);
 
 	List<Lesson> findAllByMemberId(Long memberId);
+	
+	// 강좌명과 강사명이 정확히 일치하는 강좌 찾기
+	Lesson findByLessonNameAndInstructor(String lessonName, String instructor);
 }

@@ -75,8 +75,9 @@ public class LessonServiceImpl implements LessonService {
 		Lesson lesson = lessonRepository.findById(lessonId)
 			.orElseThrow(() -> new RuntimeException("Lesson not found"));
 		
-		// LessonGisu 정보와 각 기수별 수강 인원 수 조회
+		// LessonGisu 정보와 각 기수별 수강 인원 수 조회 (끝난 기수 제외)
 		List<LessonGisuResponseDTO> lessonGisuDTOs = lesson.getLessonGisus().stream()
+			.filter(lessonGisu -> !isLessonGisuExpired(lessonGisu.getDuration())) // 끝난 강좌 제외
 			.map(lessonGisu -> {
 				int currentEnrollment = myLessonRepository.countByLessonGisu(lessonGisu);
 				
@@ -336,19 +337,34 @@ public class LessonServiceImpl implements LessonService {
 		Branch branch = branchRepository.findById(createLessonRequestDTO.getBranchId())
 			.orElseThrow(() -> new GeneralException(ErrorStatus.BRANCH_NOT_FOUND));
 
-		Lesson lesson = Lesson.builder()
-			.lessonName(createLessonRequestDTO.getLessonName())
-			.instructor(createLessonRequestDTO.getInstructor())
-			.instruction(createLessonRequestDTO.getInstruction())
-			.description(createLessonRequestDTO.getDescription())
-			.category(createLessonRequestDTO.getCategory())
-			.lessonImg(imageUrl)
-			.branch(branch)
-			.member(member)
-			.build();
+		// 강좌명과 강사명으로 기존 강좌 검색
+		Lesson existingLesson = lessonRepository.findByLessonNameAndInstructor(
+			createLessonRequestDTO.getLessonName(), 
+			createLessonRequestDTO.getInstructor()
+		);
 
-		Lesson savedLesson = lessonRepository.save(lesson);
+		Lesson targetLesson;
+		
+		if (existingLesson != null) {
+			// 기존 강좌가 있으면 해당 강좌 사용
+			targetLesson = existingLesson;
+		} else {
+			// 기존 강좌가 없으면 새로 생성
+			Lesson newLesson = Lesson.builder()
+				.lessonName(createLessonRequestDTO.getLessonName())
+				.instructor(createLessonRequestDTO.getInstructor())
+				.instruction(createLessonRequestDTO.getInstruction())
+				.description(createLessonRequestDTO.getDescription())
+				.category(createLessonRequestDTO.getCategory())
+				.lessonImg(imageUrl)
+				.branch(branch)
+				.member(member)
+				.build();
+			
+			targetLesson = lessonRepository.save(newLesson);
+		}
 
+		// 새로운 기수와 커리큘럼 생성
 		for (CreateLessonRequestDTO.CreateLessonGisuRequestDTO gisuDto : createLessonRequestDTO.getLessonGisus()) {
 			LessonRoom assignedRoom = assignAvailableRoom(branch.getId(), gisuDto.getDuration());
 			if (assignedRoom == null) {
@@ -360,7 +376,7 @@ public class LessonServiceImpl implements LessonService {
 				.lessonFee(gisuDto.getLessonFee())
 				.duration(gisuDto.getDuration())
 				.lessonState(gisuDto.getState())
-				.lesson(savedLesson)
+				.lesson(targetLesson)
 				.lessonRoom(assignedRoom)
 				.startedAt(LocalDateTime.now())
 				.build();
@@ -721,5 +737,14 @@ public class LessonServiceImpl implements LessonService {
 			LocalDate today = LocalDate.now();
 
 			return today.isAfter(endDate);
+	}
+
+	// 새로운 메서드: getEndDate를 활용하여 기수가 종료되었는지 확인
+	public boolean isLessonGisuExpired(String durationString) {
+		LocalDate endDate = getEndDate(durationString);
+		if (endDate == null) return false; // 파싱 실패 시 처리
+		
+		LocalDate today = LocalDate.now();
+		return today.isAfter(endDate);
 	}
 }
