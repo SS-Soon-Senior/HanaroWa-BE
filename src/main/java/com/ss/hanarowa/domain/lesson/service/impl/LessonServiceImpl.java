@@ -229,15 +229,13 @@ public class LessonServiceImpl implements LessonService {
 
 		if (categories != null && !categories.isEmpty()) {
 			lessons = lessons.stream()
-				.filter(lesson -> {
-					return categories.contains(lesson.getCategory().toString());
-				})
+				.filter(lesson -> categories.contains(lesson.getCategory().toString()))
 				.toList();
 		}
 
 		// 각 강좌별 LessonGisu 정보 및 수강 인원 수 조회
 		List<LessonInfoResponseDTO> lessonInfos = lessons.stream()
-			.flatMap(lesson -> lesson.getLessonGisus().stream()).filter(lessonGisu ->lessonGisu.getLessonState() == LessonState.APPROVED )
+			.flatMap(lesson -> lesson.getLessonGisus().stream()).filter(lessonGisu ->lessonGisu.getLessonState() == LessonState.APPROVED && !isLectureExpired(lessonGisu.getDuration()))
 			.map(lessonGisu -> {
 				int currentEnrollment = myLessonRepository.countByLessonGisu(lessonGisu);
 
@@ -278,7 +276,7 @@ public class LessonServiceImpl implements LessonService {
 		// 각 강좌별 LessonGisu 정보 및 수강 인원 수 조회
 		return lessons.stream()
 			.flatMap(lesson -> lesson.getLessonGisus().stream())
-				.filter(lessonGisu -> lessonGisu.getLessonState() == LessonState.APPROVED)
+				.filter(lessonGisu -> lessonGisu.getLessonState() == LessonState.APPROVED && !isLectureExpired(lessonGisu.getDuration()))
 				.map(lessonGisu -> {
 				int currentEnrollment = myLessonRepository.countByLessonGisu(lessonGisu);
 
@@ -711,5 +709,17 @@ public class LessonServiceImpl implements LessonService {
 		}
 
 		return dates;
+	}
+
+	public boolean isLectureExpired(String durationString) {
+			String dateRangePart = durationString.split(" ")[0];
+
+			String endDateString = dateRangePart.split("~")[0];
+
+			LocalDate endDate = LocalDate.parse(endDateString);
+
+			LocalDate today = LocalDate.now();
+
+			return today.isAfter(endDate);
 	}
 }
