@@ -22,4 +22,6 @@ public class MemberInfoResponseDTO {
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy년 MM월 dd일")
 	private LocalDate birth;
+
+	private String provider;
 }

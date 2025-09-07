@@ -58,10 +58,10 @@ public class JwtRefreshController {
 			.httpOnly(true)
 			.secure(false) // 프로덕션에서는 true로 변경
 			.path("/")
-			.maxAge(Duration.ofMinutes(30))
+			.maxAge(Duration.ofMinutes(1))
 			.sameSite("Lax")
 			.build();
-		response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+		response.setHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 
 		// 4. 새 RefreshToken 쿠키 설정
 		ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", newRefreshToken)
