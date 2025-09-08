@@ -1,0 +1,31 @@
+package com.ss.hanarowa.global.response.code.status;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+
+import com.ss.hanarowa.global.response.code.BaseCode;
+import com.ss.hanarowa.global.response.code.ReasonDTO;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
+public enum SuccessStatus implements BaseCode {
+
+	SUCCESS(HttpStatus.OK, "COMMON 200", "요청에 성공하셨습니다.");
+
+	private final HttpStatusCode httpStatusCode;
+	private final String code;
+	private final String message;
+
+	@Override
+	public ReasonDTO getReason() {
+		return ReasonDTO.builder()
+						.httpStatusCode(httpStatusCode)
+						.isSuccess(false)
+						.code(code)
+						.message(message)
+						.build();
+	}
+}

@@ -1,0 +1,166 @@
+package com.ss.hanarowa.domain.member.service.impl;
+
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.ss.hanarowa.domain.branch.dto.response.BranchResponseDTO;
+import com.ss.hanarowa.domain.branch.entity.Branch;
+import com.ss.hanarowa.domain.branch.repository.BranchRepository;
+import com.ss.hanarowa.domain.member.dto.request.MemberRegistRequestDTO;
+import com.ss.hanarowa.domain.member.dto.request.ModifyPasswdRequestDTO;
+import com.ss.hanarowa.domain.member.entity.Member;
+import com.ss.hanarowa.domain.member.entity.Role;
+import com.ss.hanarowa.domain.member.repository.MemberRepository;
+import com.ss.hanarowa.domain.member.dto.request.MemberInfoRequestDTO;
+import com.ss.hanarowa.domain.member.service.MemberService;
+import com.ss.hanarowa.global.exception.GeneralException;
+import com.ss.hanarowa.global.response.code.status.ErrorStatus;
+import com.ss.hanarowa.global.security.JwtUtil;
+import com.ss.hanarowa.global.security.TokenBlacklistService;
+import com.ss.hanarowa.global.util.Format;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class MemberServiceImpl implements MemberService {
+	private final MemberRepository memberRepository;
+	private final BranchRepository branchRepository;
+	private final PasswordEncoder passwordEncoder;
+
+	private final TokenBlacklistService tokenBlacklistService;
+
+	@Transactional
+	public void logout(String accessToken, String refreshToken) {
+		if (accessToken != null && !accessToken.isEmpty()) {
+			// accessToken 블랙리스트 로직
+			Map<String, Object> claims = JwtUtil.validateToken(accessToken);
+			long expirationTime = ((Number) claims.get("exp")).longValue() * 1000;
+			tokenBlacklistService.blacklistToken(accessToken, expirationTime);
+		}
+
+		if (refreshToken != null && !refreshToken.isEmpty()) {
+			// DB에서 refreshToken 삭제 로직
+			Map<String, Object> claims = JwtUtil.validateToken(refreshToken);
+			String email = (String) claims.get("email");
+			Member member = getMemberByEmail(email); // 이 메소드는 이미 있다고 가정
+			member.clearRefreshToken();
+		}
+	}
+
+	@Override
+	public void credentialRegist(MemberRegistRequestDTO memberRegistRequestDTO) {
+		Optional<Member> email = memberRepository.findByEmail(memberRegistRequestDTO.getEmail());
+		if (email.isPresent()){
+			throw new GeneralException(ErrorStatus.MEMBER_EMAIL_EXIST);
+		}
+
+		String raw = memberRegistRequestDTO.getPassword();
+		String encoded = passwordEncoder.encode(raw);
+
+		Member member = Member.builder()
+			.email(memberRegistRequestDTO.getEmail())
+			.name(memberRegistRequestDTO.getName())
+			.password(encoded)
+			.role(Role.USERS)
+			.build();
+
+		memberRepository.save(member);
+
+	}
+
+	@Override
+	public void infoRegist(MemberInfoRequestDTO memberInfoRequestDTO, String email) {
+		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+		member.setBirth(Format.getBirthAsLocalDate(memberInfoRequestDTO.getBirth()));
+		member.setPhoneNumber(memberInfoRequestDTO.getPhoneNumber());
+
+		memberRepository.save(member);
+	}
+
+	@Override
+	public void withdraw(String email) {
+		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+
+		member.setDeletedAt(LocalDateTime.now());
+
+		memberRepository.save(member);
+	}
+
+	@Override
+	public void modifyInfo(MemberInfoRequestDTO memberInfoRequestDTO, String email) {
+		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+
+		if(Format.getBirthAsLocalDate(memberInfoRequestDTO.getBirth()) != member.getBirth()){
+			member.setBirth(Format.getBirthAsLocalDate(memberInfoRequestDTO.getBirth()));
+		}
+		if(!Objects.equals(memberInfoRequestDTO.getPhoneNumber(), member.getPhoneNumber())){
+			member.setPhoneNumber(memberInfoRequestDTO.getPhoneNumber());
+		}
+
+		memberRepository.save(member);
+	}
+
+	@Override
+	public void modifyPassword(ModifyPasswdRequestDTO passwdRequestDTO, String email) {
+		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+
+		// 현재 비밀번호 확인
+		if(!passwordEncoder.matches(passwdRequestDTO.getCurrentPassword(), member.getPassword())) {
+			throw new GeneralException(ErrorStatus.MEMBER_PASSWORD_WRONG);
+		}
+
+		member.setPassword(passwordEncoder.encode(passwdRequestDTO.getNewPassword()));
+		memberRepository.save(member);
+	}
+
+	@Override
+	public void updateMemberBranch(long branchId, String email) {
+		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+
+		Branch branch = branchRepository.findById(branchId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.BRANCH_NOT_FOUND));
+
+		member.setBranch(branch);
+		memberRepository.save(member);
+	}
+
+	@Override
+	public BranchResponseDTO getMemberBranch(String email) {
+		Member member = memberRepository.findByEmail(email)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+		
+		Branch branch = member.getBranch();
+		if (branch == null) {
+			throw new GeneralException(ErrorStatus.BRANCH_NOT_FOUND);
+		}
+		
+		return BranchResponseDTO.builder()
+			.branchId(branch.getId())
+			.branchName(branch.getName())
+			.locationName(branch.getLocation().getName())
+			.build();
+	}
+
+	@Override
+	public Long getMemberIdByEmail(String email) {
+		Member member = memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+		return member.getId();
+	}
+
+	@Override
+	public Member getMemberByEmail(String email) {
+		return memberRepository.findByEmail(email).orElseThrow(()->new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+	}
+
+
+}
