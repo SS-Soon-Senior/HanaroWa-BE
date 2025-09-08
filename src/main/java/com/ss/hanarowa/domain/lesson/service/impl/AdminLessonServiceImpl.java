@@ -1,6 +1,8 @@
 package com.ss.hanarowa.domain.lesson.service.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,13 +48,10 @@ public class AdminLessonServiceImpl implements AdminLessonService {
 	public List<AdminLessonListResponseDTO> getAllLessons() {
 		List<Lesson> lessons = lessonRepository.findAll();
 
-		if (lessons.isEmpty()) {
-			throw new GeneralException(ErrorStatus.LESSON_NOT_FOUND);
-		}
-
 		return lessons.stream()
 			.flatMap(lesson -> lesson.getLessonGisus().stream()
 				.filter(gisu -> gisu.getLessonState() == LessonState.APPROVED)
+				.filter(this::isActiveGisu)
 				.map(gisu -> {
 					int participantCount = myLessonRepository.countByLessonGisuId(gisu.getId());
 					return AdminLessonListResponseDTO.builder()
@@ -132,6 +131,13 @@ public class AdminLessonServiceImpl implements AdminLessonService {
 
 	@Override
 	public List<LessonMemberResponseDTO> findAllByLessonGisuId(long lessonGisuId) {
+		LessonGisu lessonGisu = lessonGisuRepository.findById(lessonGisuId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.LESSONGISU_NOT_FOUND));
+		
+		if (!isActiveGisu(lessonGisu)) {
+			return List.of();
+		}
+		
 		return myLessonRepository.findAllByLessonGisuId(lessonGisuId).stream()
 			.map(MyLesson::getMember)               // 바로 member 추출
 			.map(m -> new LessonMemberResponseDTO(
@@ -278,5 +284,24 @@ public class AdminLessonServiceImpl implements AdminLessonService {
 		lessonRepository.save(lesson);
 		lessonGisuRepository.save(lessonGisu);
 		return getLessonGisuDetail(lessonGisuId);
+	}
+	
+	private boolean isActiveGisu(LessonGisu gisu) {
+		LocalDate endDate = getEndDate(gisu.getDuration());
+		if (endDate == null) return false;
+		
+		LocalDate today = LocalDate.now();
+		return !today.isAfter(endDate);
+	}
+
+	public LocalDate getEndDate(String duration) {
+		try {
+			String dateRangePart = duration.split(" ")[0]; // "2025-01-01~2025-02-28"
+			String endDateString = dateRangePart.split("~")[1]; // "2025-02-28"
+			return LocalDate.parse(endDateString);
+		} catch (ArrayIndexOutOfBoundsException | DateTimeParseException e) {
+			// log.error("강의 기간 문자열에서 종료 날짜를 파싱할 수 없습니다: {}", duration, e);
+			return null;
+		}
 	}
 }
