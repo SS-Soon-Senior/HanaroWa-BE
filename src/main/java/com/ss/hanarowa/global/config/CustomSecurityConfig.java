@@ -41,8 +41,6 @@ public class CustomSecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http,
 		CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
 		log.info("--- securityConfig");
-		System.out.println("** SecurityConfig.filgerChain");
-
 		http
 			// .httpBasic(AbstractHttpConfigurer::disable)
 			.csrf(AbstractHttpConfigurer::disable)
