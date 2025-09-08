@@ -26,6 +26,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 				String.format("%s %s", m.getBranch().getLocation().getName(), m.getBranch().getName()),
 				m.getPhoneNumber(),
 				m.getEmail(),
+				m.getDeletedAt() == null ? null : m.getDeletedAt().toLocalDate(),
 				m.getBirth()
 			))
 			.toList();
