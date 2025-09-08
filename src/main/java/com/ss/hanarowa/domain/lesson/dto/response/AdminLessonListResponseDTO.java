@@ -13,6 +13,7 @@ import lombok.Setter;
 @Builder
 public class AdminLessonListResponseDTO {
 	Long id;
+	Long lessonGisuId;
 	String lessonName;
 	String instructor;
 	String lessonImg;

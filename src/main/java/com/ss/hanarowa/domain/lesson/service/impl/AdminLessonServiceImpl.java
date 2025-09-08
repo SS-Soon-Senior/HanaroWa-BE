@@ -57,6 +57,7 @@ public class AdminLessonServiceImpl implements AdminLessonService {
 					int participantCount = myLessonRepository.countByLessonGisuId(gisu.getId());
 					return AdminLessonListResponseDTO.builder()
 						.id(lesson.getId())
+						.lessonGisuId(gisu.getId())
 						.lessonName(lesson.getLessonName())
 						.instructor(lesson.getInstructor())
 						.lessonImg(lesson.getLessonImg())
