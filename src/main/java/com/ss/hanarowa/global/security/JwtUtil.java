@@ -31,7 +31,6 @@ public class JwtUtil {
 			.setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
 			.setExpiration(Date.from(ZonedDateTime.now().plusMinutes(min).toInstant()))
 			.signWith(K).compact();
-		System.out.println("jwtStr = " + jwtStr);
 		return jwtStr;
 	}
 

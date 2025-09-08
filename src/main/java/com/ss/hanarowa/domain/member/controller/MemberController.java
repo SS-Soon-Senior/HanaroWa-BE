@@ -38,7 +38,7 @@ public class MemberController {
 		String email =  authentication.getName();
 		Member m = memberService.getMemberByEmail(email);
 		MemberInfoResponseDTO dto = MemberInfoResponseDTO.builder().
-			name(m.getName()).birth(m.getBirth()).phone(m.getPhoneNumber()).build();
+			name(m.getName()).birth(m.getBirth()).phone(m.getPhoneNumber()).provider(m.getProvider()).build();
 		return ResponseEntity.ok(ApiResponse.onSuccess(dto));
 	}
 

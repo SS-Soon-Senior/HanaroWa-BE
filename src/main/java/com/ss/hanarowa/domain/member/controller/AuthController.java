@@ -1,6 +1,7 @@
 package com.ss.hanarowa.domain.member.controller;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
@@ -122,21 +123,24 @@ public class AuthController {
 			}
 			member.updateRefreshToken(tokenDto.getRefreshToken());
 
-			// AccessToken 쿠키
-			Cookie accessCookie = new Cookie("accessToken", tokenDto.getAccessToken());
-			accessCookie.setHttpOnly(false);
-			accessCookie.setSecure(false); // 운영 HTTPS면 true
-			accessCookie.setPath("/");
-			accessCookie.setMaxAge(60);
-			response.addCookie(accessCookie);
+			ResponseCookie accessCookie = ResponseCookie.from("accessToken", tokenDto.getAccessToken())
+				.httpOnly(true)
+				.secure(false) // 프로덕션에서는 true로 변경
+				.path("/")
+				.maxAge(Duration.ofMinutes(1))
+				.sameSite("Lax")
+				.build();
+			response.setHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 
-			// RefreshToken 쿠키
-			Cookie refreshCookie = new Cookie("refreshToken", tokenDto.getRefreshToken());
-			refreshCookie.setHttpOnly(true);
-			refreshCookie.setSecure(false);
-			refreshCookie.setPath("/");
-			refreshCookie.setMaxAge(7 * 24 * 60 * 60);
-			response.addCookie(refreshCookie);
+			// 4. 새 RefreshToken 쿠키 설정
+			ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokenDto.getRefreshToken())
+				.httpOnly(true)
+				.secure(false) // 프로덕션에서는 true로 변경
+				.path("/")
+				.maxAge(Duration.ofDays(7))
+				.sameSite("Strict")
+				.build();
+			response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
 			String redirectUrl;
 			if(member.getRole() == Role.ADMIN) {
@@ -194,7 +198,7 @@ public class AuthController {
 		}
 
 		ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", "").maxAge(0).path("/").build();
-		response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+		response.setHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
 
 		ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", "").maxAge(0).path("/").build();
 		response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
