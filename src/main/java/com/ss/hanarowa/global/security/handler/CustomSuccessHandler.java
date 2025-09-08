@@ -60,7 +60,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 													.httpOnly(true)
 													.secure(false)
 													.path("/")
-													.maxAge(Duration.ofMinutes(1))
+													.maxAge(Duration.ofMinutes(30))
 													.sameSite("Lax")
 													.build();
 		response.setHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
@@ -70,7 +70,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 													 .secure(false)
 													 .path("/")
 													 .maxAge(Duration.ofDays(7))
-													 .sameSite("Strict")
+													 .sameSite("Lax")
 													 .build();
 		response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 	}
