@@ -28,7 +28,7 @@ public class AdminFacilityServiceImpl implements AdminFacilityService {
 				.reservationId(reservation.getId())
 				.facilityName(reservation.getFacility().getName())
 				.memberName(reservation.getMember().getName())
-				.branchName(reservation.getFacility().getBranch().getName())
+				.branchName(String.format("%s %s", reservation.getFacility().getBranch().getLocation().getName(), reservation.getFacility().getBranch().getName()))
 				.startedAt(Format.getFormattedDate(reservation.getStartedAt()))
 				.reservedAt(Format.reservedTime(reservation.getReservedAt()))
 				.isUsed(Format.isUsed(reservation.getStartedAt()))

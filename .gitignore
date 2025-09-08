@@ -13,6 +13,7 @@ scr/main/generated
 src/main/resources/static/origin
 src/main/resources/static/upload
 data.sql
+dump.sql
 
 ### STS ###
 .apt_generated
