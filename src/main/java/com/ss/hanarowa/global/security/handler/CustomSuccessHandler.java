@@ -60,10 +60,10 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 													.httpOnly(true)
 													.secure(false)
 													.path("/")
-													.maxAge(Duration.ofMinutes(30))
+													.maxAge(Duration.ofMinutes(1))
 													.sameSite("Lax")
 													.build();
-		response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+		response.setHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 
 		ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokenDto.getRefreshToken())
 													 .httpOnly(true)
