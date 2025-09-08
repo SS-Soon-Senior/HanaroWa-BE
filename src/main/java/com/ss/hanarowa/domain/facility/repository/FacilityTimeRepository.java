@@ -11,7 +11,6 @@ import com.ss.hanarowa.domain.facility.entity.FacilityTime;
 public interface FacilityTimeRepository extends JpaRepository<FacilityTime, Long> {
 	List<FacilityTime> findFacilityTimesByFacilityAndStartedAtBetween(Facility facility, LocalDateTime startedAtAfter, LocalDateTime startedAtBefore);
 	
-	// 모든 예약 내역을 최신순으로 조회 (ID 기준)
 	List<FacilityTime> findAllByOrderByIdDesc();
 
 	List<FacilityTime> findAllByMemberId(Long memberId);

@@ -74,7 +74,6 @@ public class MemberServiceImpl implements MemberService {
 			.role(Role.USERS)
 			.build();
 
-
 		memberRepository.save(member);
 
 	}
@@ -123,7 +122,6 @@ public class MemberServiceImpl implements MemberService {
 		member.setPassword(passwordEncoder.encode(passwdRequestDTO.getNewPassword()));
 		memberRepository.save(member);
 	}
-
 
 	@Override
 	public void updateMemberBranch(long branchId, String email) {

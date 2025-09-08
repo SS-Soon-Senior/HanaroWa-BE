@@ -2,7 +2,6 @@ package com.ss.hanarowa.domain.member.controller;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -30,10 +29,8 @@ import com.ss.hanarowa.global.exception.GeneralException;
 import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 import com.ss.hanarowa.global.response.ApiResponse;
 import com.ss.hanarowa.global.security.JwtUtil;
-import com.ss.hanarowa.global.security.TokenBlacklistService;
 
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 
@@ -41,9 +38,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-	
-@Slf4j
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -185,6 +180,7 @@ public class AuthController {
 
 	@PostMapping("/signout")
 	@Operation(summary = "로그아웃", description = "사용자 로그아웃 처리 및 쿠키 삭제")
+	// @Transactional 제거!
 	public ResponseEntity<ApiResponse<String>> logout(
 		@CookieValue(name = "accessToken", required = false) String accessToken,
 		@CookieValue(name = "refreshToken", required = false) String refreshToken,

@@ -18,8 +18,6 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.ss.hanarowa.global.response.ApiResponse;
-import com.ss.hanarowa.global.response.code.BaseErrorCode;
-import com.ss.hanarowa.global.response.code.ReasonDTO;
 import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 
 import jakarta.validation.ConstraintViolationException;
@@ -86,7 +84,6 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 		log.error("Unexpected Exception", ex);
 		return buildResponseEntity(ErrorStatus._INTERNAL_SERVER_ERROR, ex.getMessage());
 	}
-
 
 	private ResponseEntity<Object> buildResponseEntity(ErrorStatus status, Object data) {
 		ApiResponse<Object> body = ApiResponse.onFailure(

@@ -1,23 +1,17 @@
 package com.ss.hanarowa.global.security;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
-import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ss.hanarowa.domain.member.dto.response.MemberAuthResponseDTO;
 import com.ss.hanarowa.domain.member.entity.Role;
-import com.ss.hanarowa.global.response.ApiResponse;
-import com.ss.hanarowa.global.response.code.ReasonDTO;
-import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 import com.ss.hanarowa.global.security.exception.CustomJwtException;
 
 import jakarta.servlet.FilterChain;
@@ -64,7 +58,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		String p = request.getServletPath(); // context-path 제외된 경로
 		if (p.equals("/ws") || p.startsWith("/ws/") || p.equals("/broadcast") || p.startsWith("/broadcast/")) {
 			filterChain.doFilter(request, response);
-			return; // ✅ SockJS 핸드셰이크/스트림 완전 패스
+			return;
 		}
 		String path = request.getRequestURI();
 
@@ -72,9 +66,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			filterChain.doFilter(request, response);
 			return;
 		}
-
-
-		// --- 🔽 여기가 핵심 변경 부분 🔽 ---
 
 		String token = null;
 
@@ -93,7 +84,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			filterChain.doFilter(request, response);
 			return;
 		}
-		// --- 🔼 변경 끝 🔼 ---
 
 		try {
 			if (tokenBlacklistService.isBlacklisted(token)) {

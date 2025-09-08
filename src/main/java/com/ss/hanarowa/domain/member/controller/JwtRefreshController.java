@@ -21,9 +21,7 @@ import com.ss.hanarowa.global.security.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @RestController
 @RequestMapping("/auth")
 @Tag(name = "[사용자] 인증", description = "회원가입 및 로그인 관련 API")

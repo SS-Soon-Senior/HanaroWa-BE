@@ -10,7 +10,6 @@ import com.ss.hanarowa.domain.member.entity.Member;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 	List<Review> findByLessonGisu(LessonGisu lessonGisu);
-	List<Review> findByLessonGisuId(Long lessonGisuId);
 
 	List<Review> findByMemberAndLessonGisu(Member member, LessonGisu lessonGisu);
 }

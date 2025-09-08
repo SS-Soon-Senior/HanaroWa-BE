@@ -18,7 +18,6 @@ import com.ss.hanarowa.domain.facility.dto.reponse.FacilityReservationResponseDT
 import com.ss.hanarowa.domain.facility.dto.reponse.FacilityResponseDTO;
 import com.ss.hanarowa.domain.facility.dto.request.FacilityReservationDTO;
 import com.ss.hanarowa.domain.facility.service.FacilityService;
-import com.ss.hanarowa.domain.member.entity.Member;
 import com.ss.hanarowa.domain.member.service.MemberService;
 import com.ss.hanarowa.global.response.ApiResponse;
 
@@ -41,13 +40,10 @@ public class FacilityController {
 	public ResponseEntity<ApiResponse<FacilityListResponseDTO>> getFacilityByBranchId(
 		@PathVariable Long branchId) {
 
-		// branchId에 해당하는 branchName 가져오기
 		String branchName = facilityService.getBranchName(branchId);
 
-		// 해당 branch의 시설 리스트 조회
 		List<FacilityResponseDTO> facilities = facilityService.getAllFacilities(branchId);
 
-		// 응답 DTO 조립
 		FacilityListResponseDTO responseDto = new FacilityListResponseDTO(branchName, facilities);
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(responseDto));

@@ -37,9 +37,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Tag(name="[사용자] 강좌")
 @RestController
 @RequestMapping("/lesson")
@@ -120,7 +118,6 @@ public class LessonController {
 			lessonService.createLesson(createLessonRequestDTO, email,imageUrl);
 			return ResponseEntity.ok(ApiResponse.onSuccess(null));
 		} catch (Exception e) {
-			log.error("강좌 생성 중 오류 발생: {}", e.getMessage(), e);
 			throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
 		}
 	}
