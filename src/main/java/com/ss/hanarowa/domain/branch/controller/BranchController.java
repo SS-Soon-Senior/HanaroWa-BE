@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/branch")
 @RequiredArgsConstructor
-@Tag(name = "지점", description = "지점 관련 API")
+@Tag(name = "[사용자] 지점", description = "지점 관련 API")
 public class BranchController {
 
 	private final BranchService branchService;

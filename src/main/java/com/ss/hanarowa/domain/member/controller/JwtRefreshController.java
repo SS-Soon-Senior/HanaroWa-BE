@@ -18,6 +18,7 @@ import com.ss.hanarowa.global.response.ApiResponse;
 import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 import com.ss.hanarowa.global.security.JwtUtil;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -25,8 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "[사용자] 인증", description = "회원가입 및 로그인 관련 API")
 public class JwtRefreshController {
-
 	private final MemberService memberService;
 
 	public JwtRefreshController(MemberService memberService) {
@@ -34,7 +35,7 @@ public class JwtRefreshController {
 	}
 
 	@PostMapping("/reissue")
-	@Tag(name = "RefreshToken", description = "리프레시 토큰 재발급")
+	@Operation(summary = "토큰 재발급")
 	public ResponseEntity<ApiResponse<Void>> refresh(
 		@CookieValue(value = "refreshToken", required = false) String refreshToken,
 		HttpServletResponse response
@@ -42,38 +43,31 @@ public class JwtRefreshController {
 		if (refreshToken == null) {
 			throw new GeneralException(ErrorStatus.TOKEN_NOT_FOUND);
 		}
-
 		Map<String, Object> refreshClaim = JwtUtil.validateToken(refreshToken);
 		String email = (String) refreshClaim.get("email");
 		Member member = memberService.getMemberByEmail(email);
 
 		Map<String, Object> claims = Map.of("email", email, "role", member.getRole().name());
 
-		// 2. 새로운 AccessToken과 RefreshToken을 모두 생성 (Refresh Token Rotation)
 		String newAccessToken = JwtUtil.generateToken(claims, 30);
 		String newRefreshToken = JwtUtil.generateToken(claims, 7 * 24 * 60);
-
-		// 3. 새 AccessToken 쿠키 설정
 		ResponseCookie accessCookie = ResponseCookie.from("accessToken", newAccessToken)
 			.httpOnly(true)
-			.secure(false) // 프로덕션에서는 true로 변경
+			.secure(false)
 			.path("/")
-			.maxAge(Duration.ofMinutes(1))
+			.maxAge(Duration.ofMinutes(30))
 			.sameSite("Lax")
 			.build();
 		response.setHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 
-		// 4. 새 RefreshToken 쿠키 설정
 		ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", newRefreshToken)
 			.httpOnly(true)
-			.secure(false) // 프로덕션에서는 true로 변경
+			.secure(false)
 			.path("/")
 			.maxAge(Duration.ofDays(7))
-			.sameSite("Strict")
+			.sameSite("Lax")
 			.build();
 		response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
-
-		// 5. 본문 없이 성공 응답만 반환
 		return ResponseEntity.ok(ApiResponse.onSuccess(null));
 	}
 }
