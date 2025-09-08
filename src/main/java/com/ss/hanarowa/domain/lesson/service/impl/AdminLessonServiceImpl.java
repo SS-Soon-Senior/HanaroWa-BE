@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -142,7 +143,7 @@ public class AdminLessonServiceImpl implements AdminLessonService {
 			.map(MyLesson::getMember)               // 바로 member 추출
 			.map(m -> new LessonMemberResponseDTO(
 				m.getName(),
-				m.getBranch().getName(), // null-safe
+				String.format("%s %s", m.getBranch().getLocation().getName(), m.getBranch().getName()), // null-safe
 				m.getPhoneNumber(),
 				m.getEmail(),
 				m.getBirth()
@@ -202,6 +203,7 @@ public class AdminLessonServiceImpl implements AdminLessonService {
 					.duration(gisu.getDuration())
 					.state(gisu.getLessonState())
 					.build()))
+			.sorted(Comparator.comparing(AdminManageLessonResponseDTO::getId).reversed())
 			.toList();
 	}
 

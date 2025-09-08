@@ -23,7 +23,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 		return memberRepository.findAllByRoleNot(Role.ADMIN).stream()
 			.map(m -> new MemberListResponseDTO(
 				m.getName(),
-				m.getBranch().getName(),
+				String.format("%s %s", m.getBranch().getLocation().getName(), m.getBranch().getName()),
 				m.getPhoneNumber(),
 				m.getEmail(),
 				m.getBirth()
