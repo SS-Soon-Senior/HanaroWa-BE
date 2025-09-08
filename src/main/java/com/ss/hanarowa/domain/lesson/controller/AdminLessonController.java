@@ -42,7 +42,6 @@ public class AdminLessonController {
 	@GetMapping
 	public ResponseEntity<ApiResponse<List<AdminLessonListResponseDTO>>> getAdminAllLessons(){
 		log.debug("[관리자] Controller : 강좌 목록 전체 가져오기");
-		System.out.println("이쪽으로와야함");
 		List<AdminLessonListResponseDTO> list = adminLessonService.getAllLessons();
 		return ResponseEntity.ok(ApiResponse.onSuccess(list));
 	}
@@ -102,7 +101,6 @@ public class AdminLessonController {
 		@Valid @RequestBody UpdateLessonGisuRequestDTO requestDTO) {
 		log.info("[관리자] Controller : 기수 정보 수정 - lessonGisuId: {}, requestDTO: {}", lessonGisuId, requestDTO);
 		LessonGisuDetailResponseDTO result = adminLessonService.updateLessonGisu(lessonGisuId, requestDTO);
-		System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"+ lessonGisuId);
 		return ResponseEntity.ok(ApiResponse.onSuccess(result));
 	}
 
