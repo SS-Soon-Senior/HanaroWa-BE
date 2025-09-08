@@ -28,9 +28,6 @@ public class Advice extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false)
-	private Category category;
-
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "memberId",
 		foreignKey = @ForeignKey(name = "fk_Advice_Member"), nullable = false)

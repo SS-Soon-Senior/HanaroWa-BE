@@ -20,9 +20,7 @@ import com.ss.hanarowa.global.security.JwtUtil;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @RestController
 @RequestMapping("/auth")
 public class JwtRefreshController {

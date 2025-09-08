@@ -1,4 +1,5 @@
 package com.ss.hanarowa.global.config;
+
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;
@@ -26,10 +27,8 @@ import com.ss.hanarowa.global.security.handler.CustomAccessDeniedHandler;
 import com.ss.hanarowa.global.security.handler.CustomSuccessHandler;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
 @Configuration
-@Log4j2
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class CustomSecurityConfig {
@@ -40,7 +39,6 @@ public class CustomSecurityConfig {
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http,
 		CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
-		log.info("--- securityConfig");
 		http
 			// .httpBasic(AbstractHttpConfigurer::disable)
 			.csrf(AbstractHttpConfigurer::disable)

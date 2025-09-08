@@ -2,7 +2,6 @@ package com.ss.hanarowa.domain.member.controller;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -30,10 +29,8 @@ import com.ss.hanarowa.global.exception.GeneralException;
 import com.ss.hanarowa.global.response.code.status.ErrorStatus;
 import com.ss.hanarowa.global.response.ApiResponse;
 import com.ss.hanarowa.global.security.JwtUtil;
-import com.ss.hanarowa.global.security.TokenBlacklistService;
 
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 
@@ -41,9 +38,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-	
-@Slf4j
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -189,12 +184,10 @@ public class AuthController {
 		@CookieValue(name = "refreshToken", required = false) String refreshToken,
 		HttpServletResponse response
 	) {
-		log.info("로그아웃 요청 수신");
 
 		try {
 			memberService.logout(accessToken, refreshToken);
 		} catch (Exception e) {
-			log.error("로그아웃 서비스 처리 중 에러 발생: {}", e.getMessage());
 		}
 
 		ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", "").maxAge(0).path("/").build();

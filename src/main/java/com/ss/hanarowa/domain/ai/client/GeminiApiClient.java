@@ -34,8 +34,6 @@ public class GeminiApiClient {
 	 * @return 생성된 콘텐츠 문자열
 	 */
 	public String generateContent(String prompt) {
-		log.info("Sending prompt to Gemini API...");
-
 		// 1. 요청 DTO 생성
 		GeminiRequestDto requestDto = new GeminiRequestDto(prompt);
 
@@ -47,8 +45,6 @@ public class GeminiApiClient {
 			.retrieve() // 응답을 받아옴
 			.bodyToMono(GeminiResponseDto.class) // 응답 본문을 GeminiResponseDto로 변환
 			.block(); // 비동기 작업이 완료될 때까지 기다림 (동기식으로 변환)
-
-		log.info("Received response from Gemini API.");
 
 		// 3. 응답에서 텍스트를 추출하여 반환
 		if (responseDto == null || responseDto.getGeneratedText().isEmpty()) {
