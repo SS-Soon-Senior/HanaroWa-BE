@@ -26,12 +26,12 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/member")
 @RequiredArgsConstructor
-@Tag(name = "회원", description = "회원 관련 API")
 public class MemberController {
 	private final MemberService memberService;
 
 	@GetMapping
 	@Operation(summary = "멤버 정보 반환")
+	@Tag(name = "[사용자] 회원", description = "회원 관련 API")
 	public ResponseEntity<ApiResponse<MemberInfoResponseDTO>> getInfo (Authentication authentication) {
 		String email =  authentication.getName();
 		Member m = memberService.getMemberByEmail(email);
@@ -42,6 +42,7 @@ public class MemberController {
 
 	@PostMapping("/info")
 	@Operation(summary = "전화번호, 생일등록(회원가입 중)")
+	@Tag(name = "[사용자] 회원", description = "회원 관련 API")
 	public ResponseEntity<ApiResponse<Void>> info(@Valid @RequestBody MemberInfoRequestDTO memberInfoRequestDTO, Authentication authentication) {
 		String email = authentication.getName();
 
@@ -52,6 +53,7 @@ public class MemberController {
 
 	@PatchMapping("/withdraw")
 	@Operation(summary = "회원탈퇴")
+	@Tag(name = "[사용자] 회원", description = "회원 관련 API")
 	public void withDraw(Authentication authentication) {
 		String email = authentication.getName();
 
@@ -60,6 +62,7 @@ public class MemberController {
 
 	@PatchMapping
 	@Operation(summary = "회원 정보 수정(회원가입 후)")
+	@Tag(name = "[사용자] 회원", description = "회원 관련 API")
 	public ResponseEntity<ApiResponse<MemberInfoRequestDTO>> modifyInfo(@Valid @RequestBody MemberInfoRequestDTO memberInfoRequestDTO, Authentication authentication) {
 		String email = authentication.getName();
 
@@ -70,6 +73,7 @@ public class MemberController {
 
 	@PatchMapping("/password")
 	@Operation(summary = "비밀번호 수정")
+	@Tag(name = "[사용자] 회원", description = "회원 관련 API")
 	public ResponseEntity<ApiResponse<String>> modifyPassword(@Valid @RequestBody ModifyPasswdRequestDTO modifyDTO, Authentication authentication) {
 
 		String email = authentication.getName();
@@ -82,7 +86,7 @@ public class MemberController {
 	 */
 	@GetMapping("/branch")
 	@Operation(summary = "자신의 지점 조회 API", description = "로그인한 회원의 지점 정보를 조회합니다.")
-	@Tag(name = "지점", description = "지점 관련 API")
+	@Tag(name = "[사용자] 회원", description = "회원 관련 API")
 	public ResponseEntity<ApiResponse<BranchResponseDTO>> getMyBranch(Authentication authentication) {
 		String email = authentication.getName();
 		BranchResponseDTO branchInfo = memberService.getMemberBranch(email);
@@ -94,7 +98,7 @@ public class MemberController {
 	 */
 	@PostMapping("/branch/{branchId}")
 	@Operation(summary = "지점 선택하기/수정 API", description = "하나로와 내 지점을 선택/수정합니다.")
-	@Tag(name = "지점", description = "지점 관련 API")
+	@Tag(name = "[사용자] 지점", description = "지점 관련 API")
 	public ResponseEntity<ApiResponse<Void>> updateBranch(
 		@PathVariable Long branchId,
 		Authentication authentication) {

@@ -42,6 +42,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Tag(name = "[사용자] 인증", description = "회원가입 및 로그인 관련 API")
 public class AuthController {
 	private final AuthenticationManager authenticationManager;
 	private final MemberService memberService;
@@ -65,21 +66,23 @@ public class AuthController {
 		}
 		member.updateRefreshToken(tokenDto.getRefreshToken());
 
-		// AccessToken 쿠키
-		Cookie accessCookie = new Cookie("accessToken", tokenDto.getAccessToken());
-		accessCookie.setHttpOnly(false);
-		accessCookie.setSecure(false); // 운영 HTTPS면 true
-		accessCookie.setPath("/");
-		accessCookie.setMaxAge(60);
-		response.addCookie(accessCookie);
+		ResponseCookie accessCookie = ResponseCookie.from("accessToken", tokenDto.getAccessToken())
+			.httpOnly(true)
+			.secure(false)
+			.path("/")
+			.maxAge(Duration.ofMinutes(30))
+			.sameSite("Lax")
+			.build();
+		response.setHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 
-		// RefreshToken 쿠키
-		Cookie refreshCookie = new Cookie("refreshToken", tokenDto.getRefreshToken());
-		refreshCookie.setHttpOnly(true);
-		refreshCookie.setSecure(false);
-		refreshCookie.setPath("/");
-		refreshCookie.setMaxAge(7 * 24 * 60 * 60);
-		response.addCookie(refreshCookie);
+		ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokenDto.getRefreshToken())
+			.httpOnly(true)
+			.secure(false)
+			.path("/")
+			.maxAge(Duration.ofDays(7))
+			.sameSite("Lax")
+			.build();
+		response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
 		String redirectUrl = "http://localhost:3000/auth/signup/info";
 		LoginResponseDTO responseDto = LoginResponseDTO.builder()
@@ -96,7 +99,7 @@ public class AuthController {
 	}
 
 	@PostMapping("/signin")
-	@Tag(name = "로그인", description = "사용자 로그인")
+	@Operation(summary = "일반 로그인")
 	@Transactional
 	public ResponseEntity<ApiResponse<LoginResponseDTO>> signin(
 		@RequestBody LoginRequestDTO loginRequest,
@@ -120,20 +123,19 @@ public class AuthController {
 
 			ResponseCookie accessCookie = ResponseCookie.from("accessToken", tokenDto.getAccessToken())
 				.httpOnly(true)
-				.secure(false) // 프로덕션에서는 true로 변경
+				.secure(false)
 				.path("/")
-				.maxAge(Duration.ofMinutes(1))
+				.maxAge(Duration.ofMinutes(30))
 				.sameSite("Lax")
 				.build();
 			response.setHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 
-			// 4. 새 RefreshToken 쿠키 설정
 			ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokenDto.getRefreshToken())
 				.httpOnly(true)
-				.secure(false) // 프로덕션에서는 true로 변경
+				.secure(false)
 				.path("/")
 				.maxAge(Duration.ofDays(7))
-				.sameSite("Strict")
+				.sameSite("Lax")
 				.build();
 			response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
@@ -184,11 +186,7 @@ public class AuthController {
 		@CookieValue(name = "refreshToken", required = false) String refreshToken,
 		HttpServletResponse response
 	) {
-
-		try {
-			memberService.logout(accessToken, refreshToken);
-		} catch (Exception e) {
-		}
+		memberService.logout(accessToken, refreshToken);
 
 		ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", "").maxAge(0).path("/").build();
 		response.setHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
@@ -201,21 +199,18 @@ public class AuthController {
 
 	@GetMapping("/signin/google")
 	@Operation(summary = "Google 소셜 로그인", description = "Google 계정으로 로그인")
-	@Tag(name = "로그인", description = "구글")
 	public void googleLogin(HttpServletResponse response) throws IOException {
 		response.sendRedirect("/oauth2/authorization/google");
 	}
 
 	@GetMapping("/signin/naver")
 	@Operation(summary = "Naver 소셜 로그인", description = "Naver 계정으로 로그인")
-	@Tag(name = "로그인", description = "네이버")
 	public void naverLogin(HttpServletResponse response) throws IOException {
 		response.sendRedirect("/oauth2/authorization/naver");
 	}
 
 	@GetMapping("/signin/kakao")
 	@Operation(summary = "Kakao 소셜 로그인", description = "Kakao 계정으로 로그인")
-	@Tag(name = "로그인", description = "카카오")
 	public void kakaoLogin(HttpServletResponse response) throws IOException {
 		response.sendRedirect("/oauth2/authorization/kakao");
 	}

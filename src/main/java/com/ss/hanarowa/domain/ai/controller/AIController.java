@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/ai")
 @RequiredArgsConstructor
-@Tag(name = "AI 추천", description = "AI 기반 강좌 및 직업 추천 API")
+@Tag(name = "[사용자] AI 추천", description = "AI 기반 강좌 및 직업 추천 API")
 public class AIController {
 
 	private final AIRecService aiRecService;
