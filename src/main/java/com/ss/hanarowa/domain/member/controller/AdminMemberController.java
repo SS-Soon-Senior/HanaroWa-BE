@@ -17,7 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/admin/member")
+@RequestMapping("/api/admin/members")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
 @Tag(name = "[관리자] 회원", description = "관리자 관련 API")
