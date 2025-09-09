@@ -84,7 +84,9 @@ public class AuthController {
 			.build();
 		response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
-		String redirectUrl = "http://localhost:3000/auth/signup/info";
+		//이부분 로컬로 돌릴때는 수정해야함
+		// String redirectUrl = "http://localhost:3000/auth/signup/info";
+		String redirectUrl = "https//topician.com/auth/signup/info";
 		LoginResponseDTO responseDto = LoginResponseDTO.builder()
 			.url(redirectUrl)
 			.tokens(TokenResponseDTO.builder()
@@ -141,13 +143,16 @@ public class AuthController {
 
 			String redirectUrl;
 			if(member.getRole() == Role.ADMIN) {
-				redirectUrl = "http://localhost:3000/admin";
+				// redirectUrl = "http://localhost:3000/admin";
+				redirectUrl = "https://hanarowa.topician.com/admin";
 			}
 			else if(member.getPhoneNumber() == null || member.getBirth() == null) {
-				redirectUrl = "http://localhost:3000/auth/signup/info";
+				// redirectUrl = "http://localhost:3000/auth/signup/info";
+				redirectUrl = "https://hanarowa.topician.com/auth/signup/info";
 			}
 			else {
-				redirectUrl = "http://localhost:3000";
+				// redirectUrl = "http://localhost:3000";
+				redirectUrl = "https://hanarowa.topician.com";
 			}
 
 			BranchResponseDTO branchDto = null;
