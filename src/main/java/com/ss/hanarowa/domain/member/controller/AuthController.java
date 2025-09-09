@@ -40,7 +40,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Tag(name = "[사용자] 인증", description = "회원가입 및 로그인 관련 API")
 public class AuthController {

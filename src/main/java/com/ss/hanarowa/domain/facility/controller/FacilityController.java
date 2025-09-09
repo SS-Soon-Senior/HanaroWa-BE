@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("/facility")
+@RequestMapping("/api/facility")
 @RequiredArgsConstructor
 @Tag(name = "[사용자] 시설", description = "사용자 시설 관련 API")
 public class FacilityController {

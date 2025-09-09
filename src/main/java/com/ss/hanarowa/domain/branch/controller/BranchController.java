@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("/branch")
+@RequestMapping("/api/branch")
 @RequiredArgsConstructor
 @Tag(name = "[사용자] 지점", description = "지점 관련 API")
 public class BranchController {

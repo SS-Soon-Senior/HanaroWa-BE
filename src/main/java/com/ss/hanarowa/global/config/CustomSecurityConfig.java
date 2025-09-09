@@ -48,23 +48,23 @@ public class CustomSecurityConfig {
 			.httpBasic(AbstractHttpConfigurer::disable)
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(
-					"/auth/signup",
-					"/auth/reissue",
-					"/auth/signin",
-					"/auth/signin/**",
-					"/oauth2/**",
-					"/login/**",
+					"/api/auth/signup",
+					"/api/auth/reissue",
+					"/api/auth/signin",
+					"/api/auth/signin/**",
+					"/api/oauth2/**",
+					"/api/login/**",
 					"/favicon.ico",
 					"/actuator/**",
 					"/swagger-ui/**",
-					"/v3/api-docs/**",
+					"/api/v3/api-docs/**",
 					"/hanarowa/api-docs/**",
 					"/v3/api-docs/**",
 					"/broadcast/**",
 					"/swagger.html",
-					"/member/refresh",
-					"/auth/logout",
-					"/branch",
+					"/api/member/refresh",
+					"/api/auth/logout",
+					"/api/branch",
 					"/ws/**"
 				).permitAll()
 				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()

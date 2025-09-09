@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("/admin/facility")
+@RequestMapping("/api/admin/facility")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
 @Tag(name = "[관리자] 시설", description = "관리자 시설 관련 API")

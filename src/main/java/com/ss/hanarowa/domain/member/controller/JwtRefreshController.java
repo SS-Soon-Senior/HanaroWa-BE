@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @Tag(name = "[사용자] 인증", description = "회원가입 및 로그인 관련 API")
 public class JwtRefreshController {
 	private final MemberService memberService;

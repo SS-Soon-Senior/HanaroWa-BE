@@ -17,7 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/ai")
+@RequestMapping("/api/ai")
 @RequiredArgsConstructor
 @Tag(name = "[사용자] AI 추천", description = "AI 기반 강좌 및 직업 추천 API")
 public class AIController {
