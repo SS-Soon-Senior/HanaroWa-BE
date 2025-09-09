@@ -28,15 +28,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private final TokenBlacklistService tokenBlacklistService;
 
 	private static final List<String> PERMIT_ALL_URLS = Arrays.asList(
-		"/auth/signup",
-		"/auth/signin",
-		"/member/refresh",
-		"/oauth2/authorization/kakao",
-		"/oauth2/authorization/google",
-		"/oauth2/authorization/naver",
-		"/login/oauth2/code/kakao",
-		"/login/oauth2/code/google",
-		"/login/oauth2/code/naver"
+		"/api/auth/signup",
+		"/api/auth/signin",
+		"/api/member/refresh",
+		"/api/oauth2/authorization/kakao",
+		"/api/oauth2/authorization/google",
+		"/api/oauth2/authorization/naver",
+		"/api/login/oauth2/code/kakao",
+		"/api/login/oauth2/code/google",
+		"/api/login/oauth2/code/naver"
 	);
 
 	private String getTokenFromCookie(HttpServletRequest request) {
@@ -62,7 +62,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 		String path = request.getRequestURI();
 
-		if (PERMIT_ALL_URLS.contains(path) || path.equals("/auth/reissue")) {
+		if (PERMIT_ALL_URLS.contains(path) || path.equals("/api/auth/reissue")) {
 			filterChain.doFilter(request, response);
 			return;
 		}

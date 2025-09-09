@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 
 @Tag(name="[관리자] 강좌")
 @RestController
-@RequestMapping("/admin/lesson")
+@RequestMapping("/api/admin/lesson")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminLessonController {
