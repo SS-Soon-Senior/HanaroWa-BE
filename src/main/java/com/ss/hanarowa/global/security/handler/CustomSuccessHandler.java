@@ -76,11 +76,14 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
 	private String getRedirectUrl(Member member) {
 		if (member.getRole() == Role.ADMIN) {
-			return "http://localhost:3000/admin";
+			// return "http://localhost:3000/admin";
+			return "https://hanarowa.topician.com/admin";
 		} else if (member.getPhoneNumber() == null || member.getBirth() == null) {
-			return "http://localhost:3000/auth/signup/info";
+			// return "http://localhost:3000/auth/signup/info";
+			return "https://hanarowa.topician.com/auth/signup/info";
 		} else {
-			return "http://localhost:3000";
+			// return "http://localhost:3000";
+			return "https://hanarowa.topician.com";
 		}
 	}
 }
