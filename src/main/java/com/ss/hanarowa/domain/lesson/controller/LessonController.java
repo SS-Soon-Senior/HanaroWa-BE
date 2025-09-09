@@ -40,7 +40,7 @@ import lombok.RequiredArgsConstructor;
 
 @Tag(name="[사용자] 강좌")
 @RestController
-@RequestMapping("/lesson")
+@RequestMapping("/api/lesson")
 @RequiredArgsConstructor
 public class LessonController {
 	private final LessonService lessonService;

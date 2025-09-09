@@ -1,6 +1,7 @@
 package com.ss.hanarowa.domain.member.dto.response;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -19,5 +20,7 @@ public class MemberListResponseDTO {
 	private String phone;
 	private String email;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
-	LocalDate birth;
+	private LocalDate deletedAt;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
+	private LocalDate birth;
 }
