@@ -86,7 +86,7 @@ public class AuthController {
 
 		//이부분 로컬로 돌릴때는 수정해야함
 		// String redirectUrl = "http://localhost:3000/auth/signup/info";
-		String redirectUrl = "https//topician.com/auth/signup/info";
+		String redirectUrl = "https://hanarowa.topician.com/auth/signup/info";
 		LoginResponseDTO responseDto = LoginResponseDTO.builder()
 			.url(redirectUrl)
 			.tokens(TokenResponseDTO.builder()
