@@ -17,13 +17,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/admin/members")
+@RequestMapping("/api/admin")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
 @Tag(name = "[관리자] 회원", description = "관리자 관련 API")
 public class AdminMemberController {
 	private final AdminMemberService adminMemberService;
-	@GetMapping
+	@GetMapping("/members")
 	@Operation(summary ="관리자 회원 목록")
 	public ResponseEntity<ApiResponse<List<MemberListResponseDTO>>> getAdminAllMembers() {
 		List<MemberListResponseDTO> result = adminMemberService.getAllMembers();
