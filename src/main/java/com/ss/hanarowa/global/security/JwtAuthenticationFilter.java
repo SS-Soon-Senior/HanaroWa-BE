@@ -36,7 +36,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		"/api/oauth2/authorization/naver",
 		"/api/login/oauth2/code/kakao",
 		"/api/login/oauth2/code/google",
-		"/api/login/oauth2/code/naver"
+		"/api/login/oauth2/code/naver",
+		"/api/swagger-ui/**",
+		"/api/swagger.html",
+		"/hanarowa/api-docs/**"
 	);
 
 	private String getTokenFromCookie(HttpServletRequest request) {
