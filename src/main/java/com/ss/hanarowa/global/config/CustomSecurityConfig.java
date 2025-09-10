@@ -54,7 +54,7 @@ public class CustomSecurityConfig {
 					"/api/auth/signin/**",
 					"/api/oauth2/**",
 					"/api/login/**",
-					"/favicon.ico",
+					"/favicon.png",
 					"/actuator/**",
 					"/swagger-ui/**",
 					"/api/v3/api-docs/**",
